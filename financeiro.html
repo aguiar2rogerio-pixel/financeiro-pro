@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Controle Financeiro Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkNvbnRyb2xlIEZpbmFuY2Vpcm8gUHJvIiwKICAic2hvcnRfbmFtZSI6ICJGaW5hbmNlcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExMTExIiwKICAidGhlbWV_Y29sb3IiOiAiIzExMTExMSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI0ODkvMjQ4OTcxNS5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+    <meta name="theme-color" content="#111111">
+    <style>
+        body {
+            background-color: #111111;
+            color: #e5e7eb;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .btn-active:active {
+            transform: scale(0.98);
+        }
+        .card-glass {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+    </style>
+</head>
+<body class="p-4 max-w-md mx-auto pb-20">
+
+    <!-- Header / Saldo Acumulado -->
+    <header class="text-center mb-6 pt-4">
+        <h1 class="text-gray-400 text-xs uppercase tracking-widest mb-1">Saldo Acumulado Total</h1>
+        <div id="saldo-total" class="text-5xl font-bold text-green-500">R$ 0,00</div>
+    </header>
+
+    <!-- Resumo do Último Lançamento -->
+    <div id="ultimo-resumo-container" class="hidden mb-6 animate-fade-in">
+        <div class="card-glass rounded-2xl p-4 border border-blue-900/30">
+            <h3 class="text-blue-400 text-[10px] uppercase font-bold mb-2 tracking-wider">Último Lançamento Detalhado</h3>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-gray-800/50 p-2 rounded-lg">
+                    <span class="block text-[9px] text-gray-500 uppercase">Ganho</span>
+                    <span id="last-ganho" class="text-sm font-bold text-green-400">R$ 0</span>
+                </div>
+                <div class="bg-gray-800/50 p-2 rounded-lg">
+                    <span class="block text-[9px] text-gray-500 uppercase">Gastos</span>
+                    <span id="last-gastos" class="text-sm font-bold text-red-400">R$ 0</span>
+                </div>
+                <div class="bg-gray-800/50 p-2 rounded-lg">
+                    <span class="block text-[9px] text-gray-500 uppercase">Reserva</span>
+                    <span id="last-reserva" class="text-sm font-bold text-orange-400">R$ 0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="space-y-4 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-gray-800">
+        <div>
+            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">FATURAMENTO DO DIA (R$)</label>
+            <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-3xl p-5 rounded-2xl border border-gray-700 focus:ring-4 focus:ring-blue-500/20 transition-all">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Gasolina</label>
+                <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Pessoal</label>
+                <input type="number" id="pessoal" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Manutenção</label>
+                <input type="number" id="manutencao" inputmode="decimal" value="15.00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Casa</label>
+                <input type="number" id="reserva" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+            </div>
+        </div>
+
+        <button onclick="salvarLancamento()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
+            Salvar Movimentação
+        </button>
+    </div>
+
+    <!-- Histórico -->
+    <div class="mt-8">
+        <div class="flex justify-between items-end mb-4 px-1">
+            <h2 class="text-lg font-bold text-gray-300">Histórico (7 dias)</h2>
+            <button onclick="limparDados()" class="text-[10px] text-red-500/70 uppercase font-black tracking-tighter border border-red-900/30 px-2 py-1 rounded">Zerar Tudo</button>
+        </div>
+        <div class="overflow-hidden rounded-2xl border border-gray-800 shadow-lg">
+            <table class="w-full text-left border-collapse bg-gray-900/50">
+                <thead>
+                    <tr class="bg-gray-800/80 text-gray-500 text-[10px] uppercase font-black">
+                        <th class="p-4">Data</th>
+                        <th class="p-4">Saldo Dia</th>
+                        <th class="p-4 text-right">Reserva</th>
+                    </tr>
+                </thead>
+                <tbody id="historico-body">
+                    <!-- Inserido via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Inicialização de dados
+        let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
+            saldoAcumulado: 0,
+            historico: []
+        };
+
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function atualizarUI() {
+            // Atualiza Saldo Total
+            const saldoEl = document.getElementById('saldo-total');
+            saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
+            saldoEl.className = `text-5xl font-bold transition-colors duration-500 ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
+
+            // Atualiza Resumo do Último Lançamento
+            const resumoContainer = document.getElementById('ultimo-resumo-container');
+            if (dados.historico.length > 0) {
+                const ultimo = dados.historico[dados.historico.length - 1];
+                resumoContainer.classList.remove('hidden');
+                document.getElementById('last-ganho').innerText = formatarMoeda(ultimo.faturamento);
+                document.getElementById('last-gastos').innerText = formatarMoeda(ultimo.gasolina + ultimo.pessoal + ultimo.manutencao);
+                document.getElementById('last-reserva').innerText = formatarMoeda(ultimo.reserva);
+            } else {
+                resumoContainer.classList.add('hidden');
+            }
+
+            // Atualiza Tabela
+            const tbody = document.getElementById('historico-body');
+            tbody.innerHTML = '';
+
+            const ultimos7 = [...dados.historico].slice(-7).reverse();
+
+            if (ultimos7.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-600 text-sm italic">Nenhum lançamento ainda</td></tr>';
+            }
+
+            ultimos7.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-gray-800/50 text-sm hover:bg-gray-800/20 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-gray-400 font-medium">${item.data}</td>
+                    <td class="p-4 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
+                    <td class="p-4 text-right text-orange-400 font-medium">-${formatarMoeda(item.reserva)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function salvarLancamento() {
+            const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
+            const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
+            const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
+            const manutencao = parseFloat(document.getElementById('manutencao').value) || 0;
+            const reserva = parseFloat(document.getElementById('reserva').value) || 0;
+
+            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && reserva === 0) {
+                alert('Por favor, insira os valores do dia.');
+                return;
+            }
+
+            const saldoDia = faturamento - gasolina - pessoal - manutencao;
+            
+            // Lógica: Saldo_Acumulado = Saldo_Acumulado + Saldo_Dia - Reserva_Casa
+            dados.saldoAcumulado += (saldoDia - reserva);
+
+            const novoLancamento = {
+                data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                faturamento,
+                gasolina,
+                pessoal,
+                manutencao,
+                saldoDia,
+                reserva,
+                timestamp: new Date().getTime()
+            };
+
+            dados.historico.push(novoLancamento);
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+
+            // Limpar campos
+            document.getElementById('faturamento').value = '';
+            document.getElementById('gasolina').value = '';
+            document.getElementById('pessoal').value = '';
+            document.getElementById('reserva').value = '';
+
+            atualizarUI();
+            
+            // Feedback visual
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = '✓ SALVO COM SUCESSO';
+            btn.classList.replace('bg-blue-600', 'bg-green-600');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-green-600', 'bg-blue-600');
+            }, 2000);
+        }
+
+        function limparDados() {
+            if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
+                dados = { saldoAcumulado: 0, historico: [] };
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+
+        // Service Worker Inline
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
+        }
+
+        // Inicializar
+        atualizarUI();
+    </script>
+</body>
+</html>
