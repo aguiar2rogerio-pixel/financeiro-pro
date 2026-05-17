@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <button onclick="salvarLancamento()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
+        <button onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
             Salvar Movimentação
         </button>
     </div>
@@ -105,14 +105,17 @@
                     </tr>
                 </thead>
                 <tbody id="historico-body">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // Inicialização de dados
-        let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
+        // CHAVE DE MEMÓRIA BLINDADA E EXCLUSIVA DESTE APP
+        const MEMORIA_CHAVE = 'dados_financeiro_blindado_v3';
+
+        // Inicialização de dados usando a nova chave segura
+        let dados = JSON.parse(localStorage.getItem(MEMORIA_CHAVE)) || {
             saldoAcumulado: 0,
             historico: []
         };
@@ -122,12 +125,10 @@
         }
 
         function atualizarUI() {
-            // box de saldo total
             const saldoEl = document.getElementById('saldo-total');
             saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
             saldoEl.className = `text-5xl font-bold transition-colors duration-500 ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
 
-            // ultimo lancamento
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
@@ -139,7 +140,6 @@
                 resumoContainer.classList.add('hidden');
             }
 
-            // tabela historico
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
 
@@ -161,7 +161,7 @@
             });
         }
 
-        function salvarLancamento() {
+        function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
             const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
@@ -188,7 +188,7 @@
             };
 
             dados.historico.push(novoLancamento);
-            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
 
             document.getElementById('faturamento').value = '';
             document.getElementById('gasolina').value = '';
@@ -210,17 +210,16 @@
         function limparDados() {
             if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
                 dados = { saldoAcumulado: 0, historico: [] };
-                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
                 atualizarUI();
             }
         }
 
-        // Ativação correta do Service Worker para o seu PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then(reg => console.log('PWA ativo com sucesso!', reg))
-                    .catch(err => console.warn('Erro ao ativar PWA:', err));
+                    .catch(err => console.warn('Erro ao ativo PWA:', err));
             });
         }
 
@@ -228,4 +227,3 @@
     </script>
 </body>
 </html>
-
