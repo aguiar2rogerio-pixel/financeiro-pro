@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkNvbnRyb2xlIEZpbmFuY2Vpcm8gUHJvIiwKICAic2hvcnRfbmFtZSI6ICJGaW5hbmNlcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExMTExIiwKICAidGhlbWV_Y29sb3IiOiAiIzExMTExMSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI0ODkvMjQ4OTcxNS5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+    
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#111111">
+    
     <style>
         body {
             background-color: #111111;
@@ -30,13 +32,11 @@
 </head>
 <body class="p-4 max-w-md mx-auto pb-20">
 
-    <!-- Header / Saldo Acumulado -->
     <header class="text-center mb-6 pt-4">
         <h1 class="text-gray-400 text-xs uppercase tracking-widest mb-1">Saldo Acumulado Total</h1>
         <div id="saldo-total" class="text-5xl font-bold text-green-500">R$ 0,00</div>
     </header>
 
-    <!-- Resumo do Último Lançamento -->
     <div id="ultimo-resumo-container" class="hidden mb-6 animate-fade-in">
         <div class="card-glass rounded-2xl p-4 border border-blue-900/30">
             <h3 class="text-blue-400 text-[10px] uppercase font-bold mb-2 tracking-wider">Último Lançamento Detalhado</h3>
@@ -57,7 +57,6 @@
         </div>
     </div>
 
-    <!-- Form -->
     <div class="space-y-4 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-gray-800">
         <div>
             <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">FATURAMENTO DO DIA (R$)</label>
@@ -91,7 +90,6 @@
         </button>
     </div>
 
-    <!-- Histórico -->
     <div class="mt-8">
         <div class="flex justify-between items-end mb-4 px-1">
             <h2 class="text-lg font-bold text-gray-300">Histórico (7 dias)</h2>
@@ -107,8 +105,7 @@
                     </tr>
                 </thead>
                 <tbody id="historico-body">
-                    <!-- Inserido via JS -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
@@ -125,12 +122,12 @@
         }
 
         function atualizarUI() {
-            // Atualiza Saldo Total
+            // box de saldo total
             const saldoEl = document.getElementById('saldo-total');
             saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
             saldoEl.className = `text-5xl font-bold transition-colors duration-500 ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
 
-            // Atualiza Resumo do Último Lançamento
+            // ultimo lancamento
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
@@ -142,7 +139,7 @@
                 resumoContainer.classList.add('hidden');
             }
 
-            // Atualiza Tabela
+            // tabela historico
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
 
@@ -177,8 +174,6 @@
             }
 
             const saldoDia = faturamento - gasolina - pessoal - manutencao;
-            
-            // Lógica: Saldo_Acumulado = Saldo_Acumulado + Saldo_Dia - Reserva_Casa
             dados.saldoAcumulado += (saldoDia - reserva);
 
             const novoLancamento = {
@@ -195,7 +190,6 @@
             dados.historico.push(novoLancamento);
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
-            // Limpar campos
             document.getElementById('faturamento').value = '';
             document.getElementById('gasolina').value = '';
             document.getElementById('pessoal').value = '';
@@ -203,7 +197,6 @@
 
             atualizarUI();
             
-            // Feedback visual
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = '✓ SALVO COM SUCESSO';
@@ -222,20 +215,17 @@
             }
         }
 
-        // Service Worker Inline
+        // Ativação correta do Service Worker para o seu PWA
         if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl);
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA ativo com sucesso!', reg))
+                    .catch(err => console.warn('Erro ao ativar PWA:', err));
+            });
         }
 
-        // Inicializar
         atualizarUI();
     </script>
 </body>
 </html>
+
