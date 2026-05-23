@@ -94,24 +94,14 @@
             <button onclick="limparDados()" class="text-[10px] text-red-500/70 uppercase font-black tracking-tighter border border-red-900/30 px-2 py-1 rounded">Zerar Tudo</button>
         </div>
 
-        <div class="flex gap-2 mb-4">
-            <button onclick="exportarBackup()" class="flex-1 text-[11px] text-blue-400 uppercase font-black tracking-wider border border-blue-900/50 bg-blue-950/20 px-2 py-2.5 rounded-xl btn-active">
-                💾 Backup
-            </button>
-            <button onclick="document.getElementById('importar-backup').click()" class="flex-1 text-[11px] text-green-400 uppercase font-black tracking-wider border border-green-900/50 bg-green-950/20 px-2 py-2.5 rounded-xl btn-active">
-                🔄 Restaurar
-            </button>
-        </div>
-        <input type="file" id="importar-backup" accept=".txt" style="display:none">
-
         <div class="overflow-hidden rounded-2xl border border-gray-800 shadow-lg">
             <table class="w-full text-left border-collapse bg-gray-900/50 table-fixed">
                 <thead>
                     <tr class="bg-gray-800/80 text-gray-500 text-[10px] uppercase font-black">
-                        <th class="p-3 w-[22%]">Data</th>
-                        <th class="p-3 w-[30%]">Saldo Dia</th>
-                        <th class="p-3 w-[30%] text-right">Reserva</th>
-                        <th class="p-3 w-[18%] text-center">Ações</th>
+                        <th class="p-3 w-[25%]">Data</th>
+                        <th class="p-3 w-[35%]">Saldo Dia</th>
+                        <th class="p-3 w-[25%] text-right">Reserva</th>
+                        <th class="p-3 w-[15%] text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody id="historico-body">
@@ -121,7 +111,7 @@
     </div>
 
     <script>
-        // Chave de memória original restaurada
+        // CHAVE ORIGINAL DO SEU SITE QUE FUNCIONA
         const MEMORIA_CHAVE = 'financeiro_pro';
 
         let dados = JSON.parse(localStorage.getItem(MEMORIA_CHAVE)) || {
@@ -155,28 +145,19 @@
             const ultimos7 = [...dados.historico].slice(-7).reverse();
 
             if (ultimos7.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="p-8 text-center text-gray-600 text-sm italic">
-                            Nenhum lançamento ainda
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-600 text-sm italic">Nenhum lançamento ainda</td></tr>';
+                return;
             }
 
             ultimos7.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800/50 text-xs hover:bg-gray-800/20 transition-colors';
                 
-                // Removido o sinal de menos (-) e deixado apenas o botão de Editar (✏️) para dar espaço total
+                // IGUAL AO SEU ORIGINAL: Mas sem o sinal de menos (-) e sem a lixeira de excluir
                 tr.innerHTML = `
                     <td class="p-3 text-gray-400 font-medium">${item.data}</td>
-                    <td class="p-3 font-bold truncate ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">
-                        ${formatarMoeda(item.saldoDia)}
-                    </td>
-                    <td class="p-3 text-right text-orange-400 font-medium">
-                        ${formatarMoeda(item.reserva)}
-                    </td>
+                    <td class="p-3 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
+                    <td class="p-3 text-right text-orange-400 font-medium">${formatarMoeda(item.reserva)}</td>
                     <td class="p-3 text-center">
                         <button onclick="editarLancamento(${item.timestamp})" class="text-blue-400 p-1 active:scale-90 transition-transform">✏️</button>
                     </td>
@@ -240,89 +221,4 @@
 
             document.getElementById('faturamento').value = item.faturamento;
             document.getElementById('gasolina').value = item.gasolina;
-            document.getElementById('pessoal').value = item.pessoal;
-            document.getElementById('manutencao').value = item.manutencao;
-            document.getElementById('reserva').value = item.reserva;
-
-            dados.historico.splice(index, 1);
-            localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
-            atualizarUI();
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function limparDados() {
-            if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
-                dados = { saldoAcumulado: 0, historico: [] };
-                localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
-                atualizarUI();
-            }
-        }
-
-        function exportarBackup() {
-            try {
-                const jsonStr = JSON.stringify(dados);
-                const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
-                const blob = new Blob([base64Data], { type: 'text/plain;charset=utf-8' });
-                const hoje = new Date().toISOString().split('T')[0];
-                const nomeArquivo = `backup_financeiro_${hoje}.txt`;
-
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = nomeArquivo;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (erro) {
-                console.error(erro);
-                alert('Erro ao gerar backup');
-            }
-        }
-
-        const inputImportar = document.getElementById('importar-backup');
-        inputImportar.addEventListener('change', (evento) => {
-            const arquivo = evento.target.files[0];
-            if (!arquivo) return;
-
-            const leitor = new FileReader();
-            leitor.onload = (e) => {
-                try {
-                    const conteudo = e.target.result.trim();
-                    const jsonStr = decodeURIComponent(escape(atob(conteudo)));
-                    const dadosRestaurados = JSON.parse(jsonStr);
-
-                    if (dadosRestaurados && typeof dadosRestaurados === 'object' && 'saldoAcumulado' in dadosRestaurados && 'historico' in dadosRestaurados) {
-                        if (confirm('Deseja restaurar este backup?')) {
-                            dados = dadosRestaurados;
-                            localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
-                            atualizarUI();
-                            alert('Backup restaurado com sucesso!');
-                        }
-                    } else {
-                        throw new Error('Estrutura inválida');
-                    }
-                } catch (erro) {
-                    console.error(erro);
-                    alert('Erro ao restaurar backup');
-                }
-                inputImportar.value = '';
-            };
-            leitor.readAsText(arquivo);
-        });
-
-        // Service Worker original reestabelecido exatamente como estava
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl);
-        }
-
-        atualizarUI();
-    </script>
-</body>
-</html>
+            document.getElementById('pessoal').
