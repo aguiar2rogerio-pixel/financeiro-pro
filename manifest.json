@@ -1,7 +1,13 @@
 {
+  "id": "/index.html",
   "short_name": "Financeiro",
   "name": "Meu Controle Financeiro",
   "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2454/2454261.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2454/2454261.png",
       "type": "image/png",
