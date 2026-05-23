@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkNvbnRyb2xlIEZpbmFuY2Vpcm8gUHJvIiwKICAic2hvcnRfbmFtZSI6ICJGaW5hbmNlcyIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMTExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTExMTEiLAogICJpY29ucyI6IFsKICAgIFYgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI0ODkvMjQ4OTcxNS5wbmciLAogICAgICAic2l6ZXMiOiAiRefyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICAldQp9">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#111111">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Controle%20Financeiro%20Pro%22,%22short_name%22:%22Finances%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23111111%22,%22theme_color%22:%22%23111111%22}">
+
     <style>
         body {
             background-color: #111111;
@@ -28,7 +33,7 @@
         }
     </style>
 </head>
-<body class="p-4 max-w-md mx-auto pb-20">
+<body class="p-4 max-w-md mx-auto pb-24">
 
     <header class="text-center mb-6 pt-4">
         <h1 class="text-gray-400 text-xs uppercase tracking-widest mb-1">Saldo Acumulado Total</h1>
@@ -88,16 +93,6 @@
         </button>
     </div>
 
-    <div class="mt-6 grid grid-cols-2 gap-3">
-        <button onclick="fazerBackup()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold py-3 px-4 rounded-xl border border-gray-700 transition-all flex items-center justify-center gap-2 uppercase tracking-wider">
-            💾 Baixar Backup
-        </button>
-        <label class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold py-3 px-4 rounded-xl border border-gray-700 transition-all flex items-center justify-center gap-2 uppercase tracking-wider cursor-pointer text-center">
-            🔄 Restaurar
-            <input type="file" id="arquivo-backup" accept=".txt" onchange="restaurarBackup(event)" class="hidden">
-        </label>
-    </div>
-
     <div class="mt-8">
         <div class="flex justify-between items-end mb-4 px-1">
             <h2 class="text-lg font-bold text-gray-300">Histórico (7 dias)</h2>
@@ -118,8 +113,18 @@
         </div>
     </div>
 
+    <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-gray-900/90 backdrop-blur border-t border-gray-800 p-3 grid grid-cols-2 gap-3 z-5xl">
+        <button onclick="exportarBackup()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-4 rounded-xl text-xs uppercase transition-all flex items-center justify-center gap-1">
+            📦 Salvar Backup
+        </button>
+        <label class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-4 rounded-xl text-xs uppercase transition-all flex items-center justify-center gap-1 cursor-pointer text-center">
+            📥 Ler Backup
+            <input type="file" id="importFile" accept=".txt" onchange="importarBackup(event)" class="hidden">
+        </label>
+    </footer>
+
     <script>
-        // Inicialização de dados
+        // Inicialização de dados coerente com o localStorage
         let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
             saldoAcumulado: 0,
             historico: []
@@ -220,33 +225,30 @@
             }
         }
 
-        // --- FUNÇÕES DE BACKUP ---
-        function fazerBackup() {
+        // --- SISTEMA DE BACKUP BLINDADO ---
+        function exportarBackup() {
             if (dados.historico.length === 0 && dados.saldoAcumulado === 0) {
-                alert('Não há dados para exportar ainda.');
+                alert('Não existem dados para exportar.');
                 return;
             }
-            const textoCriptografado = btoa(unescape(encodeURIComponent(JSON.stringify(dados))));
-            const blob = new Blob([textoCriptografado], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `backup_financas_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.txt`;
-            link.click();
-            URL.revokeObjectURL(link.href);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+            const downloadAnchor = document.createElement('a');
+            const dataAtual = new Date().toISOString().slice(0,10);
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `backup_financeiro_${dataAtual}.txt`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
 
-        function restaurarBackup(event) {
-            const arquivo = event.target.files[0];
-            if (!arquivo) return;
-
-            const leitor = new FileReader();
-            leitor.onload = function(e) {
+        function importarBackup(event) {
+            const input = event.target;
+            const reader = new FileReader();
+            reader.onload = function() {
                 try {
-                    const conteudoDecodificado = decodeURIComponent(escape(atob(e.target.result)));
-                    const dadosImportados = JSON.parse(conteudoDecodificado);
-                    
+                    const dadosImportados = JSON.parse(reader.result);
                     if (dadosImportados && typeof dadosImportados.saldoAcumulado === 'number' && Array.isArray(dadosImportados.historico)) {
-                        if (confirm('Deseja substituir os dados atuais por este backup? Esta ação não pode ser desfeita.')) {
+                        if (confirm('Deseja substituir as movimentações atuais pelos dados do arquivo de backup?')) {
                             dados = dadosImportados;
                             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                             atualizarUI();
@@ -255,23 +257,29 @@
                     } else {
                         alert('Arquivo de backup inválido.');
                     }
-                } catch (err) {
-                    alert('Erro ao ler o arquivo. Certifique-se de escolher o arquivo .txt gerado pelo app.');
+                } catch (e) {
+                    alert('Erro ao processar o arquivo de backup.');
                 }
-                document.getElementById('arquivo-backup').value = ''; // reseta o input
+                input.value = ''; // Limpa o input
             };
-            leitor.readAsText(arquivo);
+            if (input.files.length > 0) {
+                reader.readAsText(input.files[0]);
+            }
         }
 
-        // Registro do Service Worker
+        // Service Worker Inline
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Pronto para instalar!'))
-                    .catch(err => console.log('Erro:', err));
-            });
+            const swCode = `
+                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
         }
 
+        // Inicializar a tela
         atualizarUI();
     </script>
 </body>
