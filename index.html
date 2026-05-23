@@ -78,7 +78,7 @@
                 <input type="number" id="manutencao" inputmode="decimal" value="15.00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Caixa</label>
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Casa</label>
                 <input type="number" id="reserva" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
         </div>
@@ -96,6 +96,17 @@
             </div>
             <button onclick="limparDados()" class="text-[10px] text-red-500/70 uppercase font-black tracking-tighter border border-red-900/30 px-2 py-1 rounded">Zerar Tudo</button>
         </div>
+
+        <div class="flex gap-2 mb-4">
+            <button onclick="exportarBackup()" class="flex-1 text-[11px] text-blue-400 uppercase font-black tracking-wider border border-blue-900/50 bg-blue-950/20 px-2 py-2.5 rounded-xl btn-active">
+                💾 Backup
+            </button>
+            <button onclick="document.getElementById('importar-backup').click()" class="flex-1 text-[11px] text-green-400 uppercase font-black tracking-wider border border-green-900/50 bg-green-950/20 px-2 py-2.5 rounded-xl btn-active">
+                🔄 Restaurar
+            </button>
+        </div>
+        <input type="file" id="importar-backup" accept=".txt" style="display:none">
+
         <div class="overflow-hidden rounded-2xl border border-gray-800 shadow-lg">
             <table class="w-full text-left border-collapse bg-gray-900/50 table-fixed">
                 <thead>
@@ -135,14 +146,12 @@
     </div>
 
     <script>
-        // Chave sincronizada mantendo compatibilidade direta
         const CHAVE_LOCAL = 'financeiro_pro';
         let dados = JSON.parse(localStorage.getItem(CHAVE_LOCAL)) || {
             saldoAcumulado: 0,
             historico: []
         };
 
-        // Guarda o timestamp do item clicado para sabermos quem editar/excluir
         let timestampSelecionado = null;
 
         function formatarMoeda(valor) {
@@ -177,17 +186,15 @@
 
             ultimos7.forEach(item => {
                 const tr = document.createElement('tr');
-                // Cursor pointer e active background dão a sensação de botão ao tocar na linha
                 tr.className = 'border-t border-gray-800/50 text-sm hover:bg-gray-800/30 active:bg-gray-800/50 cursor-pointer transition-colors';
                 tr.setAttribute('onclick', `abrirModal(${item.timestamp})`);
                 
-                // Exibição limpa: Retirado o sinal de menos (-) da reserva para dar leitura perfeita
+                tbody.appendChild(tr);
                 tr.innerHTML = `
                     <td class="p-4 text-gray-400 font-medium">${item.data}</td>
                     <td class="p-4 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
                     <td class="p-4 text-right text-orange-400 font-medium">${formatarMoeda(item.reserva)}</td>
                 `;
-                tbody.appendChild(tr);
             });
         }
 
@@ -197,131 +204,3 @@
 
             timestampSelecionado = timestamp;
             document.getElementById('modal-data').innerText = `Dia ${item.data}`;
-            document.getElementById('modal-faturamento-valor').innerText = formatarMoeda(item.faturamento);
-            document.getElementById('modal-acoes').classList.remove('hidden');
-        }
-
-        function fecharModal() {
-            document.getElementById('modal-acoes').classList.add('hidden');
-            timestampSelecionado = null;
-        }
-
-        function executarAcaoModal(acao) {
-            if (!timestampSelecionado) return;
-            
-            const t = timestampSelecionado;
-            fecharModal(); // Fecha antes para dar fluidez
-
-            if (acao === 'editar') {
-                editarLancamento(t);
-            } else if (acao === 'excluir') {
-                excluirLancamento(t);
-            }
-        }
-
-        function salvarLancamento(event) {
-            const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
-            const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
-            const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
-            const manutencao = parseFloat(document.getElementById('manutencao').value) || 0;
-            const reserva = parseFloat(document.getElementById('reserva').value) || 0;
-
-            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && reserva === 0) {
-                alert('Por favor, insira os valores do dia.');
-                return;
-            }
-
-            const saldoDia = faturamento - gasolina - pessoal - manutencao;
-            dados.saldoAcumulado += (saldoDia - reserva);
-
-            const novoLancamento = {
-                data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-                faturamento,
-                gasolina,
-                pessoal,
-                manutencao,
-                saldoDia,
-                reserva,
-                timestamp: new Date().getTime()
-            };
-
-            dados.historico.push(novoLancamento);
-            localStorage.setItem(CHAVE_LOCAL, JSON.stringify(dados));
-
-            document.getElementById('faturamento').value = '';
-            document.getElementById('gasolina').value = '';
-            document.getElementById('pessoal').value = '';
-            document.getElementById('reserva').value = '';
-
-            atualizarUI();
-            
-            if (event && event.target) {
-                const btn = event.target;
-                const originalText = btn.innerText;
-                btn.innerText = '✓ SALVO COM SUCESSO';
-                btn.classList.replace('bg-blue-600', 'bg-green-600');
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.classList.replace('bg-green-600', 'bg-blue-600');
-                }, 2000);
-            }
-        }
-
-        function editarLancamento(timestamp) {
-            const index = dados.historico.findIndex(item => item.timestamp === timestamp);
-            if (index === -1) return;
-
-            const item = dados.historico[index];
-            dados.saldoAcumulado -= (item.saldoDia - item.reserva);
-
-            document.getElementById('faturamento').value = item.faturamento || '';
-            document.getElementById('gasolina').value = item.gasolina || '';
-            document.getElementById('pessoal').value = item.pessoal || '';
-            document.getElementById('manutencao').value = item.manutencao;
-            document.getElementById('reserva').value = item.reserva || '';
-
-            dados.historico.splice(index, 1);
-            localStorage.setItem(CHAVE_LOCAL, JSON.stringify(dados));
-            atualizarUI();
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function excluirLancamento(timestamp) {
-            if (!confirm('Deseja excluir este lançamento? O saldo geral será recalculado.')) return;
-
-            const index = dados.historico.findIndex(item => item.timestamp === timestamp);
-            if (index === -1) return;
-
-            const item = dados.historico[index];
-            dados.saldoAcumulado -= (item.saldoDia - item.reserva);
-
-            dados.historico.splice(index, 1);
-            localStorage.setItem(CHAVE_LOCAL, JSON.stringify(dados));
-            atualizarUI();
-        }
-
-        function limparDados() {
-            if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
-                dados = { saldoAcumulado: 0, historico: [] };
-                localStorage.setItem(CHAVE_LOCAL, JSON.stringify(dados));
-                atualizarUI();
-            }
-        }
-
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(() => {});
-        }
-
-        atualizarUI();
-    </script>
-</body>
-</html>
-
