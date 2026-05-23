@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +7,7 @@
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJpZCI6Ii9pbmRleC5odG1sIiwKICAic2hvcnRfbmFtZSI6ICJGaW5hbmNlaXJvIiwKICAibmFtZSI6ICJNZXUgQ29udHJvbGUgRmluYW5jZWlybyIsCiAgInN0YXJ0X3VybCI6ICIuL2luZGV4Lmh0bWwiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYjBmMTkiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICtcInRoZW1lX2NvbG9yIjogIiMwYjBmMTkiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDU0LzI0NTQyNjEubHBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF1dfQ==">
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJpZCI6ICIvaW5kZXguaHRtbCIsCiAgIm5hbWUiOiAiQ29udHJvbGUgRmluYW5jZWlybyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZpbmFuY2FzIiwKICAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMTExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTExMTEiLAogICpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDg5LzI0ODk3MTUucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAg  fSwKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDg5LzI0ODk3MTUucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
     
     <meta name="theme-color" content="#111111">
     <style>
@@ -59,18 +60,19 @@
 
     <div class="space-y-4 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-gray-800">
         <div>
-            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">FATURAMENTO DO DIA (R$)</label>
-            <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-3xl p-5 rounded-2xl border border-gray-700 focus:ring-4 focus:ring-blue-500/20 transition-all">
+            <!-- Texto muda dinamicamente para avisar se está editando -->
+            <label id="label-faturamento" class="block text-xs font-bold text-gray-500 mb-1 ml-1 uppercase">Faturamento do Dia (R$)</label>
+            <input type="number" id="faturamento" inputmode="decimal" placeholder="0.00" class="w-full bg-gray-800 text-white text-3xl p-5 rounded-2xl border border-gray-700 focus:ring-4 focus:ring-blue-500/20 transition-all">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Gasolina</label>
-                <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <input type="number" id="gasolina" inputmode="decimal" placeholder="0.00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Pessoal</label>
-                <input type="number" id="pessoal" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <input type="number" id="pessoal" inputmode="decimal" placeholder="0.00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
         </div>
 
@@ -81,11 +83,11 @@
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Caixa</label>
-                <input type="number" id="reserva" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <input type="number" id="reserva" inputmode="decimal" placeholder="0.00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
         </div>
 
-        <button onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
+        <button id="btn-salvar" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
             Salvar Movimentação
         </button>
     </div>
@@ -114,6 +116,9 @@
 
     <script>
         const MEMORIA_CHAVE = 'financeiro_pro';
+
+        // Variável de controle: armazena o timestamp do item que está sendo editado (null se for um novo)
+        let idEmEdicao = null;
 
         let dados = JSON.parse(localStorage.getItem(MEMORIA_CHAVE)) || {
             saldoAcumulado: 0,
@@ -154,12 +159,17 @@
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800/50 text-xs hover:bg-gray-800/20 transition-colors';
                 
+                // Destaca visualmente a linha que está sendo editada no momento
+                if (idEmEdicao === item.timestamp) {
+                    tr.className += ' bg-blue-950/40 border-l-4 border-blue-500';
+                }
+
                 tr.innerHTML = `
                     <td class="p-3 text-gray-400 font-medium">${item.data}</td>
                     <td class="p-3 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
                     <td class="p-3 text-right text-orange-400 font-medium">${formatarMoeda(item.reserva)}</td>
                     <td class="p-3 text-center">
-                        <button onclick="editarLancamento(${item.timestamp})" class="text-blue-400 p-1 active:scale-90 transition-transform">✏️</button>
+                        <button onclick="editarLancamento(${item.timestamp})" class="text-blue-400 p-1 active:scale-90 transition-transform">${idEmEdicao === item.timestamp ? '👀' : '✏️'}</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -179,26 +189,59 @@
             }
 
             const saldoDia = faturamento - gasolina - pessoal - manutencao;
+
+            if (idEmEdicao !== null) {
+                // MODO EDIÇÃO: Encontra o item antigo no histórico para remover o impacto dele do saldo acumulado antes de aplicar o novo valor
+                const index = dados.historico.findIndex(item => item.timestamp === idEmEdicao);
+                if (index !== -1) {
+                    const itemAntigo = dados.historico[index];
+                    // Reverte o cálculo antigo do saldo acumulado
+                    dados.saldoAcumulado -= (itemAntigo.saldoDia - itemAntigo.reserva);
+                    
+                    // Substitui os dados mantendo o mesmo timestamp e data original
+                    dados.historico[index] = {
+                        ...itemAntigo,
+                        faturamento,
+                        gasolina,
+                        pessoal,
+                        manutencao,
+                        saldoDia,
+                        reserva
+                    };
+                }
+                idEmEdicao = null; // Desmarca o modo edição
+            } else {
+                // MODO NOVO LANÇAMENTO: Apenas empurra para o array
+                const novoLancamento = {
+                    data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                    faturamento,
+                    gasolina,
+                    pessoal,
+                    manutencao,
+                    saldoDia,
+                    reserva,
+                    timestamp: new Date().getTime()
+                };
+                dados.historico.push(novoLancamento);
+            }
+
+            // Aplica o novo valor atualizado/criado ao saldo acumulado
             dados.saldoAcumulado += (saldoDia - reserva);
-
-            const novoLancamento = {
-                data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-                faturamento,
-                gasolina,
-                pessoal,
-                manutencao,
-                saldoDia,
-                reserva,
-                timestamp: new Date().getTime()
-            };
-
-            dados.historico.push(novoLancamento);
+            
+            // Salva no LocalStorage
             localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
 
+            // Reseta os inputs limpando e voltando a manutenção pro padrão
             document.getElementById('faturamento').value = '';
             document.getElementById('gasolina').value = '';
             document.getElementById('pessoal').value = '';
+            document.getElementById('manutencao').value = '15.00';
             document.getElementById('reserva').value = '';
+
+            // Restaura textos originais dos botões/labels
+            document.getElementById('btn-salvar').innerText = 'Salvar Movimentação';
+            document.getElementById('label-faturamento').innerText = 'Faturamento do Dia (R$)';
+            document.getElementById('label-faturamento').classList.remove('text-blue-400');
 
             atualizarUI();
 
@@ -213,20 +256,24 @@
         }
 
         function editarLancamento(timestamp) {
-            const index = dados.historico.findIndex(item => item.timestamp === timestamp);
-            if (index === -1) return;
+            const item = dados.historico.find(item => item.timestamp === timestamp);
+            if (!item) return;
 
-            const item = dados.historico[index];
-            dados.saldoAcumulado -= (item.saldoDia - item.reserva);
+            // Define qual ID está em edição no momento
+            idEmEdicao = timestamp;
 
+            // Alimenta os inputs com as informações gravadas
             document.getElementById('faturamento').value = item.faturamento;
             document.getElementById('gasolina').value = item.gasolina;
             document.getElementById('pessoal').value = item.pessoal;
             document.getElementById('manutencao').value = item.manutencao;
             document.getElementById('reserva').value = item.reserva;
 
-            dados.historico.splice(index, 1);
-            localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
+            // Avisa o usuário na interface que ele mudou de modo
+            document.getElementById('btn-salvar').innerText = 'Atualizar Registro';
+            document.getElementById('label-faturamento').innerText = `Editando Lançamento (${item.data})`;
+            document.getElementById('label-faturamento').className += ' text-blue-400';
+
             atualizarUI();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -235,33 +282,26 @@
         function limparDados() {
             if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
                 dados = { saldoAcumulado: 0, historico: [] };
+                idEmEdicao = null;
                 localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
                 atualizarUI();
             }
         }
 
-        // SERVICE WORKER INLINE: Igual ao exemplo que você mandou, mantendo o arquivo único
+        // Service Worker original preservado
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'financeiro-v3';
-                const ASSETS = [
-                    './',
-                    './index.html'
-                ];
-
+                const CACHE_NAME = 'financeiro-v4';
+                const ASSETS = ['./', './index.html'];
                 self.addEventListener('install', (e) => {
                     self.skipWaiting();
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
                 });
-
                 self.addEventListener('activate', (e) => {
                     e.waitUntil(self.clients.claim());
                 });
-
                 self.addEventListener('fetch', (e) => {
-                    e.respondWith(
-                        caches.match(e.request).then(response => response || fetch(e.request))
-                    );
+                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
                 });
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
