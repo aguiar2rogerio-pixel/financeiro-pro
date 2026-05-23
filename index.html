@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkNvbnRyb2xlIEZpbmFuY2Vpcm8gUHJvIiwKICAic2hvcnRfbmFtZSI6ICJGaW5hbmNlcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTExMTExIiwKICAidGhlbWV_Y29sb3IiOiAiIzExMTExMSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI0ODkvMjQ4OTcxNS5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+    <!-- O seu manifesto original embutido, apenas com a correção do texto interno -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJpZCI6ICIvaW5kZXguaHRtbCIsCiAgIm5hbWUiOiAiQ29udHJvbGUgRmluYW5jZWlybyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZpbmFuY2FzIiwKICAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMTExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTExMTEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDg5LzI0ODk3MTUucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9LAogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI0ODkvMjQ4OTcxNS5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
     <meta name="theme-color" content="#111111">
     <style>
         body {
@@ -105,13 +106,12 @@
                     </tr>
                 </thead>
                 <tbody id="historico-body">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // CHAVE ORIGINAL DO SEU SITE QUE FUNCIONA
         const MEMORIA_CHAVE = 'financeiro_pro';
 
         let dados = JSON.parse(localStorage.getItem(MEMORIA_CHAVE)) || {
@@ -153,7 +153,6 @@
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800/50 text-xs hover:bg-gray-800/20 transition-colors';
                 
-                // IGUAL AO SEU ORIGINAL: Mas sem o sinal de menos (-) e sem a lixeira de excluir
                 tr.innerHTML = `
                     <td class="p-3 text-gray-400 font-medium">${item.data}</td>
                     <td class="p-3 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
@@ -240,7 +239,7 @@
             }
         }
 
-        // SERVICE WORKER ORIGINAL DO SEU SITE QUE VOCÊ COLOCOU NO SW.JS EXTERNO
+        // Registro simplificado do Service Worker
         if ('serviceWorker' in navigator) {
             window.navigator.serviceWorker.register('./sw.js').catch(err => console.warn(err));
         }
