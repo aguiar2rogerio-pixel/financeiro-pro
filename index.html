@@ -7,7 +7,7 @@
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJpZCI6ICIvaW5kZXguaHRtbCIsCiAgIm5hbWUiOiAiQ29udHJvbGUgRmluYW5jZWlybyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZpbmFuY2FzIiwKICAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMTExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTExMTEiLAogICpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDg5LzI0ODk3MTUucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAg  fSwKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDg5LzI0ODk3MTUucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
+    <link rel="manifest" href="data:application/json;base64,ewogICJpZCI6ICIvaW5kZXguaHRtbCIsCiAgIm5hbWUiOiAiQ29udHJvbGUgRmluYW5jZWlybyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZpbmFuY2FzIiwKICAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMTExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTExMTEiLAogICNpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb20uY29tLzUxMi8yNDg5LzI0ODk3MTUucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9LAogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbS5jb20vNTEyLzI0ODkvMjQ4OTcxNS5wbmciLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIKICAgIH0KICBdCn0=">
     
     <meta name="theme-color" content="#111111">
     <style>
@@ -60,8 +60,7 @@
 
     <div class="space-y-4 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-gray-800">
         <div>
-            <!-- Texto muda dinamicamente para avisar se está editando -->
-            <label id="label-faturamento" class="block text-xs font-bold text-gray-500 mb-1 ml-1 uppercase">Faturamento do Dia (R$)</label>
+            <label id="label-faturamento" class="block text-xs font-bold text-gray-500 mb-1 ml-1 uppercase">FATURAMENTO DO DIA (R$)</label>
             <input type="number" id="faturamento" inputmode="decimal" placeholder="0.00" class="w-full bg-gray-800 text-white text-3xl p-5 rounded-2xl border border-gray-700 focus:ring-4 focus:ring-blue-500/20 transition-all">
         </div>
 
@@ -116,8 +115,6 @@
 
     <script>
         const MEMORIA_CHAVE = 'financeiro_pro';
-
-        // Variável de controle: armazena o timestamp do item que está sendo editado (null se for um novo)
         let idEmEdicao = null;
 
         let dados = JSON.parse(localStorage.getItem(MEMORIA_CHAVE)) || {
@@ -159,7 +156,6 @@
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800/50 text-xs hover:bg-gray-800/20 transition-colors';
                 
-                // Destaca visualmente a linha que está sendo editada no momento
                 if (idEmEdicao === item.timestamp) {
                     tr.className += ' bg-blue-950/40 border-l-4 border-blue-500';
                 }
@@ -191,14 +187,11 @@
             const saldoDia = faturamento - gasolina - pessoal - manutencao;
 
             if (idEmEdicao !== null) {
-                // MODO EDIÇÃO: Encontra o item antigo no histórico para remover o impacto dele do saldo acumulado antes de aplicar o novo valor
                 const index = dados.historico.findIndex(item => item.timestamp === idEmEdicao);
                 if (index !== -1) {
                     const itemAntigo = dados.historico[index];
-                    // Reverte o cálculo antigo do saldo acumulado
                     dados.saldoAcumulado -= (itemAntigo.saldoDia - itemAntigo.reserva);
                     
-                    // Substitui os dados mantendo o mesmo timestamp e data original
                     dados.historico[index] = {
                         ...itemAntigo,
                         faturamento,
@@ -209,9 +202,8 @@
                         reserva
                     };
                 }
-                idEmEdicao = null; // Desmarca o modo edição
+                idEmEdicao = null;
             } else {
-                // MODO NOVO LANÇAMENTO: Apenas empurra para o array
                 const novoLancamento = {
                     data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
                     faturamento,
@@ -225,22 +217,17 @@
                 dados.historico.push(novoLancamento);
             }
 
-            // Aplica o novo valor atualizado/criado ao saldo acumulado
             dados.saldoAcumulado += (saldoDia - reserva);
-            
-            // Salva no LocalStorage
             localStorage.setItem(MEMORIA_CHAVE, JSON.stringify(dados));
 
-            // Reseta os inputs limpando e voltando a manutenção pro padrão
             document.getElementById('faturamento').value = '';
             document.getElementById('gasolina').value = '';
             document.getElementById('pessoal').value = '';
             document.getElementById('manutencao').value = '15.00';
             document.getElementById('reserva').value = '';
 
-            // Restaura textos originais dos botões/labels
             document.getElementById('btn-salvar').innerText = 'Salvar Movimentação';
-            document.getElementById('label-faturamento').innerText = 'Faturamento do Dia (R$)';
+            document.getElementById('label-faturamento').innerText = 'FATURAMENTO DO DIA (R$)';
             document.getElementById('label-faturamento').classList.remove('text-blue-400');
 
             atualizarUI();
@@ -259,23 +246,19 @@
             const item = dados.historico.find(item => item.timestamp === timestamp);
             if (!item) return;
 
-            // Define qual ID está em edição no momento
             idEmEdicao = timestamp;
 
-            // Alimenta os inputs com as informações gravadas
             document.getElementById('faturamento').value = item.faturamento;
             document.getElementById('gasolina').value = item.gasolina;
             document.getElementById('pessoal').value = item.pessoal;
             document.getElementById('manutencao').value = item.manutencao;
             document.getElementById('reserva').value = item.reserva;
 
-            // Avisa o usuário na interface que ele mudou de modo
             document.getElementById('btn-salvar').innerText = 'Atualizar Registro';
             document.getElementById('label-faturamento').innerText = `Editando Lançamento (${item.data})`;
             document.getElementById('label-faturamento').className += ' text-blue-400';
 
             atualizarUI();
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -288,10 +271,9 @@
             }
         }
 
-        // Service Worker original preservado
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'financeiro-v4';
+                const CACHE_NAME = 'financeiro-v5';
                 const ASSETS = ['./', './index.html'];
                 self.addEventListener('install', (e) => {
                     self.skipWaiting();
