@@ -10,7 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#111111">
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Controle%20Financeiro%20Pro%22,%22short_name%22:%22Finances%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23111111%22,%22theme_color%22:%22%23111111%22}">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23111111' width='192' height='192'/><circle cx='96' cy='96' r='80' fill='%2322c55e'/></svg>">
 
     <style>
         body {
@@ -30,6 +31,38 @@
             background: rgba(31, 41, 55, 0.5);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .edit-btn {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .edit-btn:hover {
+            transform: scale(1.1);
+            color: #3b82f6;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -80,12 +113,20 @@
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Manutenção</label>
-                <input type="number" id="manutencao" inputmode="decimal" value="15.00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <input type="number" id="manutencao" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Casa</label>
-                <input type="number" id="reserva" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Investimento</label>
+                <input type="number" id="investimento" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
             </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Financeira</label>
+                <input type="number" id="reserva-financeira" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+            </div>
+            <div></div>
         </div>
 
         <button onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
@@ -93,9 +134,44 @@
         </button>
     </div>
 
+    <!-- SEÇÃO DE FECHAMENTO MENSAL -->
+    <div class="mt-8 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-amber-800/30">
+        <h2 class="text-lg font-bold text-amber-400 mb-4">Fechamento de Acumulados</h2>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-gray-800/50 p-3 rounded-lg">
+                <span class="block text-[9px] text-gray-500 uppercase">Faturamento Total</span>
+                <span id="total-faturamento" class="text-lg font-bold text-green-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-800/50 p-3 rounded-lg">
+                <span class="block text-[9px] text-gray-500 uppercase">Combustível Total</span>
+                <span id="total-gasolina" class="text-lg font-bold text-red-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-800/50 p-3 rounded-lg">
+                <span class="block text-[9px] text-gray-500 uppercase">Pessoal Total</span>
+                <span id="total-pessoal" class="text-lg font-bold text-red-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-800/50 p-3 rounded-lg">
+                <span class="block text-[9px] text-gray-500 uppercase">Manutenção Total</span>
+                <span id="total-manutencao" class="text-lg font-bold text-red-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-800/50 p-3 rounded-lg">
+                <span class="block text-[9px] text-gray-500 uppercase">Investimento Total</span>
+                <span id="total-investimento" class="text-lg font-bold text-purple-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-800/50 p-3 rounded-lg">
+                <span class="block text-[9px] text-gray-500 uppercase">Reserva Financeira Total</span>
+                <span id="total-reserva-financeira" class="text-lg font-bold text-orange-400">R$ 0,00</span>
+            </div>
+        </div>
+        <button onclick="abrirFecharMes()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black py-4 rounded-2xl text-lg shadow-lg shadow-amber-900/20 transition-all btn-active uppercase tracking-tight">
+            📅 Fechar Mês
+        </button>
+    </div>
+
+    <!-- HISTÓRICO COM EDIÇÃO -->
     <div class="mt-8">
         <div class="flex justify-between items-end mb-4 px-1">
-            <h2 class="text-lg font-bold text-gray-300">Histórico (7 dias)</h2>
+            <h2 class="text-lg font-bold text-gray-300">Histórico (Mês Atual)</h2>
             <button onclick="limparDados()" class="text-[10px] text-red-500/70 uppercase font-black tracking-tighter border border-red-900/30 px-2 py-1 rounded">Zerar Tudo</button>
         </div>
         <div class="overflow-hidden rounded-2xl border border-gray-800 shadow-lg">
@@ -104,12 +180,85 @@
                     <tr class="bg-gray-800/80 text-gray-500 text-[10px] uppercase font-black">
                         <th class="p-4">Data</th>
                         <th class="p-4">Saldo Dia</th>
-                        <th class="p-4 text-right">Reserva</th>
+                        <th class="p-4 text-right">Ação</th>
                     </tr>
                 </thead>
                 <tbody id="historico-body">
                     </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- MESES ANTERIORES -->
+    <div class="mt-8">
+        <h2 class="text-lg font-bold text-gray-300 mb-4 px-1">Meses Anteriores</h2>
+        <div id="meses-anteriores-container" class="space-y-3">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+        <div id="meses-vazios" class="text-center text-gray-600 text-sm italic p-4">Nenhum mês fechado ainda</div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO -->
+    <div id="modal-edicao" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-blue-400 mb-4">Editar Lançamento</h3>
+            <div class="space-y-3 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Data</label>
+                    <input type="text" id="edit-data" disabled class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Faturamento (R$)</label>
+                    <input type="number" id="edit-faturamento" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Gasolina (R$)</label>
+                    <input type="number" id="edit-gasolina" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Pessoal (R$)</label>
+                    <input type="number" id="edit-pessoal" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Manutenção (R$)</label>
+                    <input type="number" id="edit-manutencao" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Investimento (R$)</label>
+                    <input type="number" id="edit-investimento" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Reserva Financeira (R$)</label>
+                    <input type="number" id="edit-reserva-financeira" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="salvarEdicao()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-all">
+                    Salvar
+                </button>
+                <button onclick="deletarLancamento()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg transition-all">
+                    Deletar
+                </button>
+                <button onclick="fecharModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition-all">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE FECHAMENTO DE MÊS -->
+    <div id="modal-fechar-mes" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-amber-400 mb-4">Confirmar Fechamento do Mês</h3>
+            <p class="text-gray-300 mb-6">Tem certeza que deseja fechar o mês atual? O histórico será movido para "Meses Anteriores" e a tela será zerada.</p>
+            <div class="flex gap-3">
+                <button onclick="confirmarFecharMes()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg transition-all">
+                    Confirmar
+                </button>
+                <button onclick="fecharModalMes()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition-all">
+                    Cancelar
+                </button>
+            </div>
         </div>
     </div>
 
@@ -127,8 +276,11 @@
         // Inicialização de dados coerente com o localStorage
         let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
             saldoAcumulado: 0,
-            historico: []
+            historico: [],
+            mesesAnteriores: []
         };
+
+        let lancamentoEmEdicao = null;
 
         function formatarMoeda(valor) {
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -145,30 +297,72 @@
                 resumoContainer.classList.remove('hidden');
                 document.getElementById('last-ganho').innerText = formatarMoeda(ultimo.faturamento);
                 document.getElementById('last-gastos').innerText = formatarMoeda(ultimo.gasolina + ultimo.pessoal + ultimo.manutencao);
-                document.getElementById('last-reserva').innerText = formatarMoeda(ultimo.reserva);
+                document.getElementById('last-reserva').innerText = formatarMoeda(ultimo.investimento + ultimo.reservaFinanceira);
             } else {
                 resumoContainer.classList.add('hidden');
             }
 
+            // Atualizar fechamento de acumulados
+            let totalFaturamento = 0, totalGasolina = 0, totalPessoal = 0, totalManutencao = 0, totalInvestimento = 0, totalReservaFinanceira = 0;
+            dados.historico.forEach(item => {
+                totalFaturamento += item.faturamento;
+                totalGasolina += item.gasolina;
+                totalPessoal += item.pessoal;
+                totalManutencao += item.manutencao;
+                totalInvestimento += item.investimento;
+                totalReservaFinanceira += item.reservaFinanceira;
+            });
+
+            document.getElementById('total-faturamento').innerText = formatarMoeda(totalFaturamento);
+            document.getElementById('total-gasolina').innerText = formatarMoeda(totalGasolina);
+            document.getElementById('total-pessoal').innerText = formatarMoeda(totalPessoal);
+            document.getElementById('total-manutencao').innerText = formatarMoeda(totalManutencao);
+            document.getElementById('total-investimento').innerText = formatarMoeda(totalInvestimento);
+            document.getElementById('total-reserva-financeira').innerText = formatarMoeda(totalReservaFinanceira);
+
+            // Atualizar histórico
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
 
-            const ultimos7 = [...dados.historico].slice(-7).reverse();
-
-            if (ultimos7.length === 0) {
+            if (dados.historico.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-600 text-sm italic">Nenhum lançamento ainda</td></tr>';
+            } else {
+                [...dados.historico].reverse().forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800/50 text-sm hover:bg-gray-800/20 transition-colors';
+                    tr.innerHTML = `
+                        <td class="p-4 text-gray-400 font-medium">${item.data}</td>
+                        <td class="p-4 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="abrirEdicao(${dados.historico.length - 1 - index})" class="text-blue-400 hover:text-blue-300 font-bold edit-btn">✏️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             }
 
-            ultimos7.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-t border-gray-800/50 text-sm hover:bg-gray-800/20 transition-colors';
-                tr.innerHTML = `
-                    <td class="p-4 text-gray-400 font-medium">${item.data}</td>
-                    <td class="p-4 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
-                    <td class="p-4 text-right text-orange-400 font-medium">-${formatarMoeda(item.reserva)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+            // Atualizar meses anteriores
+            const mesesContainer = document.getElementById('meses-anteriores-container');
+            const mesesVazios = document.getElementById('meses-vazios');
+            
+            if (dados.mesesAnteriores.length === 0) {
+                mesesContainer.innerHTML = '';
+                mesesVazios.classList.remove('hidden');
+            } else {
+                mesesVazios.classList.add('hidden');
+                mesesContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => `
+                    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-gray-300">${mes.periodo}</h4>
+                            <button onclick="deletarMesAnterior(${idx})" class="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><span class="text-gray-500">Faturamento:</span> <span class="text-green-400 font-bold">${formatarMoeda(mes.totalFaturamento)}</span></div>
+                            <div><span class="text-gray-500">Saldo Final:</span> <span class="text-blue-400 font-bold">${formatarMoeda(mes.saldoFinal)}</span></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         function salvarLancamento(event) {
@@ -176,15 +370,16 @@
             const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
             const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
             const manutencao = parseFloat(document.getElementById('manutencao').value) || 0;
-            const reserva = parseFloat(document.getElementById('reserva').value) || 0;
+            const investimento = parseFloat(document.getElementById('investimento').value) || 0;
+            const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
 
-            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && reserva === 0) {
+            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && investimento === 0 && reservaFinanceira === 0) {
                 alert('Por favor, insira os valores do dia.');
                 return;
             }
 
             const saldoDia = faturamento - gasolina - pessoal - manutencao;
-            dados.saldoAcumulado += (saldoDia - reserva);
+            dados.saldoAcumulado += (saldoDia - investimento - reservaFinanceira);
 
             const novoLancamento = {
                 data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
@@ -192,8 +387,9 @@
                 gasolina,
                 pessoal,
                 manutencao,
+                investimento,
+                reservaFinanceira,
                 saldoDia,
-                reserva,
                 timestamp: new Date().getTime()
             };
 
@@ -203,7 +399,9 @@
             document.getElementById('faturamento').value = '';
             document.getElementById('gasolina').value = '';
             document.getElementById('pessoal').value = '';
-            document.getElementById('reserva').value = '';
+            document.getElementById('manutencao').value = '';
+            document.getElementById('investimento').value = '';
+            document.getElementById('reserva-financeira').value = '';
 
             atualizarUI();
             
@@ -217,9 +415,132 @@
             }, 2000);
         }
 
+        function abrirEdicao(index) {
+            lancamentoEmEdicao = index;
+            const item = dados.historico[index];
+            
+            document.getElementById('edit-data').value = item.data;
+            document.getElementById('edit-faturamento').value = item.faturamento;
+            document.getElementById('edit-gasolina').value = item.gasolina;
+            document.getElementById('edit-pessoal').value = item.pessoal;
+            document.getElementById('edit-manutencao').value = item.manutencao;
+            document.getElementById('edit-investimento').value = item.investimento;
+            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
+            
+            document.getElementById('modal-edicao').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-edicao').classList.remove('active');
+            lancamentoEmEdicao = null;
+        }
+
+        function salvarEdicao() {
+            if (lancamentoEmEdicao === null) return;
+
+            const item = dados.historico[lancamentoEmEdicao];
+            
+            // Calcular diferença para ajustar o saldo acumulado
+            const saldoDiaAntigo = item.saldoDia;
+            const reservasAntigo = item.investimento + item.reservaFinanceira;
+
+            const faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
+            const gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
+            const pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
+            const manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
+            const investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
+            const reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
+
+            const saldoDiaNovo = faturamento - gasolina - pessoal - manutencao;
+            const reservasNovo = investimento + reservaFinanceira;
+
+            // Ajustar saldo acumulado
+            const diferenca = (saldoDiaNovo - saldoDiaAntigo) - (reservasNovo - reservasAntigo);
+            dados.saldoAcumulado += diferenca;
+
+            // Atualizar item
+            item.faturamento = faturamento;
+            item.gasolina = gasolina;
+            item.pessoal = pessoal;
+            item.manutencao = manutencao;
+            item.investimento = investimento;
+            item.reservaFinanceira = reservaFinanceira;
+            item.saldoDia = saldoDiaNovo;
+
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModal();
+            atualizarUI();
+            alert('Lançamento atualizado com sucesso!');
+        }
+
+        function deletarLancamento() {
+            if (lancamentoEmEdicao === null) return;
+            
+            if (confirm('Tem certeza que deseja deletar este lançamento?')) {
+                const item = dados.historico[lancamentoEmEdicao];
+                const saldoDia = item.saldoDia;
+                const reservas = item.investimento + item.reservaFinanceira;
+                
+                dados.saldoAcumulado -= (saldoDia - reservas);
+                dados.historico.splice(lancamentoEmEdicao, 1);
+                
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                fecharModal();
+                atualizarUI();
+                alert('Lançamento deletado com sucesso!');
+            }
+        }
+
+        function abrirFecharMes() {
+            document.getElementById('modal-fechar-mes').classList.add('active');
+        }
+
+        function fecharModalMes() {
+            document.getElementById('modal-fechar-mes').classList.remove('active');
+        }
+
+        function confirmarFecharMes() {
+            if (dados.historico.length === 0) {
+                alert('Não há lançamentos para fechar o mês.');
+                return;
+            }
+
+            const agora = new Date();
+            const periodo = `${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`.toUpperCase();
+
+            let totalFaturamento = 0;
+            dados.historico.forEach(item => {
+                totalFaturamento += item.faturamento;
+            });
+
+            const mesFechado = {
+                periodo,
+                totalFaturamento,
+                saldoFinal: dados.saldoAcumulado,
+                historico: [...dados.historico]
+            };
+
+            dados.mesesAnteriores.push(mesFechado);
+            dados.historico = [];
+            dados.saldoAcumulado = 0;
+
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalMes();
+            atualizarUI();
+            alert(`Mês de ${periodo} fechado com sucesso!`);
+        }
+
+        function deletarMesAnterior(index) {
+            if (confirm('Tem certeza que deseja deletar este mês?')) {
+                dados.mesesAnteriores.splice(index, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+
         function limparDados() {
             if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
-                dados = { saldoAcumulado: 0, historico: [] };
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
@@ -227,7 +548,7 @@
 
         // --- SISTEMA DE BACKUP BLINDADO ---
         function exportarBackup() {
-            if (dados.historico.length === 0 && dados.saldoAcumulado === 0) {
+            if (dados.historico.length === 0 && dados.saldoAcumulado === 0 && dados.mesesAnteriores.length === 0) {
                 alert('Não existem dados para exportar.');
                 return;
             }
@@ -260,23 +581,18 @@
                 } catch (e) {
                     alert('Erro ao processar o arquivo de backup.');
                 }
-                input.value = ''; // Limpa o input
+                input.value = '';
             };
             if (input.files.length > 0) {
                 reader.readAsText(input.files[0]);
             }
         }
 
-        // Service Worker Inline
+        // Service Worker Registration
         if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl);
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
         }
 
         // Inicializar a tela
