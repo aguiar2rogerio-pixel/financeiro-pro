@@ -1,14 +1,10 @@
 {
   "name": "Controle Financeiro Pro",
   "short_name": "Finanças Pro",
-  "description": "Aplicativo de controle financeiro pessoal e profissional",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
   "background_color": "#111111",
   "theme_color": "#111111",
-  "orientation": "portrait",
-  "id": "com.financeiro.pro.v1",
   "icons": [
     {
       "src": "icon-192.png",
