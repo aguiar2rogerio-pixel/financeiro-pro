@@ -187,7 +187,7 @@
                     </tr>
                 </thead>
                 <tbody id="historico-body">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
@@ -276,7 +276,6 @@
     </footer>
 
     <script>
-        // Inicialização de dados coerente com o localStorage
         let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
             saldoAcumulado: 0,
             historico: [],
@@ -286,7 +285,7 @@
         let lancamentoEmEdicao = null;
 
         function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
         function atualizarUI() {
@@ -298,22 +297,28 @@
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
                 resumoContainer.classList.remove('hidden');
-                document.getElementById('last-ganho').innerText = formatarMoeda(ultimo.faturamento);
-                document.getElementById('last-gastos').innerText = formatarMoeda(ultimo.gasolina + ultimo.pessoal + ultimo.manutencao);
-                document.getElementById('last-reserva').innerText = formatarMoeda(ultimo.investimento + ultimo.reservaFinanceira);
+                
+                const faturamentoUltimo = parseFloat(ultimo.faturamento) || 0;
+                const gastosUltimo = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0) + (parseFloat(ultimo.manutencao) || 0);
+                const reservaUltimo = (parseFloat(ultimo.investimento) || 0) + (parseFloat(ultimo.reservaFinanceira) || 0);
+                
+                document.getElementById('last-ganho').innerText = formatarMoeda(faturamentoUltimo);
+                document.getElementById('last-gastos').innerText = formatarMoeda(gastosUltimo);
+                document.getElementById('last-reserva').innerText = formatarMoeda(reservaUltimo);
             } else {
                 resumoContainer.classList.add('hidden');
             }
 
-            // Atualizar fechamento de acumulados
+            // Calcular acumulados de forma blindada contra NaN
             let totalFaturamento = 0, totalGasolina = 0, totalPessoal = 0, totalManutencao = 0, totalInvestimento = 0, totalReservaFinanceira = 0;
+            
             dados.historico.forEach(item => {
-                totalFaturamento += item.faturamento;
-                totalGasolina += item.gasolina;
-                totalPessoal += item.pessoal;
-                totalManutencao += item.manutencao;
-                totalInvestimento += item.investimento;
-                totalReservaFinanceira += item.reservaFinanceira;
+                totalFaturamento += parseFloat(item.faturamento) || 0;
+                totalGasolina += parseFloat(item.gasolina) || 0;
+                totalPessoal += parseFloat(item.pessoal) || 0;
+                totalManutencao += parseFloat(item.manutencao) || 0;
+                totalInvestimento += parseFloat(item.investimento) || 0;
+                totalReservaFinanceira += parseFloat(item.reservaFinanceira) || 0;
             });
 
             document.getElementById('total-faturamento').innerText = formatarMoeda(totalFaturamento);
@@ -323,7 +328,7 @@
             document.getElementById('total-investimento').innerText = formatarMoeda(totalInvestimento);
             document.getElementById('total-reserva-financeira').innerText = formatarMoeda(totalReservaFinanceira);
 
-            // Atualizar histórico
+            // Atualizar tabela de histórico
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
 
@@ -333,9 +338,10 @@
                 [...dados.historico].reverse().forEach((item, index) => {
                     const tr = document.createElement('tr');
                     tr.className = 'border-t border-gray-800/50 text-sm hover:bg-gray-800/20 transition-colors';
+                    const saldoDia = parseFloat(item.saldoDia) || 0;
                     tr.innerHTML = `
                         <td class="p-4 text-gray-400 font-medium">${item.data}</td>
-                        <td class="p-4 font-bold ${item.saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(item.saldoDia)}</td>
+                        <td class="p-4 font-bold ${saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(saldoDia)}</td>
                         <td class="p-4 text-right">
                             <button onclick="abrirEdicao(${dados.historico.length - 1 - index})" class="text-blue-400 hover:text-blue-300 font-bold edit-btn">✏️</button>
                         </td>
@@ -376,7 +382,7 @@
             const investimento = parseFloat(document.getElementById('investimento').value) || 0;
             const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
 
-            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && investimento === 0 && reservaFinanceira === 0) {
+            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && investimento === 0 && reservaFinanceira === 0 && manutencao === 0) {
                 alert('Por favor, insira os valores do dia.');
                 return;
             }
@@ -423,12 +429,12 @@
             const item = dados.historico[index];
             
             document.getElementById('edit-data').value = item.data;
-            document.getElementById('edit-faturamento').value = item.faturamento;
-            document.getElementById('edit-gasolina').value = item.gasolina;
-            document.getElementById('edit-pessoal').value = item.pessoal;
-            document.getElementById('edit-manutencao').value = item.manutencao;
-            document.getElementById('edit-investimento').value = item.investimento;
-            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
+            document.getElementById('edit-faturamento').value = item.faturamento || 0;
+            document.getElementById('edit-gasolina').value = item.gasolina || 0;
+            document.getElementById('edit-pessoal').value = item.pessoal || 0;
+            document.getElementById('edit-manutencao').value = item.manutencao || 0;
+            document.getElementById('edit-investimento').value = item.investimento || 0;
+            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira || 0;
             
             document.getElementById('modal-edicao').classList.add('active');
         }
@@ -443,9 +449,8 @@
 
             const item = dados.historico[lancamentoEmEdicao];
             
-            // Calcular diferença para ajustar o saldo acumulado
-            const saldoDiaAntigo = item.saldoDia;
-            const reservasAntigo = item.investimento + item.reservaFinanceira;
+            const saldoDiaAntigo = parseFloat(item.saldoDia) || 0;
+            const reservasAntigo = (parseFloat(item.investimento) || 0) + (parseFloat(item.reservaFinanceira) || 0);
 
             const faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
             const gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
@@ -457,11 +462,9 @@
             const saldoDiaNovo = faturamento - gasolina - pessoal - manutencao;
             const reservasNovo = investimento + reservaFinanceira;
 
-            // Ajustar saldo acumulado
             const diferenca = (saldoDiaNovo - saldoDiaAntigo) - (reservasNovo - reservasAntigo);
             dados.saldoAcumulado += diferenca;
 
-            // Atualizar item
             item.faturamento = faturamento;
             item.gasolina = gasolina;
             item.pessoal = pessoal;
@@ -481,8 +484,8 @@
             
             if (confirm('Tem certeza que deseja deletar este lançamento?')) {
                 const item = dados.historico[lancamentoEmEdicao];
-                const saldoDia = item.saldoDia;
-                const reservas = item.investimento + item.reservaFinanceira;
+                const saldoDia = parseFloat(item.saldoDia) || 0;
+                const reservas = (parseFloat(item.investimento) || 0) + (parseFloat(item.reservaFinanceira) || 0);
                 
                 dados.saldoAcumulado -= (saldoDia - reservas);
                 dados.historico.splice(lancamentoEmEdicao, 1);
@@ -513,7 +516,7 @@
 
             let totalFaturamento = 0;
             dados.historico.forEach(item => {
-                totalFaturamento += item.faturamento;
+                totalFaturamento += parseFloat(item.faturamento) || 0;
             });
 
             const mesFechado = {
@@ -549,7 +552,6 @@
             }
         }
 
-        // --- SISTEMA DE BACKUP BLINDADO ---
         function exportarBackup() {
             if (dados.historico.length === 0 && dados.saldoAcumulado === 0 && dados.mesesAnteriores.length === 0) {
                 alert('Não existem dados para exportar.');
@@ -591,33 +593,14 @@
             }
         }
 
-        // ===== DEBUG PWA (Abra F12 para ver) =====
-        console.log('%c=== PWA DEBUG ===', 'color: #22c55e; font-weight: bold; font-size: 14px;');
-        console.log('Manifest:', document.querySelector('link[rel="manifest"]')?.href);
-        console.log('Service Worker suportado:', 'serviceWorker' in navigator);
-        console.log('HTTPS:', window.location.protocol === 'https:');
-        
-        // Service Worker Registration
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js', { scope: './' })
-                .then(registration => {
-                    console.log('%c✓ Service Worker OK', 'color: #22c55e; font-weight: bold;', registration);
-                })
-                .catch(err => {
-                    console.error('%c✗ Erro SW:', 'color: #ef4444; font-weight: bold;', err);
-                });
+                .then(registration => console.log('Service Worker registrado', registration))
+                .catch(err => console.error('Erro SW:', err));
         }
-        
-        // Verificar se o manifest foi carregado
-        fetch('./manifest.json')
-            .then(r => r.json())
-            .then(manifest => {
-                console.log('%c✓ Manifest carregado:', 'color: #22c55e; font-weight: bold;', manifest);
-            })
-            .catch(err => console.error('%c✗ Erro ao carregar manifest:', 'color: #ef4444; font-weight: bold;', err));
 
-        // Inicializar a tela
         atualizarUI();
     </script>
 </body>
 </html>
+
