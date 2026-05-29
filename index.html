@@ -289,6 +289,13 @@
         }
 
         function atualizarUI() {
+            // Recalcular saldoAcumulado com base em todo o histórico para alinhar com a nova regra de saídas
+            let totalAcumuladoCalculado = 0;
+            dados.historico.forEach(item => {
+                totalAcumuladoCalculado += parseFloat(item.saldoDia) || 0;
+            });
+            dados.saldoAcumulado = totalAcumuladoCalculado;
+
             const saldoEl = document.getElementById('saldo-total');
             saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
             saldoEl.className = `text-5xl font-bold transition-colors duration-500 ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
@@ -387,8 +394,8 @@
                 return;
             }
 
-            const saldoDia = faturamento - gasolina - pessoal - manutencao;
-            dados.saldoAcumulado += (saldoDia - investimento - reservaFinanceira);
+            // NOVA FÓRMULA: Investimento e Reserva agora entram reduzindo o Saldo Real do Dia
+            const saldoDia = faturamento - gasolina - pessoal - manutencao - investimento - reservaFinanceira;
 
             const novoLancamento = {
                 data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
@@ -449,9 +456,6 @@
 
             const item = dados.historico[lancamentoEmEdicao];
             
-            const saldoDiaAntigo = parseFloat(item.saldoDia) || 0;
-            const reservasAntigo = (parseFloat(item.investimento) || 0) + (parseFloat(item.reservaFinanceira) || 0);
-
             const faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
             const gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
             const pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
@@ -459,11 +463,8 @@
             const investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
             const reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
 
-            const saldoDiaNovo = faturamento - gasolina - pessoal - manutencao;
-            const reservasNovo = investimento + reservaFinanceira;
-
-            const diferenca = (saldoDiaNovo - saldoDiaAntigo) - (reservasNovo - reservasAntigo);
-            dados.saldoAcumulado += diferenca;
+            // Ajustando a edição também para abater as reservas do saldo do dia
+            const saldoDiaNovo = faturamento - gasolina - pessoal - manutencao - investimento - reservaFinanceira;
 
             item.faturamento = faturamento;
             item.gasolina = gasolina;
@@ -483,13 +484,7 @@
             if (lancamentoEmEdicao === null) return;
             
             if (confirm('Tem certeza que deseja deletar este lançamento?')) {
-                const item = dados.historico[lancamentoEmEdicao];
-                const saldoDia = parseFloat(item.saldoDia) || 0;
-                const reservas = (parseFloat(item.investimento) || 0) + (parseFloat(item.reservaFinanceira) || 0);
-                
-                dados.saldoAcumulado -= (saldoDia - reservas);
                 dados.historico.splice(lancamentoEmEdicao, 1);
-                
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 fecharModal();
                 atualizarUI();
