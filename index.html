@@ -10,268 +10,205 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças Pro">
-    <meta name="theme-color" content="#111111">
-    <meta name="description" content="Aplicativo de controle financeiro pessoal e profissional">
+    <meta name="theme-color" content="#0a0f1d">
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./icon-192.png">
     <link rel="apple-touch-icon" href="./icon-192.png">
 
     <style>
         body {
-            background-color: #111111;
-            color: #e5e7eb;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0a0f1d;
+            color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        input:focus {
-            outline: none;
-            border-color: #3b82f6;
+        .glass-card {
+            background: rgba(16, 22, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .btn-active:active {
-            transform: scale(0.98);
-        }
-        .card-glass {
-            background: rgba(31, 41, 55, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(75, 85, 99, 0.3);
-        }
-        .edit-btn {
-            cursor: pointer;
+        .input-premium {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.2s ease;
         }
-        .edit-btn:hover {
-            transform: scale(1.1);
-            color: #3b82f6;
+        .input-premium:focus {
+            border-color: #3b82f6;
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(4px);
             z-index: 1000;
-            justify-content: center;
-            align-items: center;
         }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal-content {
-            background: #1f2937;
-            border: 1px solid #374151;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        .modal-overlay.active { display: flex; }
     </style>
 </head>
 <body class="p-4 max-w-md mx-auto pb-24">
 
-    <header class="text-center mb-6 pt-4">
-        <h1 class="text-gray-400 text-xs uppercase tracking-widest mb-1">Saldo Acumulado Total</h1>
-        <div id="saldo-total" class="text-5xl font-bold text-green-500">R$ 0,00</div>
+    <header class="text-center my-6">
+        <h1 class="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-1">Caixa Geral Acumulado</h1>
+        <div id="saldo-total" class="text-4xl font-light tracking-tight text-emerald-400">R$ 0,00</div>
     </header>
 
-    <div id="ultimo-resumo-container" class="hidden mb-6 animate-fade-in">
-        <div class="card-glass rounded-2xl p-4 border border-blue-900/30">
-            <h3 class="text-blue-400 text-[10px] uppercase font-bold mb-2 tracking-wider">Último Lançamento Detalhado</h3>
-            <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="bg-gray-800/50 p-2 rounded-lg">
-                    <span class="block text-[9px] text-gray-500 uppercase">Ganho</span>
-                    <span id="last-ganho" class="text-sm font-bold text-green-400">R$ 0</span>
+    <div id="ultimo-resumo-container" class="hidden mb-6">
+        <div class="glass-card rounded-2xl p-3.5">
+            <div class="flex justify-between items-center mb-2.5">
+                <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Fluxo do Último Registro</h3>
+                <span id="last-date" class="text-[10px] text-slate-500"></span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="bg-slate-900/40 p-2 rounded-xl border border-white/[0.02]">
+                    <span class="block text-[9px] text-slate-500 uppercase mb-0.5">Entradas</span>
+                    <span id="last-ganho" class="font-semibold text-emerald-400">R$ 0</span>
                 </div>
-                <div class="bg-gray-800/50 p-2 rounded-lg">
-                    <span class="block text-[9px] text-gray-500 uppercase">Gastos</span>
-                    <span id="last-gastos" class="text-sm font-bold text-red-400">R$ 0</span>
+                <div class="bg-slate-900/40 p-2 rounded-xl border border-white/[0.02]">
+                    <span class="block text-[9px] text-slate-500 uppercase mb-0.5">Saídas</span>
+                    <span id="last-gastos" class="font-semibold text-rose-400">R$ 0</span>
                 </div>
-                <div class="bg-gray-800/50 p-2 rounded-lg">
-                    <span class="block text-[9px] text-gray-500 uppercase">Reserva</span>
-                    <span id="last-reserva" class="text-sm font-bold text-orange-400">R$ 0</span>
+                <div class="bg-slate-900/40 p-2 rounded-xl border border-white/[0.02]">
+                    <span class="block text-[9px] text-slate-500 uppercase mb-0.5">Retido (Inv/Res)</span>
+                    <span id="last-reserva" class="font-semibold text-amber-400">R$ 0</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="space-y-4 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-gray-800">
-        <div>
-            <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">FATURAMENTO DO DIA (R$)</label>
-            <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-3xl p-5 rounded-2xl border border-gray-700 focus:ring-4 focus:ring-blue-500/20 transition-all">
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
+    <div class="glass-card p-5 rounded-3xl space-y-4 shadow-xl">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Nova Movimentação Diária</h2>
+        
+        <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Gasolina</label>
-                <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1 ml-1 uppercase tracking-wider">Faturamento App</label>
+                <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-3 rounded-xl focus:outline-none">
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Pessoal</label>
-                <input type="number" id="pessoal" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <label class="block text-[10px] font-semibold text-amber-400 mb-1 ml-1 uppercase tracking-wider">Renda Extra / Ajuste (+)</label>
+                <input type="number" id="renda-extra" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-3 rounded-xl focus:outline-none">
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Manutenção</label>
-                <input type="number" id="manutencao" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1 ml-1 uppercase tracking-wider">Combustível</label>
+                <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-3 rounded-xl focus:outline-none">
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Investimento</label>
-                <input type="number" id="investimento" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1 ml-1 uppercase tracking-wider">Manutenção Carro</label>
+                <input type="number" id="manutencao" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-3 rounded-xl focus:outline-none">
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-[10px] font-bold text-gray-500 mb-1 ml-1 uppercase">Reserva Financeira</label>
-                <input type="number" id="reserva-financeira" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 text-white text-xl p-4 rounded-2xl border border-gray-700">
+        <div class="bg-slate-900/30 p-3 rounded-xl border border-white/[0.03] space-y-2">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-rose-400 mb-1 uppercase tracking-wider">Gastos Pessoais / Ajuste (-)</label>
+                    <input type="number" id="pessoal" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-2.5 rounded-xl focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 mb-1 uppercase tracking-wider">O que foi comprado?</label>
+                    <input type="text" id="pessoal-nota" placeholder="Ex: Almoço, mercado..." class="w-full input-premium text-white text-xs p-2.5 rounded-xl focus:outline-none italic">
+                </div>
             </div>
-            <div></div>
         </div>
 
-        <button onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl text-2xl shadow-lg shadow-blue-900/20 transition-all btn-active mt-2 uppercase tracking-tight">
-            Salvar Movimentação
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-[10px] font-semibold text-purple-400 mb-1 ml-1 uppercase tracking-wider">Investimentos</label>
+                <input type="number" id="investimento" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-3 rounded-xl focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] font-semibold text-orange-400 mb-1 ml-1 uppercase tracking-wider">Reserva Guardada</label>
+                <input type="number" id="reserva-financeira" inputmode="decimal" placeholder="0,00" class="w-full input-premium text-white text-base p-3 rounded-xl focus:outline-none">
+            </div>
+        </div>
+
+        <button onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-4 rounded-xl text-base shadow-lg shadow-blue-950/50 transition-all duration-200 uppercase tracking-wider mt-2">
+            Salvar Registro
         </button>
     </div>
 
-    <!-- SEÇÃO DE FECHAMENTO MENSAL -->
-    <div class="mt-8 bg-gray-900 p-6 rounded-3xl shadow-2xl border border-amber-800/30">
-        <h2 class="text-lg font-bold text-amber-400 mb-4">Fechamento de Acumulados</h2>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-gray-800/50 p-3 rounded-lg">
-                <span class="block text-[9px] text-gray-500 uppercase">Faturamento Total</span>
-                <span id="total-faturamento" class="text-lg font-bold text-green-400">R$ 0,00</span>
-            </div>
-            <div class="bg-gray-800/50 p-3 rounded-lg">
-                <span class="block text-[9px] text-gray-500 uppercase">Combustível Total</span>
-                <span id="total-gasolina" class="text-lg font-bold text-red-400">R$ 0,00</span>
-            </div>
-            <div class="bg-gray-800/50 p-3 rounded-lg">
-                <span class="block text-[9px] text-gray-500 uppercase">Pessoal Total</span>
-                <span id="total-pessoal" class="text-lg font-bold text-red-400">R$ 0,00</span>
-            </div>
-            <div class="bg-gray-800/50 p-3 rounded-lg">
-                <span class="block text-[9px] text-gray-500 uppercase">Manutenção Total</span>
-                <span id="total-manutencao" class="text-lg font-bold text-red-400">R$ 0,00</span>
-            </div>
-            <div class="bg-gray-800/50 p-3 rounded-lg">
-                <span class="block text-[9px] text-gray-500 uppercase">Investimento Total</span>
-                <span id="total-investimento" class="text-lg font-bold text-purple-400">R$ 0,00</span>
-            </div>
-            <div class="bg-gray-800/50 p-3 rounded-lg">
-                <span class="block text-[9px] text-gray-500 uppercase">Reserva Financeira Total</span>
-                <span id="total-reserva-financeira" class="text-lg font-bold text-orange-400">R$ 0,00</span>
-            </div>
+    <div class="mt-6 glass-card p-4 rounded-2xl border border-slate-800">
+        <h2 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Balanço do Período Atual</h2>
+        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+            <div class="bg-slate-900/50 p-2.5 rounded-xl"><span class="block text-[9px] text-slate-500 uppercase">Faturamento App</span><span id="total-faturamento" class="font-bold text-emerald-400">R$ 0,00</span></div>
+            <div class="bg-slate-900/50 p-2.5 rounded-xl"><span class="block text-[9px] text-amber-500 uppercase">Renda Extra Total</span><span id="total-renda-extra" class="font-bold text-amber-400">R$ 0,00</span></div>
+            <div class="bg-slate-900/50 p-2.5 rounded-xl"><span class="block text-[9px] text-slate-500 uppercase">Combustível Total</span><span id="total-gasolina" class="font-bold text-rose-400">R$ 0,00</span></div>
+            <div class="bg-slate-900/50 p-2.5 rounded-xl"><span class="block text-[9px] text-slate-500 uppercase">Manutenção Total</span><span id="total-manutencao" class="font-bold text-rose-400">R$ 0,00</span></div>
+            <div class="bg-slate-900/50 p-2.5 rounded-xl"><span class="block text-[9px] text-rose-400 uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-rose-400">R$ 0,00</span></div>
+            <div class="bg-slate-900/50 p-2.5 rounded-xl"><span class="block text-[9px] text-purple-400 uppercase">Reservado + Investido</span><span id="total-retido" class="font-bold text-purple-400">R$ 0,00</span></div>
         </div>
-        <button onclick="abrirFecharMes()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black py-4 rounded-2xl text-lg shadow-lg shadow-amber-900/20 transition-all btn-active uppercase tracking-tight">
-            📅 Fechar Mês
+        <button onclick="abrirFecharMes()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-3 rounded-xl text-sm transition-all uppercase tracking-wider">
+            📅 Fechar Balanço Mensal
         </button>
     </div>
 
-    <!-- HISTÓRICO COM EDIÇÃO -->
-    <div class="mt-8">
-        <div class="flex justify-between items-end mb-4 px-1">
-            <h2 class="text-lg font-bold text-gray-300">Histórico (Mês Atual)</h2>
-            <button onclick="limparDados()" class="text-[10px] text-red-500/70 uppercase font-black tracking-tighter border border-red-900/30 px-2 py-1 rounded">Zerar Tudo</button>
+    <div class="mt-6">
+        <div class="flex justify-between items-center mb-2 px-1">
+            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Histórico Diário</h2>
+            <button onclick="limparDados()" class="text-[9px] text-rose-500/80 uppercase font-bold tracking-wider border border-rose-950/50 px-2 py-1 rounded-lg">Zerar Sistema</button>
         </div>
-        <div class="overflow-hidden rounded-2xl border border-gray-800 shadow-lg">
-            <table class="w-full text-left border-collapse bg-gray-900/50">
+        <div class="overflow-hidden rounded-xl border border-slate-800/60 shadow-lg">
+            <table class="w-full text-left border-collapse bg-slate-900/20">
                 <thead>
-                    <tr class="bg-gray-800/80 text-gray-500 text-[10px] uppercase font-black">
-                        <th class="p-4">Data</th>
-                        <th class="p-4">Saldo Dia</th>
-                        <th class="p-4 text-right">Ação</th>
+                    <tr class="bg-slate-900/80 text-slate-500 text-[9px] uppercase font-bold tracking-wider">
+                        <th class="p-3">Data</th>
+                        <th class="p-3">Saldo Caixa Líquido</th>
+                        <th class="p-3 text-right">Ações</th>
                     </tr>
                 </thead>
-                <tbody id="historico-body">
-                </tbody>
+                <tbody id="historico-body" class="text-xs"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- MESES ANTERIORES -->
-    <div class="mt-8">
-        <h2 class="text-lg font-bold text-gray-300 mb-4 px-1">Meses Anteriores</h2>
-        <div id="meses-anteriores-container" class="space-y-3">
-            <!-- Será preenchido dinamicamente -->
-        </div>
-        <div id="meses-vazios" class="text-center text-gray-600 text-sm italic p-4">Nenhum mês fechado ainda</div>
+    <div class="mt-6">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5 px-1">Histórico de Meses Fechados</h2>
+        <div id="meses-anteriores-container" class="space-y-2"></div>
+        <div id="meses-vazios" class="text-center text-slate-600 text-xs italic p-4">Nenhum mês arquivado ainda</div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO -->
-    <div id="modal-edicao" class="modal-overlay">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold text-blue-400 mb-4">Editar Lançamento</h3>
-            <div class="space-y-3 mb-6">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Data</label>
-                    <input type="text" id="edit-data" disabled class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Faturamento (R$)</label>
-                    <input type="number" id="edit-faturamento" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Gasolina (R$)</label>
-                    <input type="number" id="edit-gasolina" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Pessoal (R$)</label>
-                    <input type="number" id="edit-pessoal" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Manutenção (R$)</label>
-                    <input type="number" id="edit-manutencao" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Investimento (R$)</label>
-                    <input type="number" id="edit-investimento" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Reserva Financeira (R$)</label>
-                    <input type="number" id="edit-reserva-financeira" inputmode="decimal" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
-                </div>
+    <div id="modal-edicao" class="modal-overlay items-center justify-center p-4">
+        <div class="glass-card rounded-2xl p-5 w-full max-w-sm max-h-[85vh] overflow-y-auto space-y-3">
+            <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider">Ajustar Registro</h3>
+            <div class="space-y-2 text-xs">
+                <div><label class="block text-slate-500 mb-0.5">Data</label><input type="text" id="edit-data" disabled class="w-full bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-400"></div>
+                <div><label class="block text-slate-400 mb-0.5">Faturamento App</label><input type="number" id="edit-faturamento" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
+                <div><label class="block text-amber-400 mb-0.5">Renda Extra / Ajuste (+)</label><input type="number" id="edit-renda-extra" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
+                <div><label class="block text-slate-400 mb-0.5">Combustível</label><input type="number" id="edit-gasolina" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
+                <div><label class="block text-slate-400 mb-0.5">Manutenção</label><input type="number" id="edit-manutencao" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
+                <div><label class="block text-rose-400 mb-0.5">Gastos Pessoais / Ajuste (-)</label><input type="number" id="edit-pessoal" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
+                <div><label class="block text-slate-500 mb-0.5">Nota do Gasto Pessoal</label><input type="text" id="edit-pessoal-nota" class="w-full input-premium p-2.5 rounded-lg text-white italic"></div>
+                <div><label class="block text-purple-400 mb-0.5">Investimentos</label><input type="number" id="edit-investimento" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
+                <div><label class="block text-orange-400 mb-0.5">Reserva Financeira</label><input type="number" id="edit-reserva-financeira" class="w-full input-premium p-2.5 rounded-lg text-white"></div>
             </div>
-            <div class="flex gap-3">
-                <button onclick="salvarEdicao()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-all">
-                    Salvar
-                </button>
-                <button onclick="deletarLancamento()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg transition-all">
-                    Deletar
-                </button>
-                <button onclick="fecharModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition-all">
-                    Cancelar
-                </button>
+            <div class="grid grid-cols-3 gap-2 pt-2 text-xs font-bold">
+                <button onclick="salvarEdicao()" class="bg-emerald-600 py-2.5 rounded-xl text-white">Salvar</button>
+                <button onclick="deletarLancamento()" class="bg-rose-600 py-2.5 rounded-xl text-white">Deletar</button>
+                <button onclick="fecharModal()" class="bg-slate-800 py-2.5 rounded-xl text-slate-400">Voltar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE FECHAMENTO DE MÊS -->
-    <div id="modal-fechar-mes" class="modal-overlay">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold text-amber-400 mb-4">Confirmar Fechamento do Mês</h3>
-            <p class="text-gray-300 mb-6">Tem certeza que deseja fechar o mês atual? O histórico será movido para "Meses Anteriores" e a tela será zerada.</p>
-            <div class="flex gap-3">
-                <button onclick="confirmarFecharMes()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg transition-all">
-                    Confirmar
-                </button>
-                <button onclick="fecharModalMes()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition-all">
-                    Cancelar
-                </button>
+    <div id="modal-fechar-mes" class="modal-overlay items-center justify-center p-4">
+        <div class="glass-card rounded-2xl p-5 w-full max-w-sm text-center space-y-4">
+            <h3 class="text-base font-bold text-amber-400 uppercase tracking-wider">Fechar Mês Comercial</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Isso irá consolidar as estatísticas deste período para o histórico permanente. Seu saldo geral acumulado de caixa **NÃO** será zerado.</p>
+            <div class="flex gap-2 text-xs font-bold">
+                <button onclick="confirmarFecharMes()" class="flex-1 bg-amber-500 py-3 rounded-xl text-slate-950">Confirmar</button>
+                <button onclick="fecharModalMes()" class="flex-1 bg-slate-800 py-3 rounded-xl text-slate-400">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-gray-900/90 backdrop-blur border-t border-gray-800 p-3 grid grid-cols-2 gap-3 z-5xl">
-        <button onclick="exportarBackup()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-4 rounded-xl text-xs uppercase transition-all flex items-center justify-center gap-1">
-            📦 Salvar Backup
-        </button>
-        <label class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-4 rounded-xl text-xs uppercase transition-all flex items-center justify-center gap-1 cursor-pointer text-center">
-            📥 Ler Backup
-            <input type="file" id="importFile" accept=".txt" onchange="importarBackup(event)" class="hidden">
+    <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-950/80 backdrop-blur-lg border-t border-slate-900 p-3 grid grid-cols-2 gap-3 z-50">
+        <button onclick="exportarBackup()" class="bg-slate-900 border border-slate-800 text-slate-300 font-semibold py-2.5 rounded-xl text-[10px] uppercase tracking-wider">📦 Criar Backup</button>
+        <label class="bg-slate-900 border border-slate-800 text-slate-300 font-semibold py-2.5 rounded-xl text-[10px] uppercase tracking-wider text-center cursor-pointer block">
+            📥 Ler Backup <input type="file" id="importFile" accept=".txt" onchange="importarBackup(event)" class="hidden">
         </label>
     </footer>
 
@@ -281,7 +218,6 @@
             historico: [],
             mesesAnteriores: []
         };
-
         let lancamentoEmEdicao = null;
 
         function formatarMoeda(valor) {
@@ -289,92 +225,98 @@
         }
 
         function atualizarUI() {
-            // Recalcular saldoAcumulado com base em todo o histórico para alinhar com a nova regra de saídas
-            let totalAcumuladoCalculado = 0;
-            dados.historico.forEach(item => {
-                totalAcumuladoCalculado += parseFloat(item.saldoDia) || 0;
-            });
-            dados.saldoAcumulado = totalAcumuladoCalculado;
+            // LÓGICA CONTINUA: O saldo do topo agora é a soma de todo o histórico ativo + a memória histórica dos meses fechados
+            let totalHistoricoAtivo = 0;
+            dados.historico.forEach(item => { totalHistoricoAtivo += parseFloat(item.saldoDia) || 0; });
+            
+            let totalMesesFechados = 0;
+            dados.mesesAnteriores.forEach(mes => { totalMesesFechados += parseFloat(mes.saldoFinalNoMes) || 0; });
+
+            dados.saldoAcumulado = totalHistoricoAtivo + totalMesesFechados;
 
             const saldoEl = document.getElementById('saldo-total');
             saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
-            saldoEl.className = `text-5xl font-bold transition-colors duration-500 ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
+            saldoEl.className = `text-4xl font-light tracking-tight transition-colors ${dados.saldoAcumulado >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
                 resumoContainer.classList.remove('hidden');
+                document.getElementById('last-date').innerText = `Lançado em: ${ultimo.data}`;
                 
-                const faturamentoUltimo = parseFloat(ultimo.faturamento) || 0;
-                const gastosUltimo = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0) + (parseFloat(ultimo.manutencao) || 0);
-                const reservaUltimo = (parseFloat(ultimo.investimento) || 0) + (parseFloat(ultimo.reservaFinanceira) || 0);
+                const entradas = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
+                const saidas = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.manutencao) || 0) + (parseFloat(ultimo.pessoal) || 0);
+                const retido = (parseFloat(ultimo.investimento) || 0) + (parseFloat(ultimo.reservaFinanceira) || 0);
                 
-                document.getElementById('last-ganho').innerText = formatarMoeda(faturamentoUltimo);
-                document.getElementById('last-gastos').innerText = formatarMoeda(gastosUltimo);
-                document.getElementById('last-reserva').innerText = formatarMoeda(reservaUltimo);
+                document.getElementById('last-ganho').innerText = formatarMoeda(entradas);
+                document.getElementById('last-gastos').innerText = formatarMoeda(saidas);
+                document.getElementById('last-reserva').innerText = formatarMoeda(retido);
             } else {
                 resumoContainer.classList.add('hidden');
             }
 
-            // Calcular acumulados de forma blindada contra NaN
-            let totalFaturamento = 0, totalGasolina = 0, totalPessoal = 0, totalManutencao = 0, totalInvestimento = 0, totalReservaFinanceira = 0;
-            
+            // Acumulados do período
+            let totalFat = 0, totalRenda = 0, totalGas = 0, totalMan = 0, totalPes = 0, totalInv = 0, totalRes = 0;
             dados.historico.forEach(item => {
-                totalFaturamento += parseFloat(item.faturamento) || 0;
-                totalGasolina += parseFloat(item.gasolina) || 0;
-                totalPessoal += parseFloat(item.pessoal) || 0;
-                totalManutencao += parseFloat(item.manutencao) || 0;
-                totalInvestimento += parseFloat(item.investimento) || 0;
-                totalReservaFinanceira += parseFloat(item.reservaFinanceira) || 0;
+                totalFat += parseFloat(item.faturamento) || 0;
+                totalRenda += parseFloat(item.rendaExtra) || 0;
+                totalGas += parseFloat(item.gasolina) || 0;
+                totalMan += parseFloat(item.manutencao) || 0;
+                totalPes += parseFloat(item.pessoal) || 0;
+                totalInv += parseFloat(item.investimento) || 0;
+                totalRes += parseFloat(item.reservaFinanceira) || 0;
             });
 
-            document.getElementById('total-faturamento').innerText = formatarMoeda(totalFaturamento);
-            document.getElementById('total-gasolina').innerText = formatarMoeda(totalGasolina);
-            document.getElementById('total-pessoal').innerText = formatarMoeda(totalPessoal);
-            document.getElementById('total-manutencao').innerText = formatarMoeda(totalManutencao);
-            document.getElementById('total-investimento').innerText = formatarMoeda(totalInvestimento);
-            document.getElementById('total-reserva-financeira').innerText = formatarMoeda(totalReservaFinanceira);
+            document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
+            document.getElementById('total-renda-extra').innerText = formatarMoeda(totalRenda);
+            document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
+            document.getElementById('total-manutencao').innerText = formatarMoeda(totalMan);
+            document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
+            document.getElementById('total-retido').innerText = formatarMoeda(totalInv + totalRes);
 
-            // Atualizar tabela de histórico
+            // Lista diária compacta
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
-
             if (dados.historico.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-600 text-sm italic">Nenhum lançamento ainda</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-600 italic">Nenhum registro ativo</td></tr>';
             } else {
                 [...dados.historico].reverse().forEach((item, index) => {
+                    const idxReal = dados.historico.length - 1 - index;
                     const tr = document.createElement('tr');
-                    tr.className = 'border-t border-gray-800/50 text-sm hover:bg-gray-800/20 transition-colors';
+                    tr.className = 'border-t border-slate-900 text-slate-300 hover:bg-white/[0.01]';
                     const saldoDia = parseFloat(item.saldoDia) || 0;
+                    
+                    // Se houver nota nos gastos pessoais, mostra um pequeno aviso visual clicável
+                    const temNota = item.pessoalNota ? `<span class="block text-[9px] text-slate-500 italic truncate max-w-[120px]">💬 ${item.pessoalNota}</span>` : '';
+
                     tr.innerHTML = `
-                        <td class="p-4 text-gray-400 font-medium">${item.data}</td>
-                        <td class="p-4 font-bold ${saldoDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(saldoDia)}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="abrirEdicao(${dados.historico.length - 1 - index})" class="text-blue-400 hover:text-blue-300 font-bold edit-btn">✏️</button>
-                        </td>
+                        <td class="p-3 font-medium text-slate-400">${item.data}${temNota}</td>
+                        <td class="p-3 font-semibold ${saldoDia >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${formatarMoeda(saldoDia)}</td>
+                        <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 bg-blue-950/40 border border-blue-900/40 px-2.5 py-1 rounded-md text-[10px]">Ajustar</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            // Atualizar meses anteriores
+            // Listar meses salvos
             const mesesContainer = document.getElementById('meses-anteriores-container');
             const mesesVazios = document.getElementById('meses-vazios');
-            
             if (dados.mesesAnteriores.length === 0) {
-                mesesContainer.innerHTML = '';
-                mesesVazios.classList.remove('hidden');
+                mesesContainer.innerHTML = ''; mesesVazios.classList.remove('hidden');
             } else {
                 mesesVazios.classList.add('hidden');
                 mesesContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => `
-                    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-gray-300">${mes.periodo}</h4>
-                            <button onclick="deletarMesAnterior(${idx})" class="text-red-400 hover:text-red-300 text-xs">🗑️</button>
+                    <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-800/60 flex justify-between items-center text-xs">
+                        <div>
+                            <h4 class="font-bold text-slate-300 uppercase text-[10px] tracking-wider">${mes.periodo}</h4>
+                            <p class="text-slate-500 text-[10px] mt-0.5">Faturamento Total: <span class="text-emerald-400 font-medium">${formatarMoeda(mes.totalFaturamentoApp + mes.totalRendaExtra)}</span></p>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div><span class="text-gray-500">Faturamento:</span> <span class="text-green-400 font-bold">${formatarMoeda(mes.totalFaturamento)}</span></div>
-                            <div><span class="text-gray-500">Saldo Final:</span> <span class="text-blue-400 font-bold">${formatarMoeda(mes.saldoFinal)}</span></div>
+                        <div class="text-right flex items-center gap-3">
+                            <div>
+                                <span class="text-[9px] text-slate-500 block uppercase">Resultado Caixa</span>
+                                <span class="font-bold text-blue-400">${formatarMoeda(mes.saldoFinalNoMes)}</span>
+                            </div>
+                            <button onclick="deletarMesAnterior(${idx})" class="text-rose-500 text-sm">🗑️</button>
                         </div>
                     </div>
                 `).join('');
@@ -383,156 +325,113 @@
 
         function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
+            const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
             const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
             const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
+            const pessoalNota = document.getElementById('pessoal-nota').value.trim();
             const manutencao = parseFloat(document.getElementById('manutencao').value) || 0;
             const investimento = parseFloat(document.getElementById('investimento').value) || 0;
             const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
 
-            if (faturamento === 0 && gasolina === 0 && pessoal === 0 && investimento === 0 && reservaFinanceira === 0 && manutencao === 0) {
-                alert('Por favor, insira os valores do dia.');
-                return;
+            if (!faturamento && !rendaExtra && !gasolina && !pessoal && !manutencao && !investimento && !reservaFinanceira) {
+                alert('Preencha pelo menos um campo para lançar.'); return;
             }
 
-            // NOVA FÓRMULA: Investimento e Reserva agora entram reduzindo o Saldo Real do Dia
-            const saldoDia = faturamento - gasolina - pessoal - manutencao - investimento - reservaFinanceira;
+            // NOVA FÓRMULA MATEMÁTICA REAL: Entradas menos saídas operacionais e reservas
+            const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - investimento - reservaFinanceira;
 
-            const novoLancamento = {
+            dados.historico.push({
                 data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-                faturamento,
-                gasolina,
-                pessoal,
-                manutencao,
-                investimento,
-                reservaFinanceira,
-                saldoDia,
-                timestamp: new Date().getTime()
-            };
+                faturamento, rendaExtra, gasolina, pessoal, pessoalNota, manutencao, investimento, reservaFinanceira,
+                saldoDia, timestamp: new Date().getTime()
+            });
 
-            dados.historico.push(novoLancamento);
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
-            document.getElementById('faturamento').value = '';
-            document.getElementById('gasolina').value = '';
-            document.getElementById('pessoal').value = '';
-            document.getElementById('manutencao').value = '';
-            document.getElementById('investimento').value = '';
-            document.getElementById('reserva-financeira').value = '';
+            // Limpar formulário
+            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'pessoal-nota', 'manutencao', 'investimento', 'reserva-financeira'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
 
             atualizarUI();
             
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = '✓ SALVO COM SUCESSO';
-            btn.classList.replace('bg-blue-600', 'bg-green-600');
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.replace('bg-green-600', 'bg-blue-600');
-            }, 2000);
+            const btn = event.target; const txt = btn.innerText;
+            btn.innerText = '✓ REGISTRO SALVO'; btn.className = btn.className.replace('bg-blue-600', 'bg-emerald-600');
+            setTimeout(() => { btn.innerText = txt; btn.className = btn.className.replace('bg-emerald-600', 'bg-blue-600'); }, 1500);
         }
 
         function abrirEdicao(index) {
             lancamentoEmEdicao = index;
             const item = dados.historico[index];
-            
             document.getElementById('edit-data').value = item.data;
             document.getElementById('edit-faturamento').value = item.faturamento || 0;
+            document.getElementById('edit-renda-extra').value = item.rendaExtra || 0;
             document.getElementById('edit-gasolina').value = item.gasolina || 0;
             document.getElementById('edit-pessoal').value = item.pessoal || 0;
+            document.getElementById('edit-pessoal-nota').value = item.pessoalNota || '';
             document.getElementById('edit-manutencao').value = item.manutencao || 0;
             document.getElementById('edit-investimento').value = item.investimento || 0;
             document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira || 0;
-            
             document.getElementById('modal-edicao').classList.add('active');
         }
 
-        function fecharModal() {
-            document.getElementById('modal-edicao').classList.remove('active');
-            lancamentoEmEdicao = null;
-        }
+        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
 
         function salvarEdicao() {
             if (lancamentoEmEdicao === null) return;
-
             const item = dados.historico[lancamentoEmEdicao];
+
+            item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
+            item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
+            item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
+            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
+            item.pessoalNota = document.getElementById('edit-pessoal-nota').value.trim();
+            item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
+            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
+            item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
             
-            const faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
-            const gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
-            const pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
-            const manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
-            const investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
-            const reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
-
-            // Ajustando a edição também para abater as reservas do saldo do dia
-            const saldoDiaNovo = faturamento - gasolina - pessoal - manutencao - investimento - reservaFinanceira;
-
-            item.faturamento = faturamento;
-            item.gasolina = gasolina;
-            item.pessoal = pessoal;
-            item.manutencao = manutencao;
-            item.investimento = investimento;
-            item.reservaFinanceira = reservaFinanceira;
-            item.saldoDia = saldoDiaNovo;
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.investimento - item.reservaFinanceira;
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            fecharModal();
-            atualizarUI();
-            alert('Lançamento atualizado com sucesso!');
+            fecharModal(); atualizarUI();
         }
 
         function deletarLancamento() {
             if (lancamentoEmEdicao === null) return;
-            
-            if (confirm('Tem certeza que deseja deletar este lançamento?')) {
+            if (confirm('Deletar em definitivo este registro?')) {
                 dados.historico.splice(lancamentoEmEdicao, 1);
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                fecharModal();
-                atualizarUI();
-                alert('Lançamento deletado com sucesso!');
+                fecharModal(); atualizarUI();
             }
         }
 
-        function abrirFecharMes() {
-            document.getElementById('modal-fechar-mes').classList.add('active');
-        }
-
-        function fecharModalMes() {
-            document.getElementById('modal-fechar-mes').classList.remove('active');
-        }
+        function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
+        function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
 
         function confirmarFecharMes() {
-            if (dados.historico.length === 0) {
-                alert('Não há lançamentos para fechar o mês.');
-                return;
-            }
-
+            if (dados.historico.length === 0) { alert('Não há movimentações para consolidar.'); return; }
+            
             const agora = new Date();
             const periodo = `${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`.toUpperCase();
 
-            let totalFaturamento = 0;
+            let totalFatApp = 0, totalRenda = 0, saldoFinalNoMes = 0;
             dados.historico.forEach(item => {
-                totalFaturamento += parseFloat(item.faturamento) || 0;
+                totalFatApp += parseFloat(item.faturamento) || 0;
+                totalRenda += parseFloat(item.rendaExtra) || 0;
+                saldoFinalNoMes += parseFloat(item.saldoDia) || 0;
             });
 
-            const mesFechado = {
-                periodo,
-                totalFaturamento,
-                saldoFinal: dados.saldoAcumulado,
-                historico: [...dados.historico]
-            };
-
-            dados.mesesAnteriores.push(mesFechado);
-            dados.historico = [];
-            dados.saldoAcumulado = 0;
+            // Arquiva o mês sem alterar o saldo do topo, mantendo a contabilidade viva
+            dados.mesesAnteriores.push({ periodo, totalFaturamentoApp: totalFatApp, totalRendaExtra: totalRenda, saldoFinalNoMes, historico: [...dados.historico] });
+            dados.historico = []; // Limpa apenas a lista visível do mês atual
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            fecharModalMes();
-            atualizarUI();
-            alert(`Mês de ${periodo} fechado com sucesso!`);
+            fecharModalMes(); atualizarUI();
+            alert(`Mês de ${periodo} fechado e arquivado.`);
         }
 
         function deletarMesAnterior(index) {
-            if (confirm('Tem certeza que deseja deletar este mês?')) {
+            if (confirm('Atenção: Excluir este mês alterará seu saldo geral vitalício. Deseja continuar?')) {
                 dados.mesesAnteriores.splice(index, 1);
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
@@ -540,7 +439,7 @@
         }
 
         function limparDados() {
-            if (confirm('ATENÇÃO: Isso vai apagar todo o seu histórico e zerar o saldo. Confirmar?')) {
+            if (confirm('Deseja apagar todas as configurações e banco de dados do aplicativo?')) {
                 dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
@@ -548,54 +447,31 @@
         }
 
         function exportarBackup() {
-            if (dados.historico.length === 0 && dados.saldoAcumulado === 0 && dados.mesesAnteriores.length === 0) {
-                alert('Não existem dados para exportar.');
-                return;
-            }
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
-            const downloadAnchor = document.createElement('a');
-            const dataAtual = new Date().toISOString().slice(0,10);
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `backup_financeiro_${dataAtual}.txt`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr); dl.setAttribute("download", `backup_financeiro_${new Date().toISOString().slice(0,10)}.txt`);
+            document.body.appendChild(dl); dl.click(); dl.remove();
         }
 
         function importarBackup(event) {
-            const input = event.target;
-            const reader = new FileReader();
+            const input = event.target; const reader = new FileReader();
             reader.onload = function() {
                 try {
-                    const dadosImportados = JSON.parse(reader.result);
-                    if (dadosImportados && typeof dadosImportados.saldoAcumulado === 'number' && Array.isArray(dadosImportados.historico)) {
-                        if (confirm('Deseja substituir as movimentações atuais pelos dados do arquivo de backup?')) {
-                            dados = dadosImportados;
-                            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                            atualizarUI();
-                            alert('Backup restaurado com sucesso!');
-                        }
-                    } else {
-                        alert('Arquivo de backup inválido.');
+                    const parsed = JSON.parse(reader.result);
+                    if (parsed && Array.isArray(parsed.historico)) {
+                        dados = parsed; localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                        atualizarUI(); alert('Dados importados.');
                     }
-                } catch (e) {
-                    alert('Erro ao processar o arquivo de backup.');
-                }
+                } catch (e) { alert('Falha no backup.'); }
                 input.value = '';
             };
-            if (input.files.length > 0) {
-                reader.readAsText(input.files[0]);
-            }
+            if (input.files.length > 0) reader.readAsText(input.files[0]);
         }
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js', { scope: './' })
-                .then(registration => console.log('Service Worker registrado', registration))
-                .catch(err => console.error('Erro SW:', err));
+            navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.error(err));
         }
-
         atualizarUI();
     </script>
 </body>
-</html>
-
+    </html>
