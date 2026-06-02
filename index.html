@@ -18,13 +18,13 @@
     <style>
         body {
             background-color: #111111;
-            color: #e5e7eb;
+            color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         .input-autonomo {
             background-color: #1f2937;
-            border: 2px solid #374151;
+            border: 2px solid #4b5563;
             color: #ffffff;
             font-size: 1.25rem;
             padding: 0.75rem;
@@ -50,7 +50,7 @@
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.85);
+            background-color: rgba(0, 0, 0, 0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -58,7 +58,7 @@
         .modal-overlay.active { display: flex; }
         .modal-content {
             background-color: #1f2937;
-            border: 2px solid #4b5563;
+            border: 2px solid #6b7280;
             border-radius: 1.5rem;
             padding: 1.25rem;
             width: 92%;
@@ -70,7 +70,7 @@
 </head>
 <body class="p-4 max-w-md mx-auto pb-24">
 
-    <!-- SALDO TOTAL VITALÍCIO (NÃO ZERA) -->
+    <!-- SALDO TOTAL VITALÍCIO -->
     <header class="text-center my-5">
         <h1 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Caixa Geral Acumulado</h1>
         <div id="saldo-total" class="text-4xl font-black text-green-500">R$ 0,00</div>
@@ -81,36 +81,36 @@
         <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-3">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Último Registro</h3>
-                <span id="last-date" class="text-[10px] text-gray-500 font-bold"></span>
+                <span id="last-date" class="text-[10px] text-gray-400 font-black"></span>
             </div>
             <div class="grid grid-cols-3 gap-2 text-center text-xs">
                 <div class="bg-gray-800 p-2 rounded-xl">
-                    <span class="block text-[9px] text-gray-400 uppercase mb-0.5">Entradas</span>
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Entradas</span>
                     <span id="last-ganho" class="font-bold text-green-400">R$ 0</span>
                 </div>
                 <div class="bg-gray-800 p-2 rounded-xl">
-                    <span class="block text-[9px] text-gray-400 uppercase mb-0.5">Saídas</span>
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Saídas</span>
                     <span id="last-gastos" class="font-bold text-red-400">R$ 0</span>
                 </div>
                 <div class="bg-gray-800 p-2 rounded-xl">
-                    <span class="block text-[9px] text-gray-400 uppercase mb-0.5">Reservas</span>
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Reservas</span>
                     <span id="last-reserva" class="font-bold text-orange-400">R$ 0</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FORMULÁRIO PRINCIPAL COM TAMANHO MÉDIO E ALTO CONTRASTE -->
+    <!-- FORMULÁRIO PRINCIPAL -->
     <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
         
         <!-- ENTRADAS -->
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-xs font-bold text-white mb-1 ml-1 uppercase tracking-wide">Faturamento</label>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Faturamento</label>
                 <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
             <div>
-                <label class="block text-xs font-bold text-green-400 mb-1 ml-1 uppercase tracking-wide">Renda Extra (+)</label>
+                <label class="block text-xs font-black text-green-400 mb-1 ml-1 uppercase tracking-wide">Renda Extra (+)</label>
                 <input type="number" id="renda-extra" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
         </div>
@@ -118,53 +118,57 @@
         <!-- SAÍDAS OPERACIONAIS -->
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-xs font-bold text-gray-300 mb-1 ml-1 uppercase tracking-wide">Combustível</label>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Combustível</label>
                 <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-300 mb-1 ml-1 uppercase tracking-wide">Reserva Manutenção</label>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Reserva Manutenção</label>
                 <input type="number" id="manutencao" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
         </div>
 
-        <!-- GASTOS PESSOAIS (SISTEMA DE PLANILHA INTELIGENTE) -->
+        <!-- GASTOS PESSOAIS (PLANILHA) -->
         <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-2">
             <div class="flex justify-between items-center">
-                <label class="block text-xs font-bold text-red-400 uppercase tracking-wide ml-1">Gastos Pessoais (-)</label>
-                <button onclick="abrirSubjanelaGastos()" class="bg-red-900/60 hover:bg-red-900 border border-red-700 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase tracking-wider">
+                <label class="block text-xs font-black text-red-400 uppercase tracking-wide ml-1">Gastos Pessoais (-)</label>
+                <button id="btn-detalhar" onclick="abrirSubjanelaGastos()" class="bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase tracking-wider">
                     📝 Detalhar Gastos
                 </button>
             </div>
             <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
         </div>
 
-        <!-- INVESTIMENTOS E RESERVAS -->
+        <!-- RESERVAS E INVESTIMENTOS -->
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-xs font-bold text-purple-400 mb-1 ml-1 uppercase tracking-wide">Investimentos</label>
-                <input type="number" id="investimento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+                <label class="block text-xs font-black text-orange-400 mb-1 ml-1 uppercase tracking-wide">Reserva Financeira</label>
+                <input type="number" id="reserva-financeira" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
             <div>
-                <label class="block text-xs font-bold text-orange-400 mb-1 ml-1 uppercase tracking-wide">Reserva Guardada</label>
-                <input type="number" id="reserva-financeira" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+                <label class="block text-xs font-black text-purple-400 mb-1 ml-1 uppercase tracking-wide">Poupança</label>
+                <input type="number" id="investimento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
         </div>
 
-        <button onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider mt-2">
+        <!-- BOTÃO DE LANÇAMENTO INTELIGENTE COM TRAVA -->
+        <button id="btn-salvar-principal" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider mt-2">
             Salvar Lançamento do Dia
         </button>
     </div>
 
     <!-- RESUMO DO PERÍODO CORRENTE -->
     <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
-        <h2 class="text-xs font-bold text-yellow-500 mb-3 uppercase tracking-wider">Balanço do Período Atual</h2>
+        <h2 class="text-xs font-black text-yellow-500 mb-3 uppercase tracking-wider">Balanço do Período Atual</h2>
         <div class="grid grid-cols-2 gap-2 text-xs mb-4">
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-gray-400 uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-gray-400 uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-gray-400 uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-gray-400 uppercase">Reserva Manut.</span><span id="total-manutencao" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-gray-400 uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-gray-400 uppercase">Retido (Inv+Res)</span><span id="total-retido" class="font-bold text-purple-400 text-sm">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Reserva Manut.</span><span id="total-manutencao" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            
+            <!-- CONTAS DESMEMBRADAS -->
+            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-orange-400 font-bold uppercase">Reserva Finan.</span><span id="total-reserva-aba" class="font-bold text-orange-400 text-sm">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl col-span-2"><span class="block text-[9px] text-purple-400 font-bold uppercase">Poupança Acumulada</span><span id="total-investimento-aba" class="font-bold text-purple-400 text-sm">R$ 0,00</span></div>
         </div>
         <button onclick="abrirFecharMes()" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
             📅 Fechar Balanço Mensal
@@ -174,13 +178,13 @@
     <!-- HISTÓRICO DIÁRIO -->
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Mensal</h2>
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico</h2>
             <button onclick="limparDados()" class="text-[9px] text-red-500 font-bold uppercase border border-red-900 px-2 py-1 rounded-lg">Zerar Tudo</button>
         </div>
         <div class="overflow-hidden rounded-xl border-2 border-gray-800 shadow-md">
             <table class="w-full text-left border-collapse bg-gray-900">
                 <thead>
-                    <tr class="bg-gray-800 text-gray-400 text-[10px] uppercase font-bold tracking-wider border-b border-gray-700">
+                    <tr class="bg-gray-800 text-white text-[10px] uppercase font-bold tracking-wider border-b border-gray-700">
                         <th class="p-3">Data</th>
                         <th class="p-3">Saldo Líquido</th>
                         <th class="p-3 text-right">Ação</th>
@@ -191,16 +195,14 @@
         </div>
     </div>
 
-    <!-- HISTÓRICO FECHADO ARQUIVADO -->
+    <!-- MESES ARQUIVADOS -->
     <div class="mt-6">
         <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Meses Arquivados</h2>
         <div id="meses-anteriores-container" class="space-y-2"></div>
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- SUBJANELA MODAL: MINI PLANILHA DE GASTOS   -->
-    <!-- ========================================== -->
+    <!-- SUBJANELA MODAL: PLANILHA DE GASTOS -->
     <div id="subjanela-gastos" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -208,15 +210,14 @@
                 <button onclick="fecharSubjanelaGastos()" class="text-gray-400 text-lg font-bold">✕</button>
             </div>
             
-            <!-- ENTRADA DE ITENS -->
             <div class="space-y-2 bg-gray-950 p-2.5 rounded-xl border border-gray-800">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-0.5">Descrição</label>
+                        <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Descrição</label>
                         <input type="text" id="gasto-item-desc" placeholder="Ex: Café, Pneu" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-0.5">Valor (R$)</label>
+                        <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Valor (R$)</label>
                         <div class="flex gap-1">
                             <input type="number" id="gasto-item-val" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
                             <button onclick="adicionarItemNaLista()" class="bg-red-600 text-white font-black px-3 rounded-lg text-sm">+</button>
@@ -225,10 +226,9 @@
                 </div>
             </div>
 
-            <!-- TABELA DE EXIBIÇÃO DA LISTA -->
             <div class="max-h-40 overflow-y-auto border border-gray-700 rounded-xl bg-gray-950">
                 <table class="w-full text-left text-xs text-gray-300">
-                    <thead class="bg-gray-800 text-[10px] font-bold text-gray-400 uppercase border-b border-gray-700">
+                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700">
                         <tr>
                             <th class="p-2">Descrição</th>
                             <th class="p-2">Valor</th>
@@ -239,9 +239,8 @@
                 </table>
             </div>
 
-            <!-- TOTAL DA PLANILHA -->
             <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
-                <span class="text-gray-400 uppercase text-xs">Total do Dia:</span>
+                <span class="text-white uppercase text-xs">Total do Dia:</span>
                 <span id="subjanela-total-acumulado" class="text-red-400">R$ 0,00</span>
             </div>
 
@@ -259,11 +258,11 @@
                 <div><label class="block text-gray-400 font-bold uppercase text-[10px] mb-0.5">Data</label><input type="text" id="edit-data" disabled class="w-full bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-500 font-bold"></div>
                 <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Faturamento</label><input type="number" id="edit-faturamento" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white font-bold"></div>
                 <div><label class="block text-green-400 font-bold uppercase text-[10px] mb-0.5">Renda Extra (+)</label><input type="number" id="edit-renda-extra" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white font-bold"></div>
-                <div><label class="block text-gray-300 font-bold uppercase text-[10px] mb-0.5">Combustível</label><input type="number" id="edit-gasolina" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
-                <div><label class="block text-gray-300 font-bold uppercase text-[10px] mb-0.5">Reserva Manutenção</label><input type="number" id="edit-manutencao" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
+                <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Combustível</label><input type="number" id="edit-gasolina" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
+                <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Reserva Manutenção</label><input type="number" id="edit-manutencao" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
                 <div><label class="block text-red-400 font-bold uppercase text-[10px] mb-0.5">Gastos Pessoais (Total)</label><input type="number" id="edit-pessoal" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white font-bold"><p class="text-[9px] text-gray-500 italic mt-0.5">*Nota: Alterar o valor direto aqui anulará os itens detalhados.</p></div>
-                <div><label class="block text-purple-400 font-bold uppercase text-[10px] mb-0.5">Investimentos</label><input type="number" id="edit-investimento" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
-                <div><label class="block text-orange-400 font-bold uppercase text-[10px] mb-0.5">Reserva Guardada</label><input type="number" id="edit-reserva-financeira" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
+                <div><label class="block text-orange-400 font-bold uppercase text-[10px] mb-0.5">Reserva Financeira</label><input type="number" id="edit-reserva-financeira" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
+                <div><label class="block text-purple-400 font-bold uppercase text-[10px] mb-0.5">Poupança</label><input type="number" id="edit-investimento" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
             </div>
             <div class="grid grid-cols-3 gap-2 pt-2 text-xs font-bold">
                 <button onclick="salvarEdicao()" class="bg-green-600 py-2.5 rounded-xl text-white">Salvar</button>
@@ -300,7 +299,6 @@
             mesesAnteriores: []
         };
         
-        // Memória temporária da planilha de gastos do dia corrente
         let itensGastosTemporarios = [];
         let lancamentoEmEdicao = null;
 
@@ -308,8 +306,47 @@
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        // CORREÇÃO DO FUSO HORÁRIO APLICADA AQUI (CRUCIAL PARA GITHUB PAGES)
+        function obterDataHoje() {
+            return new Date().toLocaleDateString('pt-BR', { 
+                day: '2-digit', 
+                month: '2-digit',
+                timeZone: 'America/Sao_Paulo' 
+            });
+        }
+
+        function verificarTravaDiaria() {
+            const hoje = obterDataHoje();
+            const jaLancado = dados.historico.some(item => item.data === hoje);
+            const btnSalvar = document.getElementById('btn-salvar-principal');
+            const btnDetalhar = document.getElementById('btn-detalhar');
+
+            if (jaLancado) {
+                btnSalvar.innerText = `⚠️ ${hoje} JÁ LANÇADO (USE O AJUSTAR)`;
+                btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
+                btnSalvar.disabled = true;
+                btnDetalhar.disabled = true;
+                btnDetalhar.className = btnDetalhar.className.replace("bg-red-950", "bg-gray-950 text-gray-600 border-gray-800 cursor-not-allowed");
+                
+                ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
+                    document.getElementById(id).disabled = true;
+                    document.getElementById(id).className = "input-bloqueado";
+                });
+            } else {
+                btnSalvar.innerText = "Salvar Lançamento do Dia";
+                btnSalvar.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider mt-2";
+                btnSalvar.disabled = false;
+                btnDetalhar.disabled = false;
+                btnDetalhar.className = "bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase tracking-wider";
+                
+                ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
+                    document.getElementById(id).disabled = false;
+                    document.getElementById(id).className = "input-autonomo";
+                });
+            }
+        }
+
         function atualizarUI() {
-            // REGRA DE CONTINUIDADE: Calcula o saldo com base no histórico ativo + meses fechados arquivados
             let totalHistoricoAtivo = 0;
             dados.historico.forEach(item => { totalHistoricoAtivo += parseFloat(item.saldoDia) || 0; });
 
@@ -322,16 +359,15 @@
             saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
             saldoEl.className = `text-4xl font-black transition-colors ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
 
-            // Exibição do topo do último registro
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
                 resumoContainer.classList.remove('hidden');
-                document.getElementById('last-date').innerText = `Data: ${ultimo.data}`;
+                document.getElementById('last-date').innerText = `${ultimo.data}`;
                 
                 const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
                 const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.manutencao) || 0) + (parseFloat(ultimo.pessoal) || 0);
-                const retidoTotal = (parseFloat(ultimo.investimento) || 0) + (parseFloat(ultimo.reservaFinanceira) || 0);
+                const retidoTotal = (parseFloat(ultimo.reservaFinanceira) || 0) + (parseFloat(ultimo.investimento) || 0);
 
                 document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
                 document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
@@ -340,7 +376,6 @@
                 resumoContainer.classList.add('hidden');
             }
 
-            // Totais consolidados do período visível
             let totalFat = 0, totalRenda = 0, totalGas = 0, totalMan = 0, totalPes = 0, totalInv = 0, totalRes = 0;
             dados.historico.forEach(item => {
                 totalFat += parseFloat(item.faturamento) || 0;
@@ -357,9 +392,9 @@
             document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
             document.getElementById('total-manutencao').innerText = formatarMoeda(totalMan);
             document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
-            document.getElementById('total-retido').innerText = formatarMoeda(totalInv + totalRes);
+            document.getElementById('total-reserva-aba').innerText = formatarMoeda(totalRes);
+            document.getElementById('total-investimento-aba').innerText = formatarMoeda(totalInv);
 
-            // Montagem da tabela de histórico
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
             if (dados.historico.length === 0) {
@@ -371,19 +406,17 @@
                     tr.className = 'border-t border-gray-800 hover:bg-gray-800/30 text-xs';
                     const sDia = parseFloat(item.saldoDia) || 0;
                     
-                    // Exibe dica visual se contiver detalhamento de planilha interna
-                    const indicadorPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-400 font-bold uppercase mt-0.5">📋 Com Detalhamento</span>` : '';
+                    const indicadorPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
 
                     tr.innerHTML = `
-                        <td class="p-3 text-gray-400 font-bold">${item.data}${indicadorPlanilha}</td>
-                        <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-400' : 'text-red-400'}">${formatarMoeda(sDia)}</td>
-                        <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border border-blue-900/50 bg-blue-950/40 px-2 py-0.5 rounded">Ajustar</button></td>
+                        <td class="p-3 text-white font-black">${item.data}${indicadorPlanilha}</td>
+                        <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-500' : 'text-red-500'}">${formatarMoeda(sDia)}</td>
+                        <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border-2 border-blue-600 bg-blue-950 px-2.5 py-1 rounded-md text-xs">Ajustar</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            // Exibição dos meses fechados
             const mContainer = document.getElementById('meses-anteriores-container');
             const mVazios = document.getElementById('meses-vazios');
             if (dados.mesesAnteriores.length === 0) {
@@ -394,11 +427,11 @@
                     <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs">
                         <div>
                             <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">${mes.periodo}</h4>
-                            <p class="text-gray-500 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(mes.faturamentoTotal + mes.rendaExtraTotal)}</span></p>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(mes.faturamentoTotal + mes.rendaExtraTotal)}</span></p>
                         </div>
                         <div class="text-right flex items-center gap-3">
                             <div>
-                                <span class="text-[9px] text-gray-500 block uppercase">Fundo Líquido</span>
+                                <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
                                 <span class="font-bold text-blue-400">${formatarMoeda(mes.saldoFinalNoMes)}</span>
                             </div>
                             <button onclick="deletarMesAnterior(${idx})" class="text-red-500 text-sm">🗑️</button>
@@ -406,9 +439,11 @@
                     </div>
                 `).join('');
             }
+
+            verificarTravaDiaria();
         }
 
-        /* FUNÇÕES DA SUBJANELA DE GASTOS PESSOAIS */
+        /* OPERAÇÕES DA PLANILHA DE GASTOS */
         function abrirSubjanelaGastos() {
             document.getElementById('subjanela-gastos').classList.add('active');
             renderizarListaSubjanela();
@@ -425,7 +460,7 @@
             const valor = parseFloat(valEl.value) || 0;
 
             if (!descricao || valor <= 0) {
-                alert('Insira uma descrição válida e um valor maior que zero.'); return;
+                alert('Insira uma descrição e um valor maior que zero.'); return;
             }
 
             itensGastosTemporarios.push({ descricao, valor });
@@ -461,41 +496,37 @@
         function salvarSubjanelaGastos() {
             let totalCalculado = 0;
             itensGastosTemporarios.forEach(i => totalCalculado += i.valor);
-            
-            // Joga o total calculado diretamente para o campo bloqueado da tela principal
             document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
             fecharSubjanelaGastos();
         }
 
-        /* SALVAMENTO DO REGISTRO PRINCIPAL DIÁRIO */
+        /* GRAVAÇÃO DO DIA */
         function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
             const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
             const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
             const manutencao = parseFloat(document.getElementById('manutencao').value) || 0;
-            const investimento = parseFloat(document.getElementById('investimento').value) || 0;
             const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
+            const investimento = parseFloat(document.getElementById('investimento').value) || 0;
 
             if (!faturamento && !rendaExtra && !gasolina && !pessoal && !manutencao && !investimento && !reservaFinanceira) {
-                alert('Preencha ao menos um valor para salvar.'); return;
+                alert('Preencha ao menos um valor.'); return;
             }
 
-            // EQUAÇÃO CONTÁBIL: Créditos menos Débitos e Provisões
-            const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - investimento - reservaFinanceira;
+            const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
 
             dados.historico.push({
-                data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-                faturamento, rendaExtra, gasolina, pessoal, manutencao, investimento, reservaFinanceira,
+                data: obterDataHoje(),
+                faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
                 saldoDia,
-                detalheGastos: [...itensGastosTemporarios], // Salva a lista de sublançamentos
+                detalheGastos: [...itensGastosTemporarios],
                 timestamp: new Date().getTime()
             });
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
-            // Limpeza completa de campos e memória temporária
-            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'manutencao', 'investimento', 'reserva-financeira'].forEach(id => {
+            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
                 document.getElementById(id).value = '';
             });
             itensGastosTemporarios = [];
@@ -503,11 +534,11 @@
             atualizarUI();
 
             const btn = event.target; const txt = btn.innerText;
-            btn.innerText = '✓ REGISTRO SALVO'; btn.classList.replace('bg-blue-600', 'bg-green-600');
-            setTimeout(() => { btn.innerText = txt; btn.classList.replace('bg-green-600', 'bg-blue-600'); }, 1500);
+            btn.innerText = '✓ REGISTRO SALVO'; btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
+            setTimeout(() => { btn.innerText = txt; btn.className = btn.className.replace('bg-green-600', 'bg-blue-600'); }, 1500);
         }
 
-        /* SISTEMA DE MODAL DE AJUSTE/EDIÇÃO */
+        /* AJUSTES / EDIÇÃO */
         function abrirEdicao(index) {
             lancamentoEmEdicao = index;
             const item = dados.historico[index];
@@ -517,8 +548,8 @@
             document.getElementById('edit-gasolina').value = item.gasolina || 0;
             document.getElementById('edit-pessoal').value = item.pessoal || 0;
             document.getElementById('edit-manutencao').value = item.manutencao || 0;
-            document.getElementById('edit-investimento').value = item.investimento || 0;
             document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira || 0;
+            document.getElementById('edit-investimento').value = item.investimento || 0;
             document.getElementById('modal-edicao').classList.add('active');
         }
 
@@ -535,14 +566,14 @@
             const novoPessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
             if (novoPessoal !== item.pessoal) {
                 item.pessoal = novoPessoal;
-                item.detalheGastos = []; // Apaga detalhamento antigo se alterou o valor manualmente
+                item.detalheGastos = []; 
             }
 
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
-            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
             item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
+            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
             
-            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.investimento - item.reservaFinanceira;
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModal(); atualizarUI();
@@ -557,7 +588,7 @@
             }
         }
 
-        /* ARQUIVAMENTO MENSAL */
+        /* CONSOLIDAR BALANÇO */
         function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
         function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
 
@@ -565,7 +596,7 @@
             if (dados.historico.length === 0) { alert('Não há lançamentos no período.'); return; }
             
             const agora = new Date();
-            const periodo = `${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`.toUpperCase();
+            const periodo = `${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' })}`.toUpperCase();
 
             let totalFaturamentoApp = 0, totalRendaExtra = 0, saldoFinalNoMes = 0;
             dados.historico.forEach(item => {
@@ -574,11 +605,10 @@
                 saldoFinalNoMes += parseFloat(item.saldoDia) || 0;
             });
 
-            // Arquiva a estatística isolada sem zerar o patrimônio do topo
             dados.mesesAnteriores.push({
                 periodo, faturamentoTotal: totalFaturamentoApp, rendaExtraTotal: totalRendaExtra, saldoFinalNoMes, historico: [...dados.historico]
             });
-            dados.historico = []; // Limpa apenas o painel do mês atual
+            dados.historico = []; 
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModalMes(); atualizarUI();
@@ -586,7 +616,7 @@
         }
 
         function deletarMesAnterior(index) {
-            if (confirm('Atenção: Remover um mês arquivado alterará seu saldo vitalício total. Confirmar?')) {
+            if (confirm('Atenção: Excluir um período fechado alterará seu caixa acumulado vitalício. Deseja continuar?')) {
                 dados.mesesAnteriores.splice(index, 1);
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
@@ -594,20 +624,20 @@
         }
 
         function limparDados() {
-            if (confirm('Isso excluirá todo o banco de dados local do app. Tem certeza?')) {
+            if (confirm('Deseja apagar todo o banco de dados do aplicativo?')) {
                 dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
         }
 
-        /* SISTEMA DE BACKUP */
+        /* LOGÍSTICA DE BACKUP */
         function exportarBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `backup_financeiro_${new Date().toISOString().slice(0,10)}.txt`);
-            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `backup_financeiro_${new Date().toISOString().slice(0,10)}.txt`);
+            document.body.appendChild(dl); dl.click(); dl.remove();
         }
 
         function importarBackup(event) {
@@ -619,7 +649,7 @@
                         dados = dadosImportados; localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                         atualizarUI(); alert('Backup restaurado.');
                     }
-                } catch (e) { alert('Erro ao processar backup.'); }
+                } catch (e) { alert('Erro no backup.'); }
                 input.value = '';
             };
             if (input.files.length > 0) reader.readAsText(input.files[0]);
@@ -631,4 +661,4 @@
         atualizarUI();
     </script>
 </body>
-</html>
+            </html>
