@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#111111">
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./icon-192.png">
-    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link class="apple-touch-icon" href="./icon-192.png">
 
     <style>
         body {
@@ -135,7 +135,7 @@
                     📝 Detalhar Gastos
                 </button>
             </div>
-            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculated" class="input-bloqueado font-bold">
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
         </div>
 
         <!-- RESERVAS E INVESTIMENTOS -->
@@ -252,20 +252,21 @@
         </div>
     </div>
 
-    <!-- SUBJANELA MODAL: CONFERÊNCIA DETALHADA DA CATEGORIA (NOVO FEATURE) -->
+    <!-- SUBJANELA MODAL: CONFERÊNCIA DETALHADA DA CATEGORIA -->
     <div id="subjanela-auditoria" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
                 <div>
                     <h3 id="auditoria-titulo" class="text-sm font-bold uppercase tracking-wider text-yellow-500">Conferência</h3>
-                    <p class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos do período corrente</p>
+                    <p id="auditoria-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos do período corrente</p>
                 </div>
                 <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold hover:text-white">✕</button>
             </div>
 
+            <!-- Tabela de Lançamentos ou de Agrupados -->
             <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
                 <table class="w-full text-left text-xs text-gray-300">
-                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
+                    <thead id="auditoria-head" class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
                         <tr>
                             <th class="p-2.5">Data</th>
                             <th class="p-2.5 text-right">Valor</th>
@@ -337,6 +338,7 @@
         
         let itensGastosTemporarios = [];
         let lancamentoEmEdicao = null;
+        let expandirHistoricoCompleto = false; // Controla se o histórico está aberto ou recolhido
 
         function formatarMoeda(valor) {
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -432,10 +434,14 @@
 
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
+            
             if (dados.historico.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-600 italic text-xs">Nenhum registro ativo</td></tr>';
             } else {
-                [...dados.historico].reverse().forEach((item, index) => {
+                const historicoInvertido = [...dados.historico].reverse();
+                const itensExibidos = expandirHistoricoCompleto ? historicoInvertido : historicoInvertido.slice(0, 5);
+
+                itensExibidos.forEach((item, index) => {
                     const idxReal = dados.historico.length - 1 - index;
                     const tr = document.createElement('tr');
                     tr.className = 'border-t border-gray-800 hover:bg-gray-800/30 text-xs';
@@ -450,6 +456,19 @@
                     `;
                     tbody.appendChild(tr);
                 });
+
+                if (dados.historico.length > 5) {
+                    const trBotao = document.createElement('tr');
+                    trBotao.className = 'bg-gray-950 text-center border-t border-gray-800';
+                    trBotao.innerHTML = `
+                        <td colspan="3" class="p-2.5">
+                            <button onclick="alternarVisibilidadeHistorico()" class="w-full text-[10px] font-black uppercase tracking-wider text-blue-400 hover:text-blue-300 py-1">
+                                ${expandirHistoricoCompleto ? '▲ Recolher Histórico' : `▼ Ver Todos os Lançamentos (+${dados.historico.length - 5})`}
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(trBotao);
+                }
             }
 
             const mContainer = document.getElementById('meses-anteriores-container');
@@ -478,9 +497,16 @@
             verificarTravaDiaria();
         }
 
-        /* FUNÇÃO DE CONFERÊNCIA DIÁRIA (NOVO FEATURE) */
+        function alternarVisibilidadeHistorico() {
+            expandirHistoricoCompleto = !expandirHistoricoCompleto;
+            atualizarUI();
+        }
+
+        /* FUNÇÃO DE CONFERÊNCIA DIÁRIA E AGRUPAMENTO DE GASTOS PESSOAIS */
         function auditarCategoria(propriedade, nomeExibicao) {
             const tituloEl = document.getElementById('auditoria-titulo');
+            const subtituloEl = document.getElementById('auditoria-subtitulo');
+            const headEl = document.getElementById('auditoria-head');
             const tbodyEl = document.getElementById('lista-auditoria-body');
             const totalEl = document.getElementById('auditoria-total-acumulado');
             
@@ -488,36 +514,76 @@
             tbodyEl.innerHTML = '';
             let acumuloTotal = 0;
 
-            // Filtra e agrupa registros do período corrente que possuem o campo preenchido
-            const lancamentosFiltrados = dados.historico.filter(item => (parseFloat(item[propriedade]) || 0) > 0);
+            // CASO ESPECIAL: GASTOS PESSOAIS (AGRUPAMENTO INTELIGENTE)
+            if (propriedade === 'pessoal') {
+                subtituloEl.innerText = "Resumo acumulado por item no mês";
+                headEl.innerHTML = `<tr><th class="p-2.5">Descrição do Item</th><th class="p-2.5 text-right">Total Acumulado</th></tr>`;
 
-            if (lancamentosFiltrados.length === 0) {
-                tbodyEl.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-xs">Nenhum valor lançado nesta categoria no período ativo.</td></tr>';
-            } else {
-                // Percorre do mais recente para o mais antigo
-                [...lancamentosFiltrados].reverse().forEach(item => {
-                    const valorItem = parseFloat(item[propriedade]) || 0;
-                    acumuloTotal += valorItem;
+                let mapaItens = {};
 
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-t border-gray-800 text-xs hover:bg-gray-900/50';
-                    
-                    let corTextoValor = 'text-white';
-                    if (['faturamento', 'rendaExtra'].includes(propriedade)) corTextoValor = 'text-green-400';
-                    if (['gasolina', 'manutencao', 'pessoal'].includes(propriedade)) corTextoValor = 'text-red-400';
-                    if (propriedade === 'reservaFinanceira') corTextoValor = 'text-orange-400';
-                    if (propriedade === 'investimento') corTextoValor = 'text-purple-400';
-
-                    tr.innerHTML = `
-                        <td class="p-2.5 text-gray-300 font-bold">${item.data}</td>
-                        <td class="p-2.5 text-right font-black ${corTextoValor}">${formatarMoeda(valorItem)}</td>
-                    `;
-                    tbodyEl.appendChild(tr);
+                dados.historico.forEach(item => {
+                    if (item.detalheGastos && item.detalheGastos.length > 0) {
+                        item.detalheGastos.forEach(g => {
+                            let descFormatada = g.descricao.trim().toUpperCase();
+                            mapaItens[descFormatada] = (mapaItens[descFormatada] || 0) + (parseFloat(g.valor) || 0);
+                        });
+                    } else if ((parseFloat(item.pessoal) || 0) > 0) {
+                        mapaItens["NÃO ESPECIFICADO (DIRETO)"] = (mapaItens["NÃO ESPECIFICADO (DIRETO)"] || 0) + parseFloat(item.pessoal);
+                    }
                 });
+
+                const chavesOrdenadas = Object.keys(mapaItens).sort((a,b) => mapaItens[b] - mapaItens[a]);
+
+                if (chavesOrdenadas.length === 0) {
+                    tbodyEl.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-xs">Nenhum gasto pessoal lançado neste período.</td></tr>';
+                } else {
+                    chavesOrdenadas.forEach(desc => {
+                        const valorTotalItem = mapaItens[desc];
+                        acumuloTotal += valorTotalItem;
+
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs hover:bg-gray-900/50';
+                        tr.innerHTML = `
+                            <td class="p-2.5 text-gray-300 font-bold uppercase">${desc}</td>
+                            <td class="p-2.5 text-right font-black text-red-400">${formatarMoeda(valorTotalItem)}</td>
+                        `;
+                        tbodyEl.appendChild(tr);
+                    });
+                }
+            } 
+            // CASO PADRÃO: OUTRAS CATEGORIAS (LISTA DIÁRIA)
+            else {
+                subtituloEl.innerText = "Lançamentos do período corrente";
+                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
+
+                const lancamentosFiltrados = dados.historico.filter(item => (parseFloat(item[propriedade]) || 0) > 0);
+
+                if (lancamentosFiltrados.length === 0) {
+                    tbodyEl.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-xs">Nenhum valor lançado nesta categoria no período ativo.</td></tr>';
+                } else {
+                    [...lancamentosFiltrados].reverse().forEach(item => {
+                        const valorItem = parseFloat(item[propriedade]) || 0;
+                        acumuloTotal += valorItem;
+
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs hover:bg-gray-900/50';
+                        
+                        let corTextoValor = 'text-white';
+                        if (['faturamento', 'rendaExtra'].includes(propriedade)) corTextoValor = 'text-green-400';
+                        if (['gasolina', 'manutencao'].includes(propriedade)) corTextoValor = 'text-red-400';
+                        if (propriedade === 'reservaFinanceira') corTextoValor = 'text-orange-400';
+                        if (propriedade === 'investimento') corTextoValor = 'text-purple-400';
+
+                        tr.innerHTML = `
+                            <td class="p-2.5 text-gray-300 font-bold">${item.data}</td>
+                            <td class="p-2.5 text-right font-black ${corTextoValor}">${formatarMoeda(valorItem)}</td>
+                        `;
+                        tbodyEl.appendChild(tr);
+                    });
+                }
             }
 
             totalEl.innerText = formatarMoeda(acumuloTotal);
-            
             let corTotalBorda = 'text-white';
             if (['faturamento', 'rendaExtra'].includes(propriedade)) corTotalBorda = 'text-green-400';
             if (['gasolina', 'manutencao', 'pessoal'].includes(propriedade)) corTotalBorda = 'text-red-400';
