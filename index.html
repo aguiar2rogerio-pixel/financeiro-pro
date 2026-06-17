@@ -297,7 +297,18 @@
                 <div><label class="block text-green-400 font-bold uppercase text-[10px] mb-0.5">Renda Extra (+)</label><input type="number" id="edit-renda-extra" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white font-bold"></div>
                 <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Combustível</label><input type="number" id="edit-gasolina" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
                 <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Reserva Manutenção</label><input type="number" id="edit-manutencao" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
-                <div><label class="block text-red-400 font-bold uppercase text-[10px] mb-0.5">Gastos Pessoais (Total)</label><input type="number" id="edit-pessoal" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white font-bold"><p class="text-[9px] text-gray-500 italic mt-0.5">*Nota: Alterar o valor direto aqui anulará os itens detalhados.</p></div>
+                
+                <!-- GASTOS PESSOAIS NO AJUSTE -->
+                <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 space-y-1.5">
+                    <label class="block text-red-400 font-bold uppercase text-[10px]">Gastos Pessoais</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="edit-pessoal" readonly class="w-full bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-400 font-bold text-xs" placeholder="0,00">
+                        <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 hover:bg-blue-900 border border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wide whitespace-nowrap">
+                            📋 Reabrir Planilha
+                        </button>
+                    </div>
+                </div>
+
                 <div><label class="block text-orange-400 font-bold uppercase text-[10px] mb-0.5">Reserva Financeira</label><input type="number" id="edit-reserva-financeira" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
                 <div><label class="block text-purple-400 font-bold uppercase text-[10px] mb-0.5">Poupança</label><input type="number" id="edit-investimento" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white"></div>
             </div>
@@ -308,6 +319,9 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL DE EDIÇÃO DA PLANILHA EM MODO HISTÓRICO RETROATIVO -->
+    <input type="hidden" id="modo-planilha-contexto" value="principal">
 
     <!-- MODAL FECHAMENTO MENSAL -->
     <div id="modal-fechar-mes" class="modal-overlay">
@@ -338,7 +352,7 @@
         
         let itensGastosTemporarios = [];
         let lancamentoEmEdicao = null;
-        let expandirHistoricoCompleto = false; // Controla se o histórico está aberto ou recolhido
+        let expandirHistoricoCompleto = false;
 
         function formatarMoeda(valor) {
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -502,7 +516,7 @@
             atualizarUI();
         }
 
-        /* FUNÇÃO DE CONFERÊNCIA DIÁRIA E AGRUPAMENTO DE GASTOS PESSOAIS */
+        /* CONFERÊNCIA DIÁRIA E AGRUPAMENTO */
         function auditarCategoria(propriedade, nomeExibicao) {
             const tituloEl = document.getElementById('auditoria-titulo');
             const subtituloEl = document.getElementById('auditoria-subtitulo');
@@ -514,7 +528,6 @@
             tbodyEl.innerHTML = '';
             let acumuloTotal = 0;
 
-            // CASO ESPECIAL: GASTOS PESSOAIS (AGRUPAMENTO INTELIGENTE)
             if (propriedade === 'pessoal') {
                 subtituloEl.innerText = "Resumo acumulado por item no mês";
                 headEl.innerHTML = `<tr><th class="p-2.5">Descrição do Item</th><th class="p-2.5 text-right">Total Acumulado</th></tr>`;
@@ -550,9 +563,7 @@
                         tbodyEl.appendChild(tr);
                     });
                 }
-            } 
-            // CASO PADRÃO: OUTRAS CATEGORIAS (LISTA DIÁRIA)
-            else {
+            } else {
                 subtituloEl.innerText = "Lançamentos do período corrente";
                 headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
 
@@ -600,11 +611,28 @@
 
         /* OPERAÇÕES DA PLANILHA DE GASTOS */
         function abrirSubjanelaGastos() {
+            document.getElementById('modo-planilha-contexto').value = "principal";
+            document.getElementById('subjanela-gastos').classList.add('active');
+            renderizarListaSubjanela();
+        }
+
+        function reabrirPlanilhaNoAjuste() {
+            if (lancamentoEmEdicao === null) return;
+            document.getElementById('modo-planilha-contexto').value = "ajuste";
+            
+            const itemOriginal = dados.historico[lancamentoEmEdicao];
+            // Carrega os itens reais guardados naquele dia para edição
+            itensGastosTemporarios = itemOriginal.detalheGastos ? [...itemOriginal.detalheGastos] : [];
+            
             document.getElementById('subjanela-gastos').classList.add('active');
             renderizarListaSubjanela();
         }
 
         function fecharSubjanelaGastos() {
+            const contexto = document.getElementById('modo-planilha-contexto').value;
+            if (contexto === "ajuste") {
+                itensGastosTemporarios = []; // limpa memória temporária se fechar sem salvar
+            }
             document.getElementById('subjanela-gastos').classList.remove('active');
         }
 
@@ -638,7 +666,7 @@
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800 text-xs';
                 tr.innerHTML = `
-                    <td class="p-2 text-gray-300">${item.descricao}</td>
+                    <td class="p-2 text-gray-300 font-bold uppercase">${item.descricao}</td>
                     <td class="p-2 text-white font-bold">${formatarMoeda(item.valor)}</td>
                     <td class="p-2 text-right"><button onclick="removerItemDaLista(${index})" class="text-red-500 font-bold px-1">✕</button></td>
                 `;
@@ -651,8 +679,23 @@
         function salvarSubjanelaGastos() {
             let totalCalculado = 0;
             itensGastosTemporarios.forEach(i => totalCalculado += i.valor);
-            document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
-            fecharSubjanelaGastos();
+            
+            const contexto = document.getElementById('modo-planilha-contexto').value;
+
+            if (contexto === "ajuste") {
+                // Aplica direto na caixinha do ajuste
+                document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0.00';
+                // Salva a lista de itens temporários direto na referência da memória do histórico editado
+                if (lancamentoEmEdicao !== null) {
+                    dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
+                }
+                itensGastosTemporarios = []; // Limpa a variável global de uso provisório
+            } else {
+                // Modo principal normal
+                document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
+            }
+
+            document.getElementById('subjanela-gastos').classList.remove('active');
         }
 
         /* GRAVAÇÃO DO DIA */
@@ -718,11 +761,8 @@
             item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
             item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
             
-            const novoPessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
-            if (novoPessoal !== item.pessoal) {
-                item.pessoal = novoPessoal;
-                item.detalheGastos = []; 
-            }
+            // O valor de item.pessoal e item.detalheGastos já foi atualizado dinamicamente via subjanela caso o usuário tenha clicado em "Reabrir Planilha"
+            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
 
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
             item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
