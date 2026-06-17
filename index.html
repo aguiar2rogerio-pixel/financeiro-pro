@@ -135,7 +135,7 @@
                     📝 Detalhar Gastos
                 </button>
             </div>
-            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculated" class="input-bloqueado font-bold">
         </div>
 
         <!-- RESERVAS E INVESTIMENTOS -->
@@ -158,17 +158,19 @@
 
     <!-- RESUMO DO PERÍODO CORRENTE -->
     <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
-        <h2 class="text-xs font-black text-yellow-500 mb-3 uppercase tracking-wider">Balanço do Período Atual</h2>
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xs font-black text-yellow-500 uppercase tracking-wider">Balanço do Período Atual</h2>
+            <span class="text-[9px] text-gray-500 font-bold uppercase italic">Toque para ver os dias</span>
+        </div>
         <div class="grid grid-cols-2 gap-2 text-xs mb-4">
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Reserva Manut.</span><span id="total-manutencao" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('manutencao', 'Reserva Manut.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Reserva Manut.</span><span id="total-manutencao" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('reservaFinanceira', 'Reserva Finan.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-orange-400 font-bold uppercase">Reserva Finan.</span><span id="total-reserva-aba" class="font-bold text-orange-400 text-sm">R$ 0,00</span></div>
             
-            <!-- CONTAS DESMEMBRADAS -->
-            <div class="bg-gray-800 p-2 rounded-xl"><span class="block text-[9px] text-orange-400 font-bold uppercase">Reserva Finan.</span><span id="total-reserva-aba" class="font-bold text-orange-400 text-sm">R$ 0,00</span></div>
-            <div class="bg-gray-800 p-2 rounded-xl col-span-2"><span class="block text-[9px] text-purple-400 font-bold uppercase">Poupança Acumulada</span><span id="total-investimento-aba" class="font-bold text-purple-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('investimento', 'Poupança Acumulada')" class="bg-gray-800 p-2 rounded-xl col-span-2 cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700 text-center"><span class="block text-[9px] text-purple-400 font-bold uppercase">Poupança Acumulada</span><span id="total-investimento-aba" class="font-bold text-purple-400 text-sm">R$ 0,00</span></div>
         </div>
         <button onclick="abrirFecharMes()" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
             📅 Fechar Balanço Mensal
@@ -250,6 +252,40 @@
         </div>
     </div>
 
+    <!-- SUBJANELA MODAL: CONFERÊNCIA DETALHADA DA CATEGORIA (NOVO FEATURE) -->
+    <div id="subjanela-auditoria" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="auditoria-titulo" class="text-sm font-bold uppercase tracking-wider text-yellow-500">Conferência</h3>
+                    <p class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos do período corrente</p>
+                </div>
+                <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold hover:text-white">✕</button>
+            </div>
+
+            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
+                        <tr>
+                            <th class="p-2.5">Data</th>
+                            <th class="p-2.5 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-auditoria-body"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
+                <span class="text-white uppercase text-xs">Total Acumulado:</span>
+                <span id="auditoria-total-acumulado" class="text-white">R$ 0,00</span>
+            </div>
+
+            <button onclick="fecharSubjanelaAuditoria()" class="w-full bg-gray-750 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase tracking-wider border border-gray-600">
+                Fechar Verificação
+            </button>
+        </div>
+    </div>
+
     <!-- MODAL DE EDIÇÃO / AJUSTE HISTÓRICO -->
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
@@ -306,7 +342,6 @@
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // CORREÇÃO DO FUSO HORÁRIO APLICADA AQUI (CRUCIAL PARA GITHUB PAGES)
         function obterDataHoje() {
             return new Date().toLocaleDateString('pt-BR', { 
                 day: '2-digit', 
@@ -441,6 +476,60 @@
             }
 
             verificarTravaDiaria();
+        }
+
+        /* FUNÇÃO DE CONFERÊNCIA DIÁRIA (NOVO FEATURE) */
+        function auditarCategoria(propriedade, nomeExibicao) {
+            const tituloEl = document.getElementById('auditoria-titulo');
+            const tbodyEl = document.getElementById('lista-auditoria-body');
+            const totalEl = document.getElementById('auditoria-total-acumulado');
+            
+            tituloEl.innerText = `Conferência: ${nomeExibicao}`;
+            tbodyEl.innerHTML = '';
+            let acumuloTotal = 0;
+
+            // Filtra e agrupa registros do período corrente que possuem o campo preenchido
+            const lancamentosFiltrados = dados.historico.filter(item => (parseFloat(item[propriedade]) || 0) > 0);
+
+            if (lancamentosFiltrados.length === 0) {
+                tbodyEl.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-xs">Nenhum valor lançado nesta categoria no período ativo.</td></tr>';
+            } else {
+                // Percorre do mais recente para o mais antigo
+                [...lancamentosFiltrados].reverse().forEach(item => {
+                    const valorItem = parseFloat(item[propriedade]) || 0;
+                    acumuloTotal += valorItem;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs hover:bg-gray-900/50';
+                    
+                    let corTextoValor = 'text-white';
+                    if (['faturamento', 'rendaExtra'].includes(propriedade)) corTextoValor = 'text-green-400';
+                    if (['gasolina', 'manutencao', 'pessoal'].includes(propriedade)) corTextoValor = 'text-red-400';
+                    if (propriedade === 'reservaFinanceira') corTextoValor = 'text-orange-400';
+                    if (propriedade === 'investimento') corTextoValor = 'text-purple-400';
+
+                    tr.innerHTML = `
+                        <td class="p-2.5 text-gray-300 font-bold">${item.data}</td>
+                        <td class="p-2.5 text-right font-black ${corTextoValor}">${formatarMoeda(valorItem)}</td>
+                    `;
+                    tbodyEl.appendChild(tr);
+                });
+            }
+
+            totalEl.innerText = formatarMoeda(acumuloTotal);
+            
+            let corTotalBorda = 'text-white';
+            if (['faturamento', 'rendaExtra'].includes(propriedade)) corTotalBorda = 'text-green-400';
+            if (['gasolina', 'manutencao', 'pessoal'].includes(propriedade)) corTotalBorda = 'text-red-400';
+            if (propriedade === 'reservaFinanceira') corTotalBorda = 'text-orange-400';
+            if (propriedade === 'investimento') corTotalBorda = 'text-purple-400';
+            totalEl.className = `font-black text-sm ${corTotalBorda}`;
+
+            document.getElementById('subjanela-auditoria').classList.add('active');
+        }
+
+        function fecharSubjanelaAuditoria() {
+            document.getElementById('subjanela-auditoria').classList.remove('active');
         }
 
         /* OPERAÇÕES DA PLANILHA DE GASTOS */
@@ -661,4 +750,5 @@
         atualizarUI();
     </script>
 </body>
-            </html>
+</html>
+
