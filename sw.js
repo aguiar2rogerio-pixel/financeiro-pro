@@ -1,4 +1,4 @@
-const CACHE_NAME = 'financeiro-v4'; // Incrementado para v4 para forçar a atualização do cache
+const CACHE_NAME = 'financeiro-v5'; // Incrementado para v5 para forçar a atualização do cache
 const ASSETS = [
   './index.html',
   './manifest.json',
