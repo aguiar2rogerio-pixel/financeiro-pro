@@ -129,7 +129,7 @@
                     📝 Detalhar Gastos
                 </button>
             </div>
-            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculated" class="input-bloqueado font-bold">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -287,7 +287,7 @@
                     <label class="block text-red-400 font-bold uppercase text-[10px]">Gastos Pessoais</label>
                     <div class="flex gap-2">
                         <input type="number" id="edit-pessoal" readonly class="w-full bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-400 font-bold text-xs" placeholder="0,00">
-                        <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 hover:bg-blue-900 border border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wide whitespace-nowrap">
+                        <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 hover:bg-blue-900 border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wide whitespace-nowrap">
                             📋 Reabrir Planilha
                         </button>
                     </div>
@@ -339,7 +339,7 @@
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        function obterDataHoje() {
+        function obtenerDataHoje() {
             return new Date().toLocaleDateString('pt-BR', { 
                 day: '2-digit', 
                 month: '2-digit',
@@ -348,7 +348,7 @@
         }
 
         function verificarTravaDiaria() {
-            const hoje = obterDataHoje();
+            const hoje = obtenerDataHoje();
             const jaLancado = dados.historico.some(item => item.data === hoje);
             const btnSalvar = document.getElementById('btn-salvar-principal');
             const btnDetalhar = document.getElementById('btn-detalhar');
@@ -563,7 +563,7 @@
                         let corTextoValor = 'text-white';
                         if (['faturamento', 'rendaExtra'].includes(propriedade)) corTextoValor = 'text-green-400';
                         if (['gasolina', 'manutencao'].includes(propriedade)) corTextoValor = 'text-red-400';
-                        if (propriedade === 'reservaFinanceira') corTotalBorda = 'text-orange-400';
+                        if (propriedade === 'reservaFinanceira') corTextoValor = 'text-orange-400';
                         if (propriedade === 'investimento') corTextoValor = 'text-purple-400';
 
                         tr.innerHTML = `
@@ -602,13 +602,9 @@
             document.getElementById('modo-planilha-contexto').value = "ajuste";
             
             const itemOriginal = dados.historico[lancamentoEmEdicao];
-            // Carrega os itens reais guardados naquele dia para edição
             itensGastosTemporarios = itemOriginal.detalheGastos ? [...itemOriginal.detalheGastos] : [];
             
-            // Oculta o modal de edição para não sobrepor telas
             document.getElementById('modal-edicao').classList.remove('active');
-            
-            // Abre a planilha de gastos e renderiza a lista salva
             document.getElementById('subjanela-gastos').classList.add('active');
             renderizarListaSubjanela();
         }
@@ -618,8 +614,7 @@
             document.getElementById('subjanela-gastos').classList.remove('active');
             
             if (contexto === "ajuste") {
-                itensGastosTemporarios = []; // limpa memória temporária
-                // Reabre o modal de ajuste original
+                itensGastosTemporarios = [];
                 document.getElementById('modal-edicao').classList.add('active');
             }
         }
@@ -671,20 +666,14 @@
             const contexto = document.getElementById('modo-planilha-contexto').value;
 
             if (contexto === "ajuste") {
-                // Aplica direto na caixinha do ajuste
                 document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0.00';
-                
-                // Salva a lista de itens temporários direto na referência da memória do histórico editado
                 if (lancamentoEmEdicao !== null) {
                     dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
                 }
-                itensGastosTemporarios = []; // Limpa a variável global de uso provisório
-                
-                // Fecha a planilha e volta com segurança para a tela de ajuste
+                itensGastosTemporarios = [];
                 document.getElementById('subjanela-gastos').classList.remove('active');
                 document.getElementById('modal-edicao').classList.add('active');
             } else {
-                // Modo principal normal
                 document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
                 document.getElementById('subjanela-gastos').classList.remove('active');
             }
@@ -741,9 +730,7 @@
             document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira || 0;
             document.getElementById('edit-investimento').value = item.investimento || 0;
             
-            // Pré-carrega os itens da planilha dele caso o usuário queira reabri-la
             itensGastosTemporarios = item.detalheGastos ? [...item.detalheGastos] : [];
-            
             document.getElementById('modal-edicao').classList.add('active');
         }
 
@@ -756,10 +743,7 @@
             item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
             item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
             item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
-            
-            // Atualiza o valor final modificado
             item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
-
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
             item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
             item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
