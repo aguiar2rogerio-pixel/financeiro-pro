@@ -129,7 +129,7 @@
                     📝 Detalhar Gastos
                 </button>
             </div>
-            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculated" class="input-bloqueado font-bold">
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -497,7 +497,6 @@
             atualizarUI();
         }
 
-        /* CONFERÊNCIA DIÁRIA E AGRUPAMENTO */
         function auditarCategoria(propriedade, nomeExibicao) {
             const tituloEl = document.getElementById('auditoria-titulo');
             const subtituloEl = document.getElementById('auditoria-subtitulo');
@@ -590,7 +589,6 @@
             document.getElementById('subjanela-auditoria').classList.remove('active');
         }
 
-        /* OPERAÇÕES DA PLANILHA DE GASTOS */
         function abrirSubjanelaGastos() {
             document.getElementById('modo-planilha-contexto').value = "principal";
             document.getElementById('subjanela-gastos').classList.add('active');
@@ -679,7 +677,7 @@
             }
         }
 
-        /* GRAVAÇÃO DO DIA */
+        /* CORREÇÃO DO BOTÃO: Tratando campos nulos ou vazios com segurança */
         function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
@@ -689,14 +687,16 @@
             const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
             const investimento = parseFloat(document.getElementById('investimento').value) || 0;
 
-            if (!faturamento && !rendaExtra && !gasolina && !pessoal && !manutencao && !investimento && !reservaFinanceira) {
-                alert('Preencha ao menos um valor.'); return;
+            // Se tudo for zero, avisa o usuário para digitar algo
+            if (faturamento === 0 && rendaExtra === 0 && gasolina === 0 && pessoal === 0 && manutencao === 0 && investimento === 0 && reservaFinanceira === 0) {
+                alert('Por favor, preencha pelo menos um campo com valor maior que zero para salvar.'); 
+                return;
             }
 
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
 
             dados.historico.push({
-                data: obterDataHoje(),
+                data: obtenerDataHoje(),
                 faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
                 saldoDia,
                 detalheGastos: [...itensGastosTemporarios],
@@ -712,12 +712,16 @@
 
             atualizarUI();
 
-            const btn = event.target; const txt = btn.innerText;
-            btn.innerText = '✓ REGISTRO SALVO'; btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
-            setTimeout(() => { btn.innerText = txt; btn.className = btn.className.replace('bg-green-600', 'bg-blue-600'); }, 1500);
+            const btn = event.target; 
+            const txt = btn.innerText;
+            btn.innerText = '✓ REGISTRO SALVO'; 
+            btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
+            setTimeout(() => { 
+                btn.innerText = txt; 
+                btn.className = btn.className.replace('bg-green-600', 'bg-blue-600'); 
+            }, 1500);
         }
 
-        /* AJUSTES / EDIÇÃO */
         function abrirEdicao(index) {
             lancamentoEmEdicao = index;
             const item = dados.historico[index];
@@ -763,7 +767,6 @@
             }
         }
 
-        /* CONSOLIDAR BALANÇO */
         function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
         function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
 
@@ -806,7 +809,6 @@
             }
         }
 
-        /* LOGÍSTICA DE BACKUP */
         function exportarBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
             const dl = document.createElement('a');
