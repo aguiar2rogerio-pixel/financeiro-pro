@@ -199,7 +199,6 @@
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
             <button onclick="limparDados()" class="text-[9px] text-red-500 font-bold uppercase border border-red-900 px-2 py-1 rounded-lg">Zerar Tudo</button>
         </div>
-        <!-- Solução Proposta: Altura controlada com rolagem interna autônoma -->
         <div class="overflow-y-auto max-h-[280px] rounded-xl border-2 border-gray-800 shadow-md bg-gray-900">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -557,11 +556,18 @@
             });
         }
 
+        /* CORREÇÃO AQUI: Garante que a lista temporária herda o estado atual correto ao abrir no fluxo principal */
         function abrirSubjanelaGastos() {
             document.getElementById('modo-planilha-contexto').value = "principal";
             document.getElementById('gasto-item-desc').value = '';
             document.getElementById('gasto-item-val').value = '';
             document.getElementById('subjanela-gastos').classList.add('active');
+            
+            // Se o campo já contiver um valor calculado prévio, mantemos a lista, caso contrário, resetamos
+            if (!document.getElementById('pessoal').value) {
+                itensGastosTemporarios = [];
+            }
+            
             renderizarBaloesDinamicos();
             renderizarListaSubjanela();
         }
@@ -857,8 +863,6 @@
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
             item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
             item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
-            item.saldoDia = (item.faturamento + item.investimento) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
-            // Correção da fórmula do saldoDia para manter consistência com a principal
             item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModal(); atualizarUI();
@@ -911,4 +915,3 @@
     </script>
 </body>
 </html>
-
