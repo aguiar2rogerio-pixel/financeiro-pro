@@ -66,6 +66,23 @@
             max-height: 85vh;
             overflow-y: auto;
         }
+        .sugestao-tag {
+            background-color: #374151;
+            color: #f3f4f6;
+            padding: 0.35rem 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            border: 1px solid #4b5563;
+        }
+        .sugestao-tag:active {
+            background-color: #2563eb;
+        }
     </style>
 </head>
 <body class="p-4 max-w-md mx-auto pb-24">
@@ -170,7 +187,7 @@
 
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico</h2>
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
             <button onclick="limparDados()" class="text-[9px] text-red-500 font-bold uppercase border border-red-900 px-2 py-1 rounded-lg">Zerar Tudo</button>
         </div>
         <div class="overflow-hidden rounded-xl border-2 border-gray-800 shadow-md">
@@ -188,7 +205,10 @@
     </div>
 
     <div class="mt-6">
-        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Meses Arquivados</h2>
+        <div class="flex justify-between items-center mb-2 px-1">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Meses Arquivados</h2>
+            <span class="text-[9px] text-gray-500 font-bold uppercase italic">Toque para ver o resumo</span>
+        </div>
         <div id="meses-anteriores-container" class="space-y-2"></div>
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
     </div>
@@ -201,16 +221,17 @@
             </div>
             
             <div class="space-y-2 bg-gray-950 p-2.5 rounded-xl border border-gray-800">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-2">
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Descrição</label>
-                        <input type="text" id="gasto-item-desc" placeholder="Ex: Café, Pneu" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
+                        <input type="text" id="gasto-item-desc" oninput="filtrarSugestoes()" placeholder="Ex: Café, Pneu, Luz" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
+                        <div id="container-sugestoes" class="mt-1.5 max-h-20 overflow-y-auto"></div>
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Valor (R$)</label>
                         <div class="flex gap-1">
                             <input type="number" id="gasto-item-val" inputmode="decimal" placeholder="0,00" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
-                            <button onclick="adicionarItemNaLista()" class="bg-red-600 text-white font-black px-3 rounded-lg text-sm">+</button>
+                            <button onclick="adicionarItemNaLista()" class="bg-red-600 text-white font-black px-4 rounded-lg text-base">+</button>
                         </div>
                     </div>
                 </div>
@@ -273,6 +294,37 @@
         </div>
     </div>
 
+    <div id="subjanela-mes-arquivado" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="mes-arq-titulo" class="text-sm font-bold uppercase tracking-wider text-blue-400">Resumo Fechado</h3>
+                    <p class="text-[9px] text-gray-400 uppercase mt-0.5">Balanço Consolidado do Período</p>
+                </div>
+                <button onclick="fecharSubjanelaMesArquivado()" class="text-gray-400 text-lg font-bold hover:text-white">✕</button>
+            </div>
+
+            <div class="space-y-1 text-xs bg-gray-950 border border-gray-800 p-3 rounded-xl">
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Faturamento:</span><span id="mes-arq-fat" class="font-bold text-green-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Reserva Manutenção:</span><span id="mes-arq-manut" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Gastos Pessoais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-orange-400">Reserva Financeira:</span><span id="mes-arq-reserva" class="font-bold text-orange-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1"><span class="text-purple-400">Poupança Guardada:</span><span id="mes-arq-inv" class="font-bold text-purple-400">R$ 0,00</span></div>
+            </div>
+
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
+                <span class="text-white uppercase text-xs">Fundo Líquido Final:</span>
+                <span id="mes-arq-saldo-final" class="text-blue-400">R$ 0,00</span>
+            </div>
+
+            <button onclick="fecharSubjanelaMesArquivado()" class="w-full bg-gray-750 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase tracking-wider border border-gray-600">
+                Voltar para a Tela
+            </button>
+        </div>
+    </div>
+
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
             <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider border-b border-gray-700 pb-2">Ajustar Lançamento</h3>
@@ -328,8 +380,13 @@
         let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
             saldoAcumulado: 0,
             historico: [],
-            mesesAnteriores: []
+            mesesAnteriores: [],
+            sugestoesGastos: ["MERCADO", "LUZ", "ÁGUA", "INTERNET", "ALMOÇO", "COMBUSTÍVEL", "MANUTENÇÃO"]
         };
+        
+        if (!dados.sugestoesGastos) {
+            dados.sugestoesGastos = ["MERCADO", "LUZ", "ÁGUA", "INTERNET", "ALMOÇO", "COMBUSTÍVEL", "MANUTENÇÃO"];
+        }
         
         let itensGastosTemporarios = [];
         let lancamentoEmEdicao = null;
@@ -473,17 +530,17 @@
             } else {
                 mVazios.classList.add('hidden');
                 mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => `
-                    <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs">
+                    <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs active:bg-gray-800 cursor-pointer transition-colors">
                         <div>
-                            <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">${mes.periodo}</h4>
-                            <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(mes.faturamentoTotal + mes.rendaExtraTotal)}</span></p>
+                            <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo}</h4>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Entradas: <span class="text-green-400 font-bold">${formatarMoeda((mes.faturamentoTotal || 0) + (mes.rendaExtraTotal || 0))}</span></p>
                         </div>
-                        <div class="text-right flex items-center gap-3">
+                        <div class="text-right flex items-center gap-3" onclick="event.stopPropagation();">
                             <div>
                                 <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
                                 <span class="font-bold text-blue-400">${formatarMoeda(mes.saldoFinalNoMes)}</span>
                             </div>
-                            <button onclick="deletarMesAnterior(${idx})" class="text-red-500 text-sm">🗑️</button>
+                            <button onclick="deletarMesAnterior(${idx})" class="text-red-500 text-sm p-1">🗑️</button>
                         </div>
                     </div>
                 `).join('');
@@ -497,6 +554,40 @@
             atualizarUI();
         }
 
+        /* VER RESUMO DO MÊS ARQUIVADO */
+        function abrirResumoMesArquivado(index) {
+            const mes = dados.mesesAnteriores[index];
+            document.getElementById('mes-arq-titulo').innerText = mes.periodo;
+            document.getElementById('mes-arq-fat').innerText = formatarMoeda(mes.faturamentoTotal || 0);
+            document.getElementById('mes-arq-renda').innerText = formatarMoeda(mes.rendaExtraTotal || 0);
+            
+            // Calculando despesas acumuladas vindas do histórico guardado
+            let gasolina = 0, manutencao = 0, pessoal = 0, reserva = 0, investimento = 0;
+            if (mes.historico && Array.isArray(mes.historico)) {
+                mes.historico.forEach(item => {
+                    gasolina += parseFloat(item.gasolina) || 0;
+                    manutencao += parseFloat(item.manutencao) || 0;
+                    pessoal += parseFloat(item.pessoal) || 0;
+                    reserva += parseFloat(item.reservaFinanceira) || 0;
+                    investimento += parseFloat(item.investimento) || 0;
+                });
+            }
+
+            document.getElementById('mes-arq-gas').innerText = formatarMoeda(gasolina);
+            document.getElementById('mes-arq-manut').innerText = formatarMoeda(manutencao);
+            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(pessoal);
+            document.getElementById('mes-arq-reserva').innerText = formatarMoeda(reserva);
+            document.getElementById('mes-arq-inv').innerText = formatarMoeda(investimento);
+            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(mes.saldoFinalNoMes);
+
+            document.getElementById('subjanela-mes-arquivado').classList.add('active');
+        }
+
+        function fecharSubjanelaMesArquivado() {
+            document.getElementById('subjanela-mes-arquivado').classList.remove('active');
+        }
+
+        /* CONFERÊNCIA DIÁRIA E AGRUPAMENTO */
         function auditarCategoria(propriedade, nomeExibicao) {
             const tituloEl = document.getElementById('auditoria-titulo');
             const subtituloEl = document.getElementById('auditoria-subtitulo');
@@ -589,9 +680,45 @@
             document.getElementById('subjanela-auditoria').classList.remove('active');
         }
 
+        /* AUTO-CADASTRO / AUTOCOMPLETAR GASTOS */
+        function filtrarSugestoes() {
+            const input = document.getElementById('gasto-item-desc').value.trim().toUpperCase();
+            const container = document.getElementById('container-sugestoes');
+            container.innerHTML = '';
+
+            if (input.length === 0) {
+                // Se o campo estiver vazio, mostra as primeiras 4 sugestões padrões
+                dados.sugestoesGastos.slice(0, 4).forEach(palavra => {
+                    criarTagSugestao(palavra, container);
+                });
+                return;
+            }
+
+            const filtradas = dados.sugestoesGastos.filter(p => p.includes(input));
+            filtradas.forEach(palavra => {
+                criarTagSugestao(palavra, container);
+            });
+        }
+
+        function criarTagSugestao(palavra, container) {
+            const span = document.createElement('span');
+            span.className = 'sugestao-tag';
+            span.innerText = palavra;
+            span.onclick = function() {
+                document.getElementById('gasto-item-desc').value = palabra;
+                container.innerHTML = '';
+                document.getElementById('gasto-item-val').focus();
+            };
+            container.appendChild(span);
+        }
+
+        /* OPERAÇÕES DA PLANILHA DE GASTOS */
         function abrirSubjanelaGastos() {
             document.getElementById('modo-planilha-contexto').value = "principal";
+            document.getElementById('gasto-item-desc').value = '';
+            document.getElementById('gasto-item-val').value = '';
             document.getElementById('subjanela-gastos').classList.add('active');
+            filtrarSugestoes();
             renderizarListaSubjanela();
         }
 
@@ -603,7 +730,10 @@
             itensGastosTemporarios = itemOriginal.detalheGastos ? [...itemOriginal.detalheGastos] : [];
             
             document.getElementById('modal-edicao').classList.remove('active');
+            document.getElementById('gasto-item-desc').value = '';
+            document.getElementById('gasto-item-val').value = '';
             document.getElementById('subjanela-gastos').classList.add('active');
+            filtrarSugestoes();
             renderizarListaSubjanela();
         }
 
@@ -620,16 +750,24 @@
         function adicionarItemNaLista() {
             const descEl = document.getElementById('gasto-item-desc');
             const valEl = document.getElementById('gasto-item-val');
-            const descricao = descEl.value.trim();
+            const descricao = descEl.value.trim().toUpperCase();
             const valor = parseFloat(valEl.value) || 0;
 
             if (!descricao || valor <= 0) {
-                alert('Insira uma descrição e um valor maior que zero.'); return;
+                alert('Insira uma descrição e um valor válido.'); return;
+            }
+
+            // Memoriza a nova descrição se ela ainda não existir no catálogo
+            if (!dados.sugestoesGastos.includes(descricao)) {
+                dados.sugestoesGastos.push(descricao);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             }
 
             itensGastosTemporarios.push({ descricao, valor });
             descEl.value = ''; valEl.value = '';
+            filtrarSugestoes();
             renderizarListaSubjanela();
+            descEl.focus();
         }
 
         function removerItemDaLista(index) {
@@ -677,7 +815,7 @@
             }
         }
 
-        /* CORREÇÃO DO BOTÃO: Tratando campos nulos ou vazios com segurança */
+        /* GRAVAÇÃO DO DIA */
         function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
@@ -687,16 +825,14 @@
             const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
             const investimento = parseFloat(document.getElementById('investimento').value) || 0;
 
-            // Se tudo for zero, avisa o usuário para digitar algo
-            if (faturamento === 0 && rendaExtra === 0 && gasolina === 0 && pessoal === 0 && manutencao === 0 && investimento === 0 && reservaFinanceira === 0) {
-                alert('Por favor, preencha pelo menos um campo com valor maior que zero para salvar.'); 
-                return;
+            if (!faturamento && !rendaExtra && !gasolina && !pessoal && !manutencao && !investimento && !reservaFinanceira) {
+                alert('Preencha ao menos um valor.'); return;
             }
 
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
 
             dados.historico.push({
-                data: obtenerDataHoje(),
+                data: obterDataHoje(),
                 faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
                 saldoDia,
                 detalheGastos: [...itensGastosTemporarios],
@@ -712,16 +848,12 @@
 
             atualizarUI();
 
-            const btn = event.target; 
-            const txt = btn.innerText;
-            btn.innerText = '✓ REGISTRO SALVO'; 
-            btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
-            setTimeout(() => { 
-                btn.innerText = txt; 
-                btn.className = btn.className.replace('bg-green-600', 'bg-blue-600'); 
-            }, 1500);
+            const btn = event.target; const txt = btn.innerText;
+            btn.innerText = '✓ REGISTRO SALVO'; btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
+            setTimeout(() => { btn.innerText = txt; btn.className = btn.className.replace('bg-green-600', 'bg-blue-600'); }, 1500);
         }
 
+        /* AJUSTES / EDIÇÃO */
         function abrirEdicao(index) {
             lancamentoEmEdicao = index;
             const item = dados.historico[index];
@@ -767,6 +899,7 @@
             }
         }
 
+        /* CONSOLIDAR BALANÇO MENSAL */
         function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
         function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
 
@@ -790,7 +923,7 @@
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModalMes(); atualizarUI();
-            alert(`Período ${periodo} fechado e consolidado.`);
+            alert(`Período ${periodo} fechado e consolidado com sucesso.`);
         }
 
         function deletarMesAnterior(index) {
@@ -803,12 +936,13 @@
 
         function limparDados() {
             if (confirm('Deseja apagar todo o banco de dados do aplicativo?')) {
-                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [] };
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: ["MERCADO", "LUZ", "ÁGUA", "INTERNET", "ALMOÇO", "COMBUSTÍVEL", "MANUTENÇÃO"] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
         }
 
+        /* LOGÍSTICA DE BACKUP */
         function exportarBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
             const dl = document.createElement('a');
