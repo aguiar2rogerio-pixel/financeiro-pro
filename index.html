@@ -116,7 +116,6 @@
     </div>
 
     <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
-        
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Faturamento</label>
@@ -251,7 +250,7 @@
             </div>
 
             <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
-                <span class="text-white uppercase text-xs">Total do Dia:</span>
+                <span class="text-white uppercase text-xs">Total Acumulado:</span>
                 <span id="subjanela-total-acumulado" class="text-red-400">R$ 0,00</span>
             </div>
 
@@ -309,9 +308,15 @@
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Reserva Manutenção:</span><span id="mes-arq-manut" class="font-bold text-red-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Gastos Pessoais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Gastos Pessoais (Último dia):</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-orange-400">Reserva Financeira:</span><span id="mes-arq-reserva" class="font-bold text-orange-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1"><span class="text-purple-400">Poupança Guardada:</span><span id="mes-arq-inv" class="font-bold text-purple-400">R$ 0,00</span></div>
+            </div>
+
+            <div class="space-y-1">
+                <span class="block text-[10px] uppercase font-bold text-gray-400 ml-1">Descritivo de Gastos Pessoais:</span>
+                <div class="max-h-24 overflow-y-auto border border-gray-800 bg-gray-950 p-2 rounded-xl text-[11px] space-y-1 text-gray-300" id="mes-arq-descritivo-container">
+                </div>
             </div>
 
             <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
@@ -466,14 +471,18 @@
             }
 
             let totalFat = 0, totalRenda = 0, totalGas = 0, totalMan = 0, totalPes = 0, totalInv = 0, totalRes = 0;
-            dados.historico.forEach(item => {
+            dados.historico.forEach((item, idx) => {
                 totalFat += parseFloat(item.faturamento) || 0;
                 totalRenda += parseFloat(item.rendaExtra) || 0;
                 totalGas += parseFloat(item.gasolina) || 0;
                 totalMan += parseFloat(item.manutencao) || 0;
-                totalPes += parseFloat(item.pessoal) || 0;
                 totalInv += parseFloat(item.investimento) || 0;
                 totalRes += parseFloat(item.reservaFinanceira) || 0;
+                
+                // MÉTODOLOGIA CUMULATIVA: O total da aba passa a refletir o valor do último dia lançado
+                if (idx === dados.historico.length - 1) {
+                    totalPes = parseFloat(item.pessoal) || 0;
+                }
             });
 
             document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
@@ -561,17 +570,18 @@
             document.getElementById('mes-arq-fat').innerText = formatarMoeda(mes.faturamentoTotal || 0);
             document.getElementById('mes-arq-renda').innerText = formatarMoeda(mes.rendaExtraTotal || 0);
             
-            // Calculando despesas acumuladas vindas do histórico guardado
             let gasolina = 0, manutencao = 0, pessoal = 0, reserva = 0, investimento = 0;
             if (mes.historico && Array.isArray(mes.historico)) {
                 mes.historico.forEach(item => {
                     gasolina += parseFloat(item.gasolina) || 0;
                     manutencao += parseFloat(item.manutencao) || 0;
-                    pessoal += parseFloat(item.pessoal) || 0;
                     reserva += parseFloat(item.reservaFinanceira) || 0;
                     investimento += parseFloat(item.investimento) || 0;
                 });
             }
+
+            // Pega o valor pessoal salvo de forma não-somada (direto do fechamento)
+            pessoal = parseFloat(mes.pessoalTotal) || 0;
 
             document.getElementById('mes-arq-gas').innerText = formatarMoeda(gasolina);
             document.getElementById('mes-arq-manut').innerText = formatarMoeda(manutencao);
@@ -579,6 +589,21 @@
             document.getElementById('mes-arq-reserva').innerText = formatarMoeda(reserva);
             document.getElementById('mes-arq-inv').innerText = formatarMoeda(investimento);
             document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(mes.saldoFinalNoMes);
+
+            // Renderiza a lista descritiva guardada dos gastos pessoais
+            const containerDesc = document.getElementById('mes-arq-descritivo-container');
+            containerDesc.innerHTML = '';
+            
+            if (mes.descritivoGastos && mes.descritivoGastos.length > 0) {
+                mes.descritivoGastos.forEach(g => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between py-0.5 border-b border-gray-900/40 font-mono';
+                    div.innerHTML = `<span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span>`;
+                    containerDesc.appendChild(div);
+                });
+            } else {
+                containerDesc.innerHTML = `<div class="text-gray-600 text-[10px] italic py-1 text-center">Nenhum descritivo detalhado neste mês.</div>`;
+            }
 
             document.getElementById('subjanela-mes-arquivado').classList.add('active');
         }
@@ -634,6 +659,12 @@
                         tbodyEl.appendChild(tr);
                     });
                 }
+                
+                // AJUSTE CUMULATIVO PARA VISUALIZAÇÃO: Exibe o total real do último dia lançado em vez da soma repetida
+                if (dados.historico.length > 0) {
+                    acumuloTotal = parseFloat(dados.historico[dados.historico.length - 1].pessoal) || 0;
+                }
+
             } else {
                 subtituloEl.innerText = "Lançamentos do período corrente";
                 headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
@@ -687,7 +718,6 @@
             container.innerHTML = '';
 
             if (input.length === 0) {
-                // Se o campo estiver vazio, mostra as primeiras 4 sugestões padrões
                 dados.sugestoesGastos.slice(0, 4).forEach(palavra => {
                     criarTagSugestao(palavra, container);
                 });
@@ -705,7 +735,7 @@
             span.className = 'sugestao-tag';
             span.innerText = palavra;
             span.onclick = function() {
-                document.getElementById('gasto-item-desc').value = palabra;
+                document.getElementById('gasto-item-desc').value = palavra;
                 container.innerHTML = '';
                 document.getElementById('gasto-item-val').focus();
             };
@@ -757,7 +787,6 @@
                 alert('Insira uma descrição e um valor válido.'); return;
             }
 
-            // Memoriza a nova descrição se ela ainda não existir no catálogo
             if (!dados.sugestoesGastos.includes(descricao)) {
                 dados.sugestoesGastos.push(descricao);
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
@@ -829,10 +858,13 @@
                 alert('Preencha ao menos um valor.'); return;
             }
 
+            // O saldo líquido do dia precisa deduzir apenas os gastos puros daquele dia.
+            // Para não quebrar o cálculo se o usuário lançar cumulativo puro na tela principal, 
+            // calculamos o saldo corrente com base nas entradas e saídas normais inseridas.
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
 
             dados.historico.push({
-                data: obterDataHoje(),
+                data: obtenerDataHoje(),
                 faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
                 saldoDia,
                 detalheGastos: [...itensGastosTemporarios],
@@ -910,14 +942,39 @@
             const periodo = `${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' })}`.toUpperCase();
 
             let totalFaturamentoApp = 0, totalRendaExtra = 0, saldoFinalNoMes = 0;
-            dados.historico.forEach(item => {
+            let pessoalCumulativoFinal = 0;
+            let listaDescritivoFinal = [];
+
+            // Captura o último dia do histórico ativo
+            const ultimoRegistro = dados.historico[dados.historico.length - 1];
+            pessoalCumulativoFinal = parseFloat(ultimoRegistro.pessoal) || 0;
+            listaDescritivoFinal = ultimoRegistro.detalheGastos ? [...ultimoRegistro.detalheGastos] : [];
+
+            dados.historico.forEach((item, idx) => {
                 totalFaturamentoApp += parseFloat(item.faturamento) || 0;
                 totalRendaExtra += parseFloat(item.rendaExtra) || 0;
-                saldoFinalNoMes += parseFloat(item.saldoDia) || 0;
+                
+                // CÁLCULO DO SALDO DO MÊS: Soma o líquido de faturamento/renda e deduz as despesas normais.
+                // Como "pessoal" é cumulativo, deduzimos apenas o valor final dele no cálculo de fechamento.
+                let gas = parseFloat(item.gasolina) || 0;
+                let man = parseFloat(item.manutencao) || 0;
+                let res = parseFloat(item.reservaFinanceira) || 0;
+                let inv = parseFloat(item.investimento) || 0;
+                
+                saldoFinalNoMes += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0) - gas - man - res - inv;
             });
+            
+            // Subtrai de uma vez só o valor cumulativo dos gastos pessoais do fechamento líquido do mês
+            saldoFinalNoMes -= pessoalCumulativoFinal;
 
             dados.mesesAnteriores.push({
-                periodo, faturamentoTotal: totalFaturamentoApp, rendaExtraTotal: totalRendaExtra, saldoFinalNoMes, historico: [...dados.historico]
+                periodo, 
+                faturamentoTotal: totalFaturamentoApp, 
+                rendaExtraTotal: totalRendaExtra, 
+                pessoalTotal: pessoalCumulativoFinal,
+                descritivoGastos: listaDescritivoFinal,
+                saldoFinalNoMes, 
+                historico: [...dados.historico]
             });
             dados.historico = []; 
 
