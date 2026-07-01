@@ -11,9 +11,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças Pro">
     <meta name="theme-color" content="#111111">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./icon-192.png">
-    <link class="apple-touch-icon" href="./icon-192.png">
 
     <style>
         body {
@@ -67,21 +64,22 @@
             overflow-y: auto;
         }
         .sugestao-tag {
-            background-color: #374151;
-            color: #f3f4f6;
-            padding: 0.35rem 0.6rem;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
+            background-color: #111827;
+            color: #ffffff;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
             font-weight: bold;
             display: inline-block;
-            margin-right: 0.4rem;
-            margin-bottom: 0.4rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
             cursor: pointer;
             text-transform: uppercase;
-            border: 1px solid #4b5563;
+            border: 2px solid #374151;
         }
         .sugestao-tag:active {
             background-color: #2563eb;
+            border-color: #3b82f6;
         }
     </style>
 </head>
@@ -89,7 +87,7 @@
 
     <header class="text-center my-5">
         <h1 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Caixa Geral Acumulado</h1>
-        <div id="saldo-total" class="text-4xl font-black text-green-500">R$ 0,00</div>
+        <div id="saldo-total" class="text-4xl font-black text-green-500">-R$ 22,71</div>
     </header>
 
     <div id="ultimo-resumo-container" class="hidden mb-5">
@@ -167,17 +165,15 @@
     <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
         <div class="flex justify-between items-center mb-3">
             <h2 class="text-xs font-black text-yellow-500 uppercase tracking-wider">Balanço do Período Atual</h2>
-            <span class="text-[9px] text-gray-500 font-bold uppercase italic">Toque para ver os dias</span>
         </div>
         <div class="grid grid-cols-2 gap-2 text-xs mb-4">
-            <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('manutencao', 'Reserva Manut.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Reserva Manut.</span><span id="total-manutencao" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('reservaFinanceira', 'Reserva Finan.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700"><span class="block text-[9px] text-orange-400 font-bold uppercase">Reserva Finan.</span><span id="total-reserva-aba" class="font-bold text-orange-400 text-sm">R$ 0,00</span></div>
-            
-            <div onclick="auditarCategoria('investimento', 'Poupança Acumulada')" class="bg-gray-800 p-2 rounded-xl col-span-2 cursor-pointer hover:bg-gray-750 transition-colors border border-transparent hover:border-gray-700 text-center"><span class="block text-[9px] text-purple-400 font-bold uppercase">Poupança Acumulada</span><span id="total-investimento-aba" class="font-bold text-purple-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('manutencao', 'Reserva Manut.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Reserva Manut.</span><span id="total-manutencao" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('reservaFinanceira', 'Reserva Finan.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-orange-400 font-bold uppercase">Reserva Finan.</span><span id="total-reserva-aba" class="font-bold text-orange-400 text-sm">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('investimento', 'Poupança Acumulada')" class="bg-gray-800 p-2 rounded-xl col-span-2 cursor-pointer text-center"><span class="block text-[9px] text-purple-400 font-bold uppercase">Poupança Acumulada</span><span id="total-investimento-aba" class="font-bold text-purple-400 text-sm">R$ 0,00</span></div>
         </div>
         <button onclick="abrirFecharMes()" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
             📅 Fechar Balanço Mensal
@@ -206,12 +202,12 @@
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Meses Arquivados</h2>
-            <span class="text-[9px] text-gray-500 font-bold uppercase italic">Toque para ver o resumo</span>
         </div>
         <div id="meses-anteriores-container" class="space-y-2"></div>
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
     </div>
 
+    <!-- PLANILHA DE GASTOS PESSOAIS -->
     <div id="subjanela-gastos" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -222,9 +218,11 @@
             <div class="space-y-2 bg-gray-950 p-2.5 rounded-xl border border-gray-800">
                 <div class="space-y-2">
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Descrição</label>
-                        <input type="text" id="gasto-item-desc" oninput="filtrarSugestoes()" placeholder="Ex: Café, Pneu, Luz" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
-                        <div id="container-sugestoes" class="mt-1.5 max-h-20 overflow-y-auto"></div>
+                        <label class="block text-[10px] uppercase font-bold text-white mb-1">Descrição</label>
+                        <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Padaria" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs uppercase">
+                        
+                        <!-- Balões Dinâmicos Nascem Aqui -->
+                        <div id="container-sugestoes" class="mt-2 flex flex-wrap max-h-24 overflow-y-auto pt-1"></div>
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Valor (R$)</label>
@@ -254,53 +252,45 @@
                 <span id="subjanela-total-acumulado" class="text-red-400">R$ 0,00</span>
             </div>
 
-            <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+            <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
                 💾 Confirmar e Enviar para a Tela
             </button>
         </div>
     </div>
 
+    <!-- CONFERÊNCIA -->
     <div id="subjanela-auditoria" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
                 <div>
                     <h3 id="auditoria-titulo" class="text-sm font-bold uppercase tracking-wider text-yellow-500">Conferência</h3>
-                    <p id="auditoria-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos do período corrente</p>
+                    <p id="auditoria-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5"></p>
                 </div>
-                <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold hover:text-white">✕</button>
+                <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold">✕</button>
             </div>
-
             <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
                 <table class="w-full text-left text-xs text-gray-300">
-                    <thead id="auditoria-head" class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
-                        <tr>
-                            <th class="p-2.5">Data</th>
-                            <th class="p-2.5 text-right">Valor</th>
-                        </tr>
-                    </thead>
+                    <thead id="auditoria-head" class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0"></thead>
                     <tbody id="lista-auditoria-body"></tbody>
                 </table>
             </div>
-
-            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
-                <span class="text-white uppercase text-xs">Total Acumulado:</span>
-                <span id="auditoria-total-acumulado" class="text-white">R$ 0,00</span>
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
+                <span class="text-white uppercase text-xs">Total:</span>
+                <span id="auditoria-total-acumulado">R$ 0,00</span>
             </div>
-
-            <button onclick="fecharSubjanelaAuditoria()" class="w-full bg-gray-750 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase tracking-wider border border-gray-600">
-                Fechar Verificação
-            </button>
+            <button onclick="fecharSubjanelaAuditoria()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
         </div>
     </div>
 
-    <div id="subjanela-mes-arquivado" class="modal-overlay">
+    <!-- RESUMO DO MÊS ARQUIVADO -->
+    <div id="subjanela-mes-aquivado" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
                 <div>
                     <h3 id="mes-arq-titulo" class="text-sm font-bold uppercase tracking-wider text-blue-400">Resumo Fechado</h3>
                     <p class="text-[9px] text-gray-400 uppercase mt-0.5">Balanço Consolidado do Período</p>
                 </div>
-                <button onclick="fecharSubjanelaMesArquivado()" class="text-gray-400 text-lg font-bold hover:text-white">✕</button>
+                <button onclick="fecharSubjanelaMesArquivado()" class="text-gray-400 text-lg font-bold">✕</button>
             </div>
 
             <div class="space-y-1 text-xs bg-gray-950 border border-gray-800 p-3 rounded-xl">
@@ -308,15 +298,14 @@
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Reserva Manutenção:</span><span id="mes-arq-manut" class="font-bold text-red-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Gastos Pessoais (Último dia):</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Gastos Pessoais Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-orange-400">Reserva Financeira:</span><span id="mes-arq-reserva" class="font-bold text-orange-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1"><span class="text-purple-400">Poupança Guardada:</span><span id="mes-arq-inv" class="font-bold text-purple-400">R$ 0,00</span></div>
             </div>
 
             <div class="space-y-1">
-                <span class="block text-[10px] uppercase font-bold text-gray-400 ml-1">Descritivo de Gastos Pessoais:</span>
-                <div class="max-h-24 overflow-y-auto border border-gray-800 bg-gray-950 p-2 rounded-xl text-[11px] space-y-1 text-gray-300" id="mes-arq-descritivo-container">
-                </div>
+                <span class="block text-[10px] uppercase font-bold text-gray-400 ml-1">Descritivo Completo de Gastos:</span>
+                <div class="max-h-32 overflow-y-auto border border-gray-800 bg-gray-950 p-2 rounded-xl text-[11px] space-y-1 text-gray-300" id="mes-arq-descritivo-container"></div>
             </div>
 
             <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
@@ -324,12 +313,11 @@
                 <span id="mes-arq-saldo-final" class="text-blue-400">R$ 0,00</span>
             </div>
 
-            <button onclick="fecharSubjanelaMesArquivado()" class="w-full bg-gray-750 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase tracking-wider border border-gray-600">
-                Voltar para a Tela
-            </button>
+            <button onclick="fecharSubjanelaMesArquivado()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Voltar</button>
         </div>
     </div>
 
+    <!-- AJUSTAR LANÇAMENTO -->
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
             <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider border-b border-gray-700 pb-2">Ajustar Lançamento</h3>
@@ -344,9 +332,7 @@
                     <label class="block text-red-400 font-bold uppercase text-[10px]">Gastos Pessoais</label>
                     <div class="flex gap-2">
                         <input type="number" id="edit-pessoal" readonly class="w-full bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-400 font-bold text-xs" placeholder="0,00">
-                        <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 hover:bg-blue-900 border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wide whitespace-nowrap">
-                            📋 Reabrir Planilha
-                        </button>
+                        <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase">📋 Reabrir</button>
                     </div>
                 </div>
 
@@ -363,10 +349,11 @@
 
     <input type="hidden" id="modo-planilha-contexto" value="principal">
 
+    <!-- CONFIRMAR FECHAMENTO MENSAL -->
     <div id="modal-fechar-mes" class="modal-overlay">
         <div class="modal-content text-center space-y-4">
             <h3 class="text-base font-bold text-yellow-500 uppercase tracking-wider">Confirmar Fechamento</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">Deseja arquivar os dados deste período? Seu histórico diário visível será limpo, mas o seu **Caixa Geral Acumulado no topo permanecerá intacto**.</p>
+            <p class="text-xs text-gray-400 leading-relaxed">Deseja consolidar o balanço do mês de <strong class="text-white" id="nome-mes-fechamento">JUNHO</strong>? O histórico de dias ativos será arquivado.</p>
             <div class="flex gap-2 text-xs font-bold pt-1">
                 <button onclick="confirmarFecharMes()" class="flex-1 bg-yellow-600 py-3 rounded-xl text-white">Confirmar</button>
                 <button onclick="fecharModalMes()" class="flex-1 bg-gray-800 border border-gray-700 py-3 rounded-xl text-gray-400">Cancelar</button>
@@ -375,8 +362,8 @@
     </div>
 
     <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-gray-950 border-t border-gray-800 p-2.5 grid grid-cols-2 gap-3 z-50">
-        <button onclick="exportarBackup()" class="bg-gray-900 border border-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-[10px] uppercase tracking-wider">📦 Salvar Backup</button>
-        <label class="bg-gray-900 border border-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-[10px] uppercase tracking-wider text-center cursor-pointer block">
+        <button onclick="exportarBackup()" class="bg-gray-900 border border-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-[10px] uppercase">📦 Salvar Backup</button>
+        <label class="bg-gray-900 border border-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-[10px] uppercase text-center cursor-pointer block">
             📥 Ler Backup <input type="file" id="importFile" accept=".txt" onchange="importarBackup(event)" class="hidden">
         </label>
     </footer>
@@ -386,27 +373,18 @@
             saldoAcumulado: 0,
             historico: [],
             mesesAnteriores: [],
-            sugestoesGastos: ["MERCADO", "LUZ", "ÁGUA", "INTERNET", "ALMOÇO", "COMBUSTÍVEL", "MANUTENÇÃO"]
+            sugestoesGastos: [] // Começa limpo de fábrica
         };
-        
-        if (!dados.sugestoesGastos) {
-            dados.sugestoesGastos = ["MERCADO", "LUZ", "ÁGUA", "INTERNET", "ALMOÇO", "COMBUSTÍVEL", "MANUTENÇÃO"];
-        }
         
         let itensGastosTemporarios = [];
         let lancamentoEmEdicao = null;
-        let expandirHistoricoCompleto = false;
 
         function formatarMoeda(valor) {
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
         function obtenerDataHoje() {
-            return new Date().toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
-                month: '2-digit',
-                timeZone: 'America/Sao_Paulo' 
-            });
+            return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
         }
 
         function verificarTravaDiaria() {
@@ -416,11 +394,10 @@
             const btnDetalhar = document.getElementById('btn-detalhar');
 
             if (jaLancado) {
-                btnSalvar.innerText = `⚠️ ${hoje} JÁ LANÇADO (USE O AJUSTAR)`;
+                btnSalvar.innerText = `⚠️ ${hoje} JÁ LANÇADO`;
                 btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
                 btnSalvar.disabled = true;
                 btnDetalhar.disabled = true;
-                btnDetalhar.className = btnDetalhar.className.replace("bg-red-950", "bg-gray-950 text-gray-600 border-gray-800 cursor-not-allowed");
                 
                 ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
                     document.getElementById(id).disabled = true;
@@ -431,7 +408,6 @@
                 btnSalvar.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider mt-2";
                 btnSalvar.disabled = false;
                 btnDetalhar.disabled = false;
-                btnDetalhar.className = "bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase tracking-wider";
                 
                 ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
                     document.getElementById(id).disabled = false;
@@ -451,7 +427,7 @@
 
             const saldoEl = document.getElementById('saldo-total');
             saldoEl.innerText = formatarMoeda(dados.saldoAcumulado);
-            saldoEl.className = `text-4xl font-black transition-colors ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
+            saldoEl.className = `text-4xl font-black ${dados.saldoAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
 
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
@@ -471,18 +447,14 @@
             }
 
             let totalFat = 0, totalRenda = 0, totalGas = 0, totalMan = 0, totalPes = 0, totalInv = 0, totalRes = 0;
-            dados.historico.forEach((item, idx) => {
+            dados.historico.forEach(item => {
                 totalFat += parseFloat(item.faturamento) || 0;
                 totalRenda += parseFloat(item.rendaExtra) || 0;
                 totalGas += parseFloat(item.gasolina) || 0;
                 totalMan += parseFloat(item.manutencao) || 0;
-                totalInv += parseFloat(item.investimento) || 0;
+                totalPes += parseFloat(item.pessoal) || 0; // Soma simples das fotos diárias
                 totalRes += parseFloat(item.reservaFinanceira) || 0;
-                
-                // MÉTODOLOGIA CUMULATIVA: O total da aba passa a refletir o valor do último dia lançado
-                if (idx === dados.historico.length - 1) {
-                    totalPes = parseFloat(item.pessoal) || 0;
-                }
+                totalInv += parseFloat(item.investimento) || 0;
             });
 
             document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
@@ -499,37 +471,20 @@
             if (dados.historico.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-600 italic text-xs">Nenhum registro ativo</td></tr>';
             } else {
-                const historicoInvertido = [...dados.historico].reverse();
-                const itensExibidos = expandirHistoricoCompleto ? historicoInvertido : historicoInvertido.slice(0, 5);
-
-                itensExibidos.forEach((item, index) => {
+                [...dados.historico].reverse().forEach((item, index) => {
                     const idxReal = dados.historico.length - 1 - index;
                     const tr = document.createElement('tr');
-                    tr.className = 'border-t border-gray-800 hover:bg-gray-800/30 text-xs';
+                    tr.className = 'border-t border-gray-800 text-xs';
                     const sDia = parseFloat(item.saldoDia) || 0;
-                    
-                    const indicadorPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
+                    const indPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
 
                     tr.innerHTML = `
-                        <td class="p-3 text-white font-black">${item.data}${indicadorPlanilha}</td>
+                        <td class="p-3 text-white font-black">${item.data}${indPlanilha}</td>
                         <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-500' : 'text-red-500'}">${formatarMoeda(sDia)}</td>
                         <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border-2 border-blue-600 bg-blue-950 px-2.5 py-1 rounded-md text-xs">Ajustar</button></td>
                     `;
                     tbody.appendChild(tr);
                 });
-
-                if (dados.historico.length > 5) {
-                    const trBotao = document.createElement('tr');
-                    trBotao.className = 'bg-gray-950 text-center border-t border-gray-800';
-                    trBotao.innerHTML = `
-                        <td colspan="3" class="p-2.5">
-                            <button onclick="alternarVisibilidadeHistorico()" class="w-full text-[10px] font-black uppercase tracking-wider text-blue-400 hover:text-blue-300 py-1">
-                                ${expandirHistoricoCompleto ? '▲ Recolher Histórico' : `▼ Ver Todos os Lançamentos (+${dados.historico.length - 5})`}
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(trBotao);
-                }
             }
 
             const mContainer = document.getElementById('meses-anteriores-container');
@@ -539,10 +494,10 @@
             } else {
                 mVazios.classList.add('hidden');
                 mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => `
-                    <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs active:bg-gray-800 cursor-pointer transition-colors">
+                    <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs cursor-pointer">
                         <div>
                             <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo}</h4>
-                            <p class="text-gray-400 text-[10px] mt-0.5">Entradas: <span class="text-green-400 font-bold">${formatarMoeda((mes.faturamentoTotal || 0) + (mes.rendaExtraTotal || 0))}</span></p>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(mes.faturamentoTotal)}</span></p>
                         </div>
                         <div class="text-right flex items-center gap-3" onclick="event.stopPropagation();">
                             <div>
@@ -554,225 +509,56 @@
                     </div>
                 `).join('');
             }
-
             verificarTravaDiaria();
         }
 
-        function alternarVisibilidadeHistorico() {
-            expandirHistoricoCompleto = !expandirHistoricoCompleto;
-            atualizarUI();
-        }
-
-        /* VER RESUMO DO MÊS ARQUIVADO */
-        function abrirResumoMesArquivado(index) {
-            const mes = dados.mesesAnteriores[index];
-            document.getElementById('mes-arq-titulo').innerText = mes.periodo;
-            document.getElementById('mes-arq-fat').innerText = formatarMoeda(mes.faturamentoTotal || 0);
-            document.getElementById('mes-arq-renda').innerText = formatarMoeda(mes.rendaExtraTotal || 0);
-            
-            let gasolina = 0, manutencao = 0, pessoal = 0, reserva = 0, investimento = 0;
-            if (mes.historico && Array.isArray(mes.historico)) {
-                mes.historico.forEach(item => {
-                    gasolina += parseFloat(item.gasolina) || 0;
-                    manutencao += parseFloat(item.manutencao) || 0;
-                    reserva += parseFloat(item.reservaFinanceira) || 0;
-                    investimento += parseFloat(item.investimento) || 0;
-                });
-            }
-
-            // Pega o valor pessoal salvo de forma não-somada (direto do fechamento)
-            pessoal = parseFloat(mes.pessoalTotal) || 0;
-
-            document.getElementById('mes-arq-gas').innerText = formatarMoeda(gasolina);
-            document.getElementById('mes-arq-manut').innerText = formatarMoeda(manutencao);
-            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(pessoal);
-            document.getElementById('mes-arq-reserva').innerText = formatarMoeda(reserva);
-            document.getElementById('mes-arq-inv').innerText = formatarMoeda(investimento);
-            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(mes.saldoFinalNoMes);
-
-            // Renderiza a lista descritiva guardada dos gastos pessoais
-            const containerDesc = document.getElementById('mes-arq-descritivo-container');
-            containerDesc.innerHTML = '';
-            
-            if (mes.descritivoGastos && mes.descritivoGastos.length > 0) {
-                mes.descritivoGastos.forEach(g => {
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between py-0.5 border-b border-gray-900/40 font-mono';
-                    div.innerHTML = `<span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span>`;
-                    containerDesc.appendChild(div);
-                });
-            } else {
-                containerDesc.innerHTML = `<div class="text-gray-600 text-[10px] italic py-1 text-center">Nenhum descritivo detalhado neste mês.</div>`;
-            }
-
-            document.getElementById('subjanela-mes-arquivado').classList.add('active');
-        }
-
-        function fecharSubjanelaMesArquivado() {
-            document.getElementById('subjanela-mes-arquivado').classList.remove('active');
-        }
-
-        /* CONFERÊNCIA DIÁRIA E AGRUPAMENTO */
-        function auditarCategoria(propriedade, nomeExibicao) {
-            const tituloEl = document.getElementById('auditoria-titulo');
-            const subtituloEl = document.getElementById('auditoria-subtitulo');
-            const headEl = document.getElementById('auditoria-head');
-            const tbodyEl = document.getElementById('lista-auditoria-body');
-            const totalEl = document.getElementById('auditoria-total-acumulado');
-            
-            tituloEl.innerText = `Conferência: ${nomeExibicao}`;
-            tbodyEl.innerHTML = '';
-            let acumuloTotal = 0;
-
-            if (propriedade === 'pessoal') {
-                subtituloEl.innerText = "Resumo acumulado por item no mês";
-                headEl.innerHTML = `<tr><th class="p-2.5">Descrição do Item</th><th class="p-2.5 text-right">Total Acumulado</th></tr>`;
-
-                let mapaItens = {};
-
-                dados.historico.forEach(item => {
-                    if (item.detalheGastos && item.detalheGastos.length > 0) {
-                        item.detalheGastos.forEach(g => {
-                            let descFormatada = g.descricao.trim().toUpperCase();
-                            mapaItens[descFormatada] = (mapaItens[descFormatada] || 0) + (parseFloat(g.valor) || 0);
-                        });
-                    } else if ((parseFloat(item.pessoal) || 0) > 0) {
-                        mapaItens["NÃO ESPECIFICADO (DIRETO)"] = (mapaItens["NÃO ESPECIFICADO (DIRETO)"] || 0) + parseFloat(item.pessoal);
-                    }
-                });
-
-                const chavesOrdenadas = Object.keys(mapaItens).sort((a,b) => mapaItens[b] - mapaItens[a]);
-
-                if (chavesOrdenadas.length === 0) {
-                    tbodyEl.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-xs">Nenhum gasto pessoal lançado neste período.</td></tr>';
-                } else {
-                    chavesOrdenadas.forEach(desc => {
-                        const valorTotalItem = mapaItens[desc];
-                        acumuloTotal += valorTotalItem;
-
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-t border-gray-800 text-xs hover:bg-gray-900/50';
-                        tr.innerHTML = `
-                            <td class="p-2.5 text-gray-300 font-bold uppercase">${desc}</td>
-                            <td class="p-2.5 text-right font-black text-red-400">${formatarMoeda(valorTotalItem)}</td>
-                        `;
-                        tbodyEl.appendChild(tr);
-                    });
-                }
-                
-                // AJUSTE CUMULATIVO PARA VISUALIZAÇÃO: Exibe o total real do último dia lançado em vez da soma repetida
-                if (dados.historico.length > 0) {
-                    acumuloTotal = parseFloat(dados.historico[dados.historico.length - 1].pessoal) || 0;
-                }
-
-            } else {
-                subtituloEl.innerText = "Lançamentos do período corrente";
-                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
-
-                const lancamentosFiltrados = dados.historico.filter(item => (parseFloat(item[propriedade]) || 0) > 0);
-
-                if (lancamentosFiltrados.length === 0) {
-                    tbodyEl.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-xs">Nenhum valor lançado nesta categoria no período ativo.</td></tr>';
-                } else {
-                    [...lancamentosFiltrados].reverse().forEach(item => {
-                        const valorItem = parseFloat(item[propriedade]) || 0;
-                        acumuloTotal += valorItem;
-
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-t border-gray-800 text-xs hover:bg-gray-900/50';
-                        
-                        let corTextoValor = 'text-white';
-                        if (['faturamento', 'rendaExtra'].includes(propriedade)) corTextoValor = 'text-green-400';
-                        if (['gasolina', 'manutencao'].includes(propriedade)) corTextoValor = 'text-red-400';
-                        if (propriedade === 'reservaFinanceira') corTextoValor = 'text-orange-400';
-                        if (propriedade === 'investimento') corTextoValor = 'text-purple-400';
-
-                        tr.innerHTML = `
-                            <td class="p-2.5 text-gray-300 font-bold">${item.data}</td>
-                            <td class="p-2.5 text-right font-black ${corTextoValor}">${formatarMoeda(valorItem)}</td>
-                        `;
-                        tbodyEl.appendChild(tr);
-                    });
-                }
-            }
-
-            totalEl.innerText = formatarMoeda(acumuloTotal);
-            let corTotalBorda = 'text-white';
-            if (['faturamento', 'rendaExtra'].includes(propriedade)) corTotalBorda = 'text-green-400';
-            if (['gasolina', 'manutencao', 'pessoal'].includes(propriedade)) corTotalBorda = 'text-red-400';
-            if (propriedade === 'reservaFinanceira') corTotalBorda = 'text-orange-400';
-            if (propriedade === 'investimento') corTotalBorda = 'text-purple-400';
-            totalEl.className = `font-black text-sm ${corTotalBorda}`;
-
-            document.getElementById('subjanela-auditoria').classList.add('active');
-        }
-
-        function fecharSubjanelaAuditoria() {
-            document.getElementById('subjanela-auditoria').classList.remove('active');
-        }
-
-        /* AUTO-CADASTRO / AUTOCOMPLETAR GASTOS */
-        function filtrarSugestoes() {
+        /* COMPLEMENTOS / BALÕES DINÂMICOS */
+        function renderizarBaloesDinamicos() {
             const input = document.getElementById('gasto-item-desc').value.trim().toUpperCase();
             const container = document.getElementById('container-sugestoes');
             container.innerHTML = '';
 
-            if (input.length === 0) {
-                dados.sugestoesGastos.slice(0, 4).forEach(palavra => {
-                    criarTagSugestao(palavra, container);
-                });
-                return;
-            }
+            // Se o usuário não escreveu nada, mostra até 6 balões que ele mais usou
+            const listaParaFiltrar = dados.sugestoesGastos || [];
+            const baloesFiltrados = input.length === 0 ? listaParaFiltrar.slice(0, 6) : listaParaFiltrar.filter(p => p.includes(input));
 
-            const filtradas = dados.sugestoesGastos.filter(p => p.includes(input));
-            filtradas.forEach(palavra => {
-                criarTagSugestao(palavra, container);
+            baloesFiltrados.forEach(palavra => {
+                const span = document.createElement('span');
+                span.className = 'sugestao-tag';
+                span.innerText = palavra;
+                span.onclick = function() {
+                    document.getElementById('gasto-item-desc').value = palavra;
+                    container.innerHTML = '';
+                    document.getElementById('gasto-item-val').focus();
+                };
+                container.appendChild(span);
             });
         }
 
-        function criarTagSugestao(palavra, container) {
-            const span = document.createElement('span');
-            span.className = 'sugestao-tag';
-            span.innerText = palavra;
-            span.onclick = function() {
-                document.getElementById('gasto-item-desc').value = palavra;
-                container.innerHTML = '';
-                document.getElementById('gasto-item-val').focus();
-            };
-            container.appendChild(span);
-        }
-
-        /* OPERAÇÕES DA PLANILHA DE GASTOS */
+        /* PLANILHA DE GASTOS */
         function abrirSubjanelaGastos() {
             document.getElementById('modo-planilha-contexto').value = "principal";
             document.getElementById('gasto-item-desc').value = '';
             document.getElementById('gasto-item-val').value = '';
             document.getElementById('subjanela-gastos').classList.add('active');
-            filtrarSugestoes();
+            renderizarBaloesDinamicos();
             renderizarListaSubjanela();
         }
 
         function reabrirPlanilhaNoAjuste() {
             if (lancamentoEmEdicao === null) return;
             document.getElementById('modo-planilha-contexto').value = "ajuste";
-            
             const itemOriginal = dados.historico[lancamentoEmEdicao];
             itensGastosTemporarios = itemOriginal.detalheGastos ? [...itemOriginal.detalheGastos] : [];
-            
             document.getElementById('modal-edicao').classList.remove('active');
-            document.getElementById('gasto-item-desc').value = '';
-            document.getElementById('gasto-item-val').value = '';
             document.getElementById('subjanela-gastos').classList.add('active');
-            filtrarSugestoes();
+            renderizarBaloesDinamicos();
             renderizarListaSubjanela();
         }
 
         function fecharSubjanelaGastos() {
-            const contexto = document.getElementById('modo-planilha-contexto').value;
             document.getElementById('subjanela-gastos').classList.remove('active');
-            
-            if (contexto === "ajuste") {
-                itensGastosTemporarios = [];
+            if (document.getElementById('modo-planilha-contexto').value === "ajuste") {
                 document.getElementById('modal-edicao').classList.add('active');
             }
         }
@@ -783,18 +569,11 @@
             const descricao = descEl.value.trim().toUpperCase();
             const valor = parseFloat(valEl.value) || 0;
 
-            if (!descricao || valor <= 0) {
-                alert('Insira uma descrição e um valor válido.'); return;
-            }
-
-            if (!dados.sugestoesGastos.includes(descricao)) {
-                dados.sugestoesGastos.push(descricao);
-                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            }
+            if (!descricao || valor <= 0) return;
 
             itensGastosTemporarios.push({ descricao, valor });
             descEl.value = ''; valEl.value = '';
-            filtrarSugestoes();
+            renderizarBaloesDinamicos();
             renderizarListaSubjanela();
             descEl.focus();
         }
@@ -807,35 +586,38 @@
         function renderizarListaSubjanela() {
             const tBody = document.getElementById('lista-gastos-correntes-body');
             tBody.innerHTML = '';
-            let totalAcumulado = 0;
-
+            let total = 0;
             itensGastosTemporarios.forEach((item, index) => {
-                totalAcumulado += item.valor;
+                total += item.valor;
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800 text-xs';
                 tr.innerHTML = `
-                    <td class="p-2 text-gray-300 font-bold uppercase">${item.descricao}</td>
+                    <td class="p-2 text-gray-300 uppercase">${item.descricao}</td>
                     <td class="p-2 text-white font-bold">${formatarMoeda(item.valor)}</td>
                     <td class="p-2 text-right"><button onclick="removerItemDaLista(${index})" class="text-red-500 font-bold px-1">✕</button></td>
                 `;
                 tBody.appendChild(tr);
             });
-
-            document.getElementById('subjanela-total-acumulado').innerText = formatarMoeda(totalAcumulado);
+            document.getElementById('subjanela-total-acumulado').innerText = formatarMoeda(total);
         }
 
         function salvarSubjanelaGastos() {
             let totalCalculado = 0;
-            itensGastosTemporarios.forEach(i => totalCalculado += i.valor);
-            
-            const contexto = document.getElementById('modo-planilha-contexto').value;
+            itensGastosTemporarios.forEach(i => {
+                totalCalculado += i.valor;
+                // APRENDIZADO DE BALÕES: O balão nasce no momento que o item é enviado
+                if (!dados.sugestoesGastos.includes(i.descricao)) {
+                    dados.sugestoesGastos.push(i.descricao);
+                }
+            });
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
+            const contexto = document.getElementById('modo-planilha-contexto').value;
             if (contexto === "ajuste") {
-                document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0.00';
+                document.getElementById('edit-pessoal').value = totalCalculado.toFixed(2);
                 if (lancamentoEmEdicao !== null) {
                     dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
                 }
-                itensGastosTemporarios = [];
                 document.getElementById('subjanela-gastos').classList.remove('active');
                 document.getElementById('modal-edicao').classList.add('active');
             } else {
@@ -844,7 +626,7 @@
             }
         }
 
-        /* GRAVAÇÃO DO DIA */
+        /* SALVAR MOVIMENTO DO DIA */
         function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
@@ -854,13 +636,6 @@
             const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
             const investimento = parseFloat(document.getElementById('investimento').value) || 0;
 
-            if (!faturamento && !rendaExtra && !gasolina && !pessoal && !manutencao && !investimento && !reservaFinanceira) {
-                alert('Preencha ao menos um valor.'); return;
-            }
-
-            // O saldo líquido do dia precisa deduzir apenas os gastos puros daquele dia.
-            // Para não quebrar o cálculo se o usuário lançar cumulativo puro na tela principal, 
-            // calculamos o saldo corrente com base nas entradas e saídas normais inseridas.
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
 
             dados.historico.push({
@@ -877,37 +652,170 @@
                 document.getElementById(id).value = '';
             });
             itensGastosTemporarios = [];
-
             atualizarUI();
-
-            const btn = event.target; const txt = btn.innerText;
-            btn.innerText = '✓ REGISTRO SALVO'; btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
-            setTimeout(() => { btn.innerText = txt; btn.className = btn.className.replace('bg-green-600', 'bg-blue-600'); }, 1500);
         }
 
-        /* AJUSTES / EDIÇÃO */
-        function abrirEdicao(index) {
-            lancamentoEmEdicao = index;
-            const item = dados.historico[index];
-            document.getElementById('edit-data').value = item.data;
-            document.getElementById('edit-faturamento').value = item.faturamento || 0;
-            document.getElementById('edit-renda-extra').value = item.rendaExtra || 0;
-            document.getElementById('edit-gasolina').value = item.gasolina || 0;
-            document.getElementById('edit-pessoal').value = item.pessoal || 0;
-            document.getElementById('edit-manutencao').value = item.manutencao || 0;
-            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira || 0;
-            document.getElementById('edit-investimento').value = item.investimento || 0;
+        /* AUDITORIAS / CONFERÊNCIA */
+        function auditarCategoria(propriedade, nomeExibicao) {
+            const tituloEl = document.getElementById('auditoria-titulo');
+            const subtituloEl = document.getElementById('auditoria-subtitulo');
+            const headEl = document.getElementById('auditoria-head');
+            const tbodyEl = document.getElementById('lista-auditoria-body');
+            const totalEl = document.getElementById('auditoria-total-acumulado');
             
-            itensGastosTemporarios = item.detalheGastos ? [...item.detalheGastos] : [];
+            tituloEl.innerText = `Conferência: ${nomeExibicao}`;
+            tbodyEl.innerHTML = '';
+            let acumuloTotal = 0;
+
+            if (propriedade === 'pessoal') {
+                subtituloEl.innerText = "Descritivo completo agrupado por item";
+                headEl.innerHTML = `<tr><th class="p-2.5">Item</th><th class="p-2.5 text-right">Total Acumulado</th></tr>`;
+                let mapaItens = {};
+
+                dados.historico.forEach(item => {
+                    if (item.detalheGastos) {
+                        item.detalheGastos.forEach(g => {
+                            mapaItens[g.descricao] = (mapaItens[g.descricao] || 0) + parseFloat(g.valor);
+                        });
+                    }
+                });
+
+                Object.keys(mapaItens).forEach(desc => {
+                    acumuloTotal += mapaItens[desc];
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs';
+                    tr.innerHTML = `<td class="p-2.5 uppercase font-bold text-gray-300">${desc}</td><td class="p-2.5 text-right font-black text-red-400">${formatarMoeda(mapaItens[desc])}</td>`;
+                    tbodyEl.appendChild(tr);
+                });
+            } else {
+                subtituloEl.innerText = "Lançamentos diários";
+                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
+                dados.historico.forEach(item => {
+                    const v = parseFloat(item[propriedade]) || 0;
+                    if (v > 0) {
+                        acumuloTotal += v;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-right font-bold">${formatarMoeda(v)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                });
+            }
+            totalEl.innerText = formatarMoeda(acumuloTotal);
+            document.getElementById('subjanela-auditoria').classList.add('active');
+        }
+
+        function fecharSubjanelaAuditoria() { document.getElementById('subjanela-auditoria').classList.remove('active'); }
+
+        /* FECHAMENTO DO MÊS (REFERENTE AO MÊS ANTERIOR CONCLUÍDO) */
+        function abrirFecharMes() {
+            const dataAtual = new Date();
+            // Pega o mês passado para dar o nome correto
+            dataAtual.setMonth(dataAtual.getMonth() - 1);
+            const nomeMesPassado = dataAtual.toLocaleString('pt-BR', { month: 'long' }).toUpperCase();
+            const anoMesPassado = dataAtual.getFullYear();
+
+            document.getElementById('nome-mes-fechamento').innerText = `${nomeMesPassado} DE ${anoMesPassado}`;
+            document.getElementById('modal-fechar-mes').classList.add('active');
+        }
+        function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
+
+        function confirmarFecharMes() {
+            if (dados.historico.length === 0) { alert('Sem dados no período ativo para fechar.'); return; }
+
+            const labelMes = document.getElementById('nome-mes-fechamento').innerText;
+
+            let fat = 0, renda = 0, gas = 0, man = 0, pes = 0, res = 0, inv = 0;
+            let descritivoCompilado = {};
+
+            dados.historico.forEach(item => {
+                fat += parseFloat(item.faturamento) || 0;
+                renda += parseFloat(item.rendaExtra) || 0;
+                gas += parseFloat(item.gasolina) || 0;
+                man += parseFloat(item.manutencao) || 0;
+                pes += parseFloat(item.pessoal) || 0;
+                res += parseFloat(item.reservaFinanceira) || 0;
+                inv += parseFloat(item.investimento) || 0;
+
+                if (item.detalheGastos) {
+                    item.detalheGastos.forEach(g => {
+                        descritivoCompilado[g.descricao] = (descritivoCompilado[g.descricao] || 0) + parseFloat(g.valor);
+                    });
+                }
+            });
+
+            let listaDescritivoFinal = Object.keys(descritivoCompilado).map(k => ({
+                descricao: k, valor: descritivoCompilado[k]
+            }));
+
+            const saldoFinalNoMes = (fat + renda) - gas - man - pes - res - inv;
+
+            dados.mesesAnteriores.push({
+                periodo: labelMes,
+                faturamentoTotal: fat, rendaExtraTotal: renda, pessoalTotal: pes,
+                saldoFinalNoMes,
+                descritivoGastos: listaDescritivoFinal,
+                historico: [...dados.historico]
+            });
+
+            dados.historico = [];
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalMes(); atualizarUI();
+        }
+
+        function abrirResumoMesArquivado(index) {
+            const mes = dados.mesesAnteriores[index];
+            document.getElementById('mes-arq-titulo').innerText = mes.periodo;
+            document.getElementById('mes-arq-fat').innerText = formatarMoeda(mes.faturamentoTotal);
+            document.getElementById('mes-arq-renda').innerText = formatarMoeda(mes.rendaExtraTotal);
+            
+            let gas = 0, man = 0, res = 0, inv = 0;
+            mes.historico.forEach(h => {
+                gas += parseFloat(h.gasolina) || 0;
+                man += parseFloat(h.manutencao) || 0;
+                res += parseFloat(h.reservaFinanceira) || 0;
+                inv += parseFloat(h.investimento) || 0;
+            });
+
+            document.getElementById('mes-arq-gas').innerText = formatarMoeda(gas);
+            document.getElementById('mes-arq-manut').innerText = formatarMoeda(man);
+            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(mes.pessoalTotal);
+            document.getElementById('mes-arq-reserva').innerText = formatarMoeda(res);
+            document.getElementById('mes-arq-inv').innerText = formatarMoeda(inv);
+            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(mes.saldoFinalNoMes);
+
+            const container = document.getElementById('mes-arq-descritivo-container');
+            container.innerHTML = '';
+            if (mes.descritivoGastos && mes.descritivoGastos.length > 0) {
+                mes.descritivoGastos.forEach(g => {
+                    container.innerHTML += `<div class="flex justify-between py-0.5 border-b border-gray-900"><span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span></div>`;
+                });
+            } else {
+                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo.</div>`;
+            }
+
+            document.getElementById('subjanela-mes-aquivado').classList.add('active');
+        }
+
+        function fecharSubjanelaMesArquivado() { document.getElementById('subjanela-mes-aquivado').classList.remove('active'); }
+
+        /* OPERAÇÕES COMPLEMENTARES DE EDICAO */
+        function abrirEdicao(index) {
+            lancamentoEmEdicao = index; const item = dados.historico[index];
+            document.getElementById('edit-data').value = item.data;
+            document.getElementById('edit-faturamento').value = item.faturamento;
+            document.getElementById('edit-renda-extra').value = item.rendaExtra;
+            document.getElementById('edit-gasolina').value = item.gasolina;
+            document.getElementById('edit-pessoal').value = item.pessoal;
+            document.getElementById('edit-manutencao').value = item.manutencao;
+            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
+            document.getElementById('edit-investimento').value = item.investimento;
             document.getElementById('modal-edicao').classList.add('active');
         }
-
-        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; itensGastosTemporarios = []; }
-
+        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
         function salvarEdicao() {
             if (lancamentoEmEdicao === null) return;
             const item = dados.historico[lancamentoEmEdicao];
-
             item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
             item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
             item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
@@ -915,117 +823,48 @@
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
             item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
             item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
-            
             item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
-
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModal(); atualizarUI();
         }
-
         function deletarLancamento() {
-            if (lancamentoEmEdicao === null) return;
-            if (confirm('Deseja excluir este registro definitivamente?')) {
+            if (confirm('Deletar registro?')) {
                 dados.historico.splice(lancamentoEmEdicao, 1);
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 fecharModal(); atualizarUI();
             }
         }
-
-        /* CONSOLIDAR BALANÇO MENSAL */
-        function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
-        function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
-
-        function confirmarFecharMes() {
-            if (dados.historico.length === 0) { alert('Não há lançamentos no período.'); return; }
-            
-            const agora = new Date();
-            const periodo = `${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' })}`.toUpperCase();
-
-            let totalFaturamentoApp = 0, totalRendaExtra = 0, saldoFinalNoMes = 0;
-            let pessoalCumulativoFinal = 0;
-            let listaDescritivoFinal = [];
-
-            // Captura o último dia do histórico ativo
-            const ultimoRegistro = dados.historico[dados.historico.length - 1];
-            pessoalCumulativoFinal = parseFloat(ultimoRegistro.pessoal) || 0;
-            listaDescritivoFinal = ultimoRegistro.detalheGastos ? [...ultimoRegistro.detalheGastos] : [];
-
-            dados.historico.forEach((item, idx) => {
-                totalFaturamentoApp += parseFloat(item.faturamento) || 0;
-                totalRendaExtra += parseFloat(item.rendaExtra) || 0;
-                
-                // CÁLCULO DO SALDO DO MÊS: Soma o líquido de faturamento/renda e deduz as despesas normais.
-                // Como "pessoal" é cumulativo, deduzimos apenas o valor final dele no cálculo de fechamento.
-                let gas = parseFloat(item.gasolina) || 0;
-                let man = parseFloat(item.manutencao) || 0;
-                let res = parseFloat(item.reservaFinanceira) || 0;
-                let inv = parseFloat(item.investimento) || 0;
-                
-                saldoFinalNoMes += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0) - gas - man - res - inv;
-            });
-            
-            // Subtrai de uma vez só o valor cumulativo dos gastos pessoais do fechamento líquido do mês
-            saldoFinalNoMes -= pessoalCumulativoFinal;
-
-            dados.mesesAnteriores.push({
-                periodo, 
-                faturamentoTotal: totalFaturamentoApp, 
-                rendaExtraTotal: totalRendaExtra, 
-                pessoalTotal: pessoalCumulativoFinal,
-                descritivoGastos: listaDescritivoFinal,
-                saldoFinalNoMes, 
-                historico: [...dados.historico]
-            });
-            dados.historico = []; 
-
-            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            fecharModalMes(); atualizarUI();
-            alert(`Período ${periodo} fechado e consolidado com sucesso.`);
-        }
-
         function deletarMesAnterior(index) {
-            if (confirm('Atenção: Excluir um período fechado alterará seu caixa acumulado vitalício. Deseja continuar?')) {
+            if (confirm('Remover mês fechado?')) {
                 dados.mesesAnteriores.splice(index, 1);
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
         }
-
         function limparDados() {
-            if (confirm('Deseja apagar todo o banco de dados do aplicativo?')) {
-                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: ["MERCADO", "LUZ", "ÁGUA", "INTERNET", "ALMOÇO", "COMBUSTÍVEL", "MANUTENÇÃO"] };
+            if (confirm('Zerar tudo?')) {
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
         }
-
-        /* LOGÍSTICA DE BACKUP */
         function exportarBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", `backup_financeiro_${new Date().toISOString().slice(0,10)}.txt`);
-            document.body.appendChild(dl); dl.click(); dl.remove();
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `backup_financeiro.txt`); dl.click();
         }
-
         function importarBackup(event) {
-            const input = event.target; const reader = new FileReader();
+            const reader = new FileReader();
             reader.onload = function() {
                 try {
-                    const dadosImportados = JSON.parse(reader.result);
-                    if (dadosImportados && Array.isArray(dadosImportados.historico)) {
-                        dados = dadosImportados; localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                        atualizarUI(); alert('Backup restaurado.');
-                    }
-                } catch (e) { alert('Erro no backup.'); }
-                input.value = '';
+                    dados = JSON.parse(reader.result);
+                    localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                    atualizarUI();
+                } catch (e) { alert('Erro no arquivo.'); }
             };
-            if (input.files.length > 0) reader.readAsText(input.files[0]);
+            if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
         }
 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => console.error(err));
-        }
         atualizarUI();
     </script>
 </body>
