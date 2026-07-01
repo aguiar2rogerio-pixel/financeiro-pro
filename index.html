@@ -11,6 +11,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças Pro">
     <meta name="theme-color" content="#111111">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./icon-192.png">
+    <link class="apple-touch-icon" href="./icon-192.png">
 
     <style>
         body {
@@ -113,7 +116,6 @@
         </div>
     </div>
 
-    <!-- FORMULÁRIO PRINCIPAL -->
     <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
         <div class="grid grid-cols-2 gap-3">
             <div>
@@ -163,7 +165,6 @@
         </button>
     </div>
 
-    <!-- BALANÇO DO PERÍODO -->
     <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
         <div class="flex justify-between items-center mb-3">
             <h2 class="text-xs font-black text-yellow-500 uppercase tracking-wider">Balanço do Período Atual</h2>
@@ -182,7 +183,6 @@
         </button>
     </div>
 
-    <!-- HISTÓRICO RECENTE -->
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
@@ -202,7 +202,6 @@
         </div>
     </div>
 
-    <!-- MESES ARQUIVADOS -->
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Meses Arquivados</h2>
@@ -211,7 +210,6 @@
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
     </div>
 
-    <!-- SUBJANELA DE GASTOS PESSOAIS -->
     <div id="subjanela-gastos" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -225,7 +223,6 @@
                         <label class="block text-[10px] uppercase font-bold text-white mb-1">Descrição</label>
                         <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Padaria" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs uppercase">
                         
-                        <!-- Balões Dinâmicos nascem aqui vazios -->
                         <div id="container-sugestoes" class="mt-2 flex flex-wrap max-h-24 overflow-y-auto pt-1"></div>
                     </div>
                     <div>
@@ -262,7 +259,6 @@
         </div>
     </div>
 
-    <!-- CONFERÊNCIA -->
     <div id="subjanela-auditoria" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -286,7 +282,6 @@
         </div>
     </div>
 
-    <!-- RESUMO DO MÊS ARQUIVADO -->
     <div id="subjanela-mes-aquivado" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -321,7 +316,6 @@
         </div>
     </div>
 
-    <!-- AJUSTAR LANÇAMENTO DIA -->
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
             <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider border-b border-gray-700 pb-2">Ajustar Lançamento</h3>
@@ -353,7 +347,6 @@
 
     <input type="hidden" id="modo-planilha-contexto" value="principal">
 
-    <!-- MODAL CONFIRMAR FECHAMENTO MENSAL COM INFORMAÇÃO DO BACKUP -->
     <div id="modal-fechar-mes" class="modal-overlay">
         <div class="modal-content text-center space-y-4">
             <h3 class="text-base font-bold text-yellow-500 uppercase tracking-wider">Confirmar Fechamento</h3>
@@ -384,7 +377,7 @@
             saldoAcumulado: 0,
             historico: [],
             mesesAnteriores: [],
-            sugestoesGastos: [] // Inicia limpo
+            sugestoesGastos: []
         };
         
         let itensGastosTemporarios = [];
@@ -515,7 +508,7 @@
                                 <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
                                 <span class="font-bold text-blue-400">${formatarMoeda(mes.saldoFinalNoMes)}</span>
                             </div>
-                            <button onclick="editarNomeMesAnterior(${idx})" class="text-gray-400 hover:text-white p-1 text-sm" title="Editar nome do mês">✏️</button>
+                            <button onclick="editarNomeMesAnterior(${idx})" class="text-gray-400 hover:text-white p-1 text-sm" title="Editar nome">✏️</button>
                             <button onclick="deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm" title="Excluir">🗑️</button>
                         </div>
                     </div>
@@ -524,14 +517,12 @@
             verificarTravaDiaria();
         }
 
-        /* BALÕES DINÂMICOS (NASCEM CONFORME DIGITAÇÃO SALVA) */
         function renderizarBaloesDinamicos() {
             const input = document.getElementById('gasto-item-desc').value.trim().toUpperCase();
             const container = document.getElementById('container-sugestoes');
             container.innerHTML = '';
 
             const listaParaFiltrar = dados.sugestoesGastos || [];
-            // Se vazio mostra os últimos 6 cadastrados, se digitado filtra
             const baloesFiltrados = input.length === 0 ? listaParaFiltrar.slice(-6).reverse() : listaParaFiltrar.filter(p => p.includes(input));
 
             baloesFiltrados.forEach(palavra => {
@@ -547,7 +538,6 @@
             });
         }
 
-        /* SUBJANELA DE PLANILHA DE GASTOS */
         function abrirSubjanelaGastos() {
             document.getElementById('modo-planilha-contexto').value = "principal";
             document.getElementById('gasto-item-desc').value = '';
@@ -617,7 +607,6 @@
             let totalCalculado = 0;
             itensGastosTemporarios.forEach(i => {
                 totalCalculado += i.valor;
-                // Cadastra a palavra nos balões dinâmicos apenas se for inédita
                 if (!dados.sugestoesGastos.includes(i.descricao)) {
                     dados.sugestoesGastos.push(i.descricao);
                 }
@@ -638,7 +627,6 @@
             }
         }
 
-        /* OPERAÇÃO DIÁRIA */
         function salvarLancamento(event) {
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
@@ -667,7 +655,6 @@
             atualizarUI();
         }
 
-        /* AUDITORIAS / CONFERÊNCIA */
         function auditarCategoria(propriedade, nomeExibicao) {
             const tituloEl = document.getElementById('auditoria-titulo');
             const subtituloEl = document.getElementById('auditoria-subtitulo');
@@ -719,11 +706,8 @@
 
         function fecharSubjanelaAuditoria() { document.getElementById('subjanela-auditoria').classList.remove('active'); }
 
-        /* MECÂNICA DE FECHAMENTO DO MÊS (CHASSI COMPLETO) */
         function abrirFecharMes() {
-            if (dados.historico.length === 0) { alert('Histórico atual está vazio. Insira movimentos antes de fechar.'); return; }
-            
-            // Sugere de forma inteligente pegando a data do primeiro lançamento do histórico ativo
+            if (dados.historico.length === 0) { alert('Histórico atual está vazio.'); return; }
             const dPartida = dados.historico[0].data.split('/');
             const mesesStr = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
             let idxMes = parseInt(dPartida[1]) - 1;
@@ -737,7 +721,6 @@
             const labelMes = document.getElementById('input-nome-mes-fechamento').value.trim().toUpperCase();
             if (!labelMes) { alert('Digite um nome para o período.'); return; }
 
-            // 1. ANTES DE APAGAR: EXECUTA O ESCUDO DE BACKUP AUTOMÁTICO
             try {
                 const backupDataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
                 const gatilhoDownload = document.createElement('a');
@@ -745,10 +728,9 @@
                 gatilhoDownload.setAttribute("download", `CONFERIDO_E_FECHADO_${labelMes.replace(/ /g, '_')}.txt`);
                 gatilhoDownload.click();
             } catch (err) {
-                console.error("Falha ao disparar o download preventivo", err);
+                console.error("Falha no download preventivo", err);
             }
 
-            // 2. CONSOLIDAÇÃO DOS DADOS NA GAVETA DE ARQUIVADOS
             let fat = 0, renda = 0, gas = 0, man = 0, pes = 0, res = 0, inv = 0;
             let descritivoCompilado = {};
 
@@ -782,7 +764,6 @@
                 historico: [...dados.historico]
             });
 
-            // 3. REINÍCIO COMPLETO (SÓ O SALDO ACUMULADO SOBREVIVE NO TOPO)
             dados.historico = [];
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModalMes(); 
@@ -817,7 +798,7 @@
                     container.innerHTML += `<div class="flex justify-between py-0.5 border-b border-gray-900"><span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span></div>`;
                 });
             } else {
-                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo de gastos cadastrados.</div>`;
+                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo de gastos.</div>`;
             }
 
             document.getElementById('subjanela-mes-aquivado').classList.add('active');
@@ -825,7 +806,6 @@
 
         function fecharSubjanelaMesArquivado() { document.getElementById('subjanela-mes-aquivado').classList.remove('active'); }
 
-        /* EDICÃO MANUAL DOS MESES ANTERIORES (CORREÇÃO DE GAVETA) */
         function editarNomeMesAnterior(index) {
             const novoNome = prompt("Ajustar nome do período arquivado:", dados.mesesAnteriores[index].periodo);
             if (novoNome && novoNome.trim() !== "") {
@@ -835,74 +815,8 @@
             }
         }
 
-        /* OUTROS AJUSTES E OPERAÇÕES EM BLOCK */
         function abrirEdicao(index) {
             lancamentoEmEdicao = index; const item = dados.historico[index];
             document.getElementById('edit-data').value = item.data;
-            document.getElementById('edit-faturamento').value = item.faturamento;
-            document.getElementById('edit-renda-extra').value = item.rendaExtra;
-            document.getElementById('edit-gasolina').value = item.gasolina;
-            document.getElementById('edit-pessoal').value = item.pessoal;
-            document.getElementById('edit-manutencao').value = item.manutencao;
-            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
-            document.getElementById('edit-investimento').value = item.investimento;
-            document.getElementById('modal-edicao').classList.add('active');
-        }
-        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
-        function salvarEdicao() {
-            if (lancamentoEmEdicao === null) return;
-            const item = dados.historico[lancamentoEmEdicao];
-            item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
-            item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
-            item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
-            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
-            item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
-            item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
-            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
-            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
-            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            fecharModal(); atualizarUI();
-        }
-        function deletarLancamento() {
-            if (confirm('Deletar registro deste dia?')) {
-                dados.historico.splice(lancamentoEmEdicao, 1);
-                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                fecharModal(); atualizarUI();
-            }
-        }
-        function deletarMesAnterior(index) {
-            if (confirm('Deseja realmente excluir este mês arquivado de forma definitiva?')) {
-                dados.mesesAnteriores.splice(index, 1);
-                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                atualizarUI();
-            }
-        }
-        function limparDados() {
-            if (confirm('Zerar o aplicativo inteiro? Isso apagará todo o histórico e meses salvos.')) {
-                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], BlackListSim: [],  sugestoesGastos: [] };
-                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                atualizarUI();
-            }
-        }
-        function exportarBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
-            const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", `backup_financeiro_manual.txt`); dl.click();
-        }
-        function importarBackup(event) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                try {
-                    dados = JSON.parse(reader.result);
-                    localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-                    atualizarUI();
-                } catch (e) { alert('Erro na leitura do arquivo de backup.'); }
-            };
-            if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
-        }
-
-        atualizarUI();
-    </script>
-</body>
-</html>
+            document.getElementById('edit-
 
