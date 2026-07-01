@@ -818,5 +818,76 @@
         function abrirEdicao(index) {
             lancamentoEmEdicao = index; const item = dados.historico[index];
             document.getElementById('edit-data').value = item.data;
-            document.getElementById('edit-
+            document.getElementById('edit-faturamento').value = item.faturamento;
+            document.getElementById('edit-renda-extra').value = item.rendaExtra;
+            document.getElementById('edit-gasolina').value = item.gasolina;
+            document.getElementById('edit-pessoal').value = item.pessoal;
+            document.getElementById('edit-manutencao').value = item.manutencao;
+            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
+            document.getElementById('edit-investimento').value = item.investimento;
+            document.getElementById('modal-edicao').classList.add('active');
+        }
+        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
+        function salvarEdicao() {
+            if (lancamentoEmEdicao === null) return;
+            const item = dados.historico[lancamentoEmEdicao];
+            item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
+            item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
+            item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
+            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
+            item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
+            item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
+            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModal(); atualizarUI();
+        }
+        function deletarLancamento() {
+            if (confirm('Deletar registro deste dia?')) {
+                dados.historico.splice(lancamentoEmEdicao, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                fecharModal(); atualizarUI();
+            }
+        }
+        function deletarMesAnterior(index) {
+            if (confirm('Deseja realmente excluir este mês arquivado?')) {
+                dados.mesesAnteriores.splice(index, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+        function limparDados() {
+            if (confirm('Zerar o aplicativo inteiro?')) {
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [],  sugestoesGastos: [] };
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+        function exportarBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `backup_financeiro_manual.txt`); dl.click();
+        }
+        function importarBackup(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                try {
+                    dados = JSON.parse(reader.result);
+                    localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                    atualizarUI();
+                } catch (e) { alert('Erro na leitura do backup.'); }
+            };
+            if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
+        }
+
+        /* ATIVAÇÃO DO MOTOR OFFLINE (SERVICE WORKER RECONECTADO) */
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .catch(err => console.error('Erro de registro do Service Worker:', err));
+        }
+
+        atualizarUI();
+    </script>
+</body>
+</html>
 
