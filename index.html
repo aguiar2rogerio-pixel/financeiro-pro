@@ -85,7 +85,6 @@
             background-color: #2563eb;
             border-color: #3b82f6;
         }
-        /* Ajuste fino para travar o cabeçalho da tabela no topo durante a rolagem */
         .header-fixo th {
             position: sticky;
             top: 0;
@@ -155,7 +154,7 @@
                     📝 Detalhar Gastos
                 </button>
             </div>
-            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculated" class="input-bloqueado font-bold">
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -193,7 +192,7 @@
         </button>
     </div>
 
-    <!-- HISTÓRICO RECENTE COM LIMITADOR DE ALTURA (MÁXIMO 280px) -->
+    <!-- HISTÓRICO RECENTE -->
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
@@ -235,8 +234,6 @@
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-white mb-1">Descrição</label>
                         <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Padaria" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs uppercase">
-                        
-                        <!-- Balões Dinâmicos -->
                         <div id="container-sugestoes" class="mt-2 flex flex-wrap max-h-24 overflow-y-auto pt-1"></div>
                     </div>
                     <div>
@@ -556,18 +553,18 @@
             });
         }
 
-        /* CORREÇÃO AQUI: Garante que a lista temporária herda o estado atual correto ao abrir no fluxo principal */
         function abrirSubjanelaGastos() {
             document.getElementById('modo-planilha-contexto').value = "principal";
             document.getElementById('gasto-item-desc').value = '';
             document.getElementById('gasto-item-val').value = '';
-            document.getElementById('subjanela-gastos').classList.add('active');
             
-            // Se o campo já contiver um valor calculado prévio, mantemos a lista, caso contrário, resetamos
-            if (!document.getElementById('pessoal').value) {
+            // Pega o valor que já estiver na tela principal (se houver) para não sumir com o que foi digitado
+            const valorAtual = parseFloat(document.getElementById('pessoal').value) || 0;
+            if (valorAtual === 0) {
                 itensGastosTemporarios = [];
             }
             
+            document.getElementById('subjanela-gastos').classList.add('active');
             renderizarBaloesDinamicos();
             renderizarListaSubjanela();
         }
@@ -628,20 +625,23 @@
             document.getElementById('subjanela-total-acumulado').innerText = formatarMoeda(total);
         }
 
+        /* FIX DE TRAVAMENTO DEFINITIVO: Processa a lista de forma limpa, salva as tags e fecha a janela sem quebrar */
         function salvarSubjanelaGastos() {
             let totalCalculado = 0;
+            
             itensGastosTemporarios.forEach(i => {
                 totalCalculado += i.valor;
-                if (!dados.sugestoesGastos.includes(i.descricao)) {
+                if (dados.sugestoesGastos && !dados.sugestoesGastos.includes(i.descricao)) {
                     dados.sugestoesGastos.push(i.descricao);
                 }
             });
+            
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
             const contexto = document.getElementById('modo-planilha-contexto').value;
             if (contexto === "ajuste") {
-                document.getElementById('edit-pessoal').value = totalCalculado.toFixed(2);
-                if (lancamentoEmEdicao !== null) {
+                document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0';
+                if (lancamentoEmEdicao !== null && dados.historico[lancamentoEmEdicao]) {
                     dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
                 }
                 document.getElementById('subjanela-gastos').classList.remove('active');
@@ -853,6 +853,7 @@
             document.getElementById('modal-edicao').classList.add('active');
         }
         function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
+        
         function salvarEdicao() {
             if (lancamentoEmEdicao === null) return;
             const item = dados.historico[lancamentoEmEdicao];
@@ -905,7 +906,6 @@
             if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
         }
 
-        /* ATIVAÇÃO DO MOTOR OFFLINE (SERVICE WORKER) */
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js', { scope: './' })
             .catch(err => console.error('Erro de registro do Service Worker:', err));
@@ -915,4 +915,3 @@
     </script>
 </body>
 </html>
-
