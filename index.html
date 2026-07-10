@@ -392,8 +392,9 @@
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        // AGORA BUSCA A DATA COM DIA/MÊS/ANO COMPLETO PARA EVITAR CONFLITOS DE TRAVA
         function obtenerDataHoje() {
-            return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+            return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' });
         }
 
         function verificarTravaDiaria() {
@@ -406,8 +407,8 @@
                 btnSalvar.innerText = `⚠️ ${hoje} JÁ LANÇADO`;
                 btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
                 btnSalvar.disabled = true;
-                btnDetalhar.disabled = true;
                 
+                // MANTÉM OS OUTROS BOTÕES E INPUTS COMPATÍVEIS SEM CONGELAR O APP INTEIRO
                 ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
                     document.getElementById(id).disabled = true;
                     document.getElementById(id).className = "input-bloqueado";
@@ -653,3 +654,181 @@
 
             dados.historico.push({
                 data: obtenerDataHoje(),
+                faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
+                saldoDia,
+                detalheGastos: [...itensGastosTemporarios],
+                timestamp: new Date().getTime()
+            });
+
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+
+            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            itensGastosTemporarios = [];
+            atualizarUI();
+        }
+
+        function auditarCategoria(propriedade, nomeExibicao) {
+            const tituloEl = document.getElementById('auditoria-titulo');
+            const subtituloEl = document.getElementById('auditoria-subtitulo');
+            const headEl = document.getElementById('auditoria-head');
+            const tbodyEl = document.getElementById('lista-auditoria-body');
+            const totalEl = document.getElementById('auditoria-total-acumulado');
+            
+            tituloEl.innerText = `Conferência: ${nomeExibicao}`;
+            tbodyEl.innerHTML = '';
+            let acumuloTotal = 0;
+
+            if (propriedade === 'pessoal') {
+                subtituloEl.innerText = "Descritivo acumulado por item neste mês";
+                headEl.innerHTML = `<tr><th class="p-2.5">Item</th><th class="p-2.5 text-right">Total</th></tr>`;
+                let mapaItens = {};
+
+                dados.historico.forEach(item => {
+                    if (item.detalheGastos) {
+                        item.detalheGastos.forEach(g => {
+                            mapaItens[g.descricao] = (mapaItens[g.descricao] || 0) + parseFloat(g.valor);
+                        });
+                    }
+                });
+
+                Object.keys(mapaItens).forEach(desc => {
+                    acumuloTotal += mapaItens[desc];
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs';
+                    tr.innerHTML = `<td class="p-2.5 uppercase font-bold text-gray-300">${desc}</td><td class="p-2.5 text-right font-black text-red-400">${formatarMoeda(mapaItens[desc])}</td>`;
+                    tbodyEl.appendChild(tr);
+                });
+            } else {
+                subtituloEl.innerText = "Lançamentos por dia";
+                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
+                dados.historico.forEach(item => {
+                    const v = parseFloat(item[propriedade]) || 0;
+                    if (v > 0) {
+                        acumuloTotal += v;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-right font-bold">${formatarMoeda(v)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                });
+            }
+            totalEl.innerText = formatarMoeda(acumuloTotal);
+            document.getElementById('subjanela-auditoria').classList.add('active');
+        }
+
+        function fecharSubjanelaAuditoria() { document.getElementById('subjanela-auditoria').classList.remove('active'); }
+
+        function abrirFecharMes() {
+            if (dados.historico.length === 0) { alert('Histórico atual está vazio.'); return; }
+            const dPartida = dados.historico[0].data.split('/');
+            const mesesStr = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+            let idxMes = parseInt(dPartida[1]) - 1;
+            
+            document.getElementById('input-nome-mes-fechamento').value = `${mesesStr[idxMes]} DE 2026`;
+            document.getElementById('modal-fechar-mes').classList.add('active');
+        }
+        function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
+
+        function confirmarFecharMes() {
+            const labelMes = document.getElementById('input-nome-mes-fechamento').value.trim().toUpperCase();
+            if (!labelMes) { alert('Digite um nome para o período.'); return; }
+
+            try {
+                const backupDataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+                const gatilhoDownload = document.createElement('a');
+                gatilhoDownload.setAttribute("href", backupDataStr);
+                gatilhoDownload.setAttribute("download", `CONFERIDO_E_FECHADO_${labelMes.replace(/ /g, '_')}.txt`);
+                gatilhoDownload.click();
+            } catch (err) {
+                console.error("Falha no download preventivo", err);
+            }
+
+            let fat = 0, renda = 0, gas = 0, man = 0, pes = 0, res = 0, inv = 0;
+            let descritivoCompilado = {};
+
+            dados.historico.forEach(item => {
+                fat += parseFloat(item.faturamento) || 0;
+                renda += parseFloat(item.rendaExtra) || 0;
+                gas += parseFloat(item.gasolina) || 0;
+                man += parseFloat(item.manutencao) || 0;
+                pes += parseFloat(item.pessoal) || 0;
+                res += parseFloat(item.reservaFinanceira) || 0;
+                inv += parseFloat(item.investimento) || 0;
+
+                if (item.detalheGastos) {
+                    item.detalheGastos.forEach(g => {
+                        descritivoCompilado[g.descricao] = (descritivoCompilado[g.descricao] || 0) + parseFloat(g.valor);
+                    });
+                }
+            });
+
+            let listaDescritivoFinal = Object.keys(descritivoCompilado).map(k => ({
+                descricao: k, valor: descritivoCompilado[k]
+            }));
+
+            const saldoFinalNoMes = (fat + renda) - gas - man - pes - res - inv;
+
+            dados.mesesAnteriores.push({
+                periodo: labelMes,
+                faturamentoTotal: fat, rendaExtraTotal: renda, pessoalTotal: pes,
+                saldoFinalNoMes,
+                descritivoGastos: listaDescritivoFinal,
+                historico: [...dados.historico]
+            });
+
+            dados.historico = [];
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalMes(); 
+            atualizarUI();
+        }
+
+        function abrirResumoMesArquivado(index) {
+            const mes = dados.mesesAnteriores[index];
+            document.getElementById('mes-arq-titulo').innerText = mes.periodo;
+            document.getElementById('mes-arq-fat').innerText = formatarMoeda(mes.faturamentoTotal);
+            document.getElementById('mes-arq-renda').innerText = formatarMoeda(mes.rendaExtraTotal);
+            
+            let gas = 0, man = 0, res = 0, inv = 0;
+            mes.historico.forEach(h => {
+                gas += parseFloat(h.gasolina) || 0;
+                man += parseFloat(h.manutencao) || 0;
+                res += parseFloat(h.reservaFinanceira) || 0;
+                inv += parseFloat(h.investimento) || 0;
+            });
+
+            document.getElementById('mes-arq-gas').innerText = formatarMoeda(gas);
+            document.getElementById('mes-arq-manut').innerText = formatarMoeda(man);
+            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(mes.pessoalTotal);
+            document.getElementById('mes-arq-reserva').innerText = formatarMoeda(res);
+            document.getElementById('mes-arq-inv').innerText = formatarMoeda(inv);
+            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(mes.saldoFinalNoMes);
+
+            const container = document.getElementById('mes-arq-descritivo-container');
+            container.innerHTML = '';
+            if (mes.descritivoGastos && mes.descritivoGastos.length > 0) {
+                mes.descritivoGastos.forEach(g => {
+                    container.innerHTML += `<div class="flex justify-between py-0.5 border-b border-gray-900"><span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span></div>`;
+                });
+            } else {
+                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo de gastos.</div>`;
+            }
+
+            document.getElementById('subjanela-mes-aquivado').classList.add('active');
+        }
+
+        function fecharSubjanelaMesArquivado() { document.getElementById('subjanela-mes-aquivado').classList.remove('active'); }
+
+        function editarNomeMesAnterior(index) {
+            const novoNome = prompt("Ajustar nome do período arquivado:", dados.mesesAnteriores[index].periodo);
+            if (novoNome && novoNome.trim() !== "") {
+                dados.mesesAnteriores[index].periodo = novoNome.trim().toUpperCase();
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+
+        function abrirEdicao(index) {
+            lancamentoEmEdicao = index; const item = dados.historico[index];
+            document.getElementById('edit-data
