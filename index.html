@@ -6,14 +6,12 @@
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Conectores para o Aplicativo (PWA) -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças Pro">
     <meta name="theme-color" content="#111111">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./icon-192.png">
-    <link class="apple-touch-icon" href="./icon-192.png">
 
     <style>
         body {
@@ -122,6 +120,7 @@
         </div>
     </div>
 
+    <!-- FORMULÁRIO PRINCIPAL -->
     <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
         <div class="grid grid-cols-2 gap-3">
             <div>
@@ -171,6 +170,7 @@
         </button>
     </div>
 
+    <!-- BALANÇO DO PERÍODO -->
     <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
         <div class="flex justify-between items-center mb-3">
             <h2 class="text-xs font-black text-yellow-500 uppercase tracking-wider">Balanço do Período Atual</h2>
@@ -189,6 +189,7 @@
         </button>
     </div>
 
+    <!-- HISTÓRICO RECENTE -->
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
@@ -208,6 +209,7 @@
         </div>
     </div>
 
+    <!-- MESES ARQUIVADOS -->
     <div class="mt-6">
         <div class="flex justify-between items-center mb-2 px-1">
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Meses Arquivados</h2>
@@ -216,6 +218,7 @@
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
     </div>
 
+    <!-- SUBJANELA DE GASTOS PESSOAIS -->
     <div id="subjanela-gastos" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -264,6 +267,7 @@
         </div>
     </div>
 
+    <!-- CONFERÊNCIA -->
     <div id="subjanela-auditoria" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -287,6 +291,7 @@
         </div>
     </div>
 
+    <!-- RESUMO DO MÊS ARQUIVADO -->
     <div id="subjanela-mes-aquivado" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -321,6 +326,7 @@
         </div>
     </div>
 
+    <!-- AJUSTAR LANÇAMENTO DIA -->
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
             <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider border-b border-gray-700 pb-2">Ajustar Lançamento</h3>
@@ -352,6 +358,7 @@
 
     <input type="hidden" id="modo-planilha-contexto" value="principal">
 
+    <!-- MODAL CONFIRMAR FECHAMENTO MENSAL -->
     <div id="modal-fechar-mes" class="modal-overlay">
         <div class="modal-content text-center space-y-4">
             <h3 class="text-base font-bold text-yellow-500 uppercase tracking-wider">Confirmar Fechamento</h3>
@@ -378,12 +385,29 @@
     </footer>
 
     <script>
-        let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || {
-            saldoAcumulado: 0,
-            historico: [],
-            mesesAnteriores: [],
-            sugestoesGastos: []
-        };
+        // RECUPERA SE EXISTIR OU INJETA DIRETAMENTE O BACKUP COMPLETO DO USUÁRIO SE ESTIVER ZERADO
+        let dados = JSON.parse(localStorage.getItem('financeiro_pro'));
+        
+        if (!dados || !dados.historico || dados.historico.length === 0) {
+            dados = {
+                "saldoAcumulado": 5.38,
+                "historico": [
+                    {"data":"01/07","faturamento":75.53,"rendaExtra":0,"gasolina":0,"pessoal":10,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":65.53,"detalheGastos":[{"descricao":"CIGARRO","valor":10}],"timestamp":1782960191480},
+                    {"data":"02/07","faturamento":89.7,"rendaExtra":40,"gasolina":26.86,"pessoal":106.59,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-3.75,"detalheGastos":[{"descricao":"PADARIA","valor":4},{"descricao":"CIGARRO","valor":13},{"descricao":"ÓLEO MOTOR","valor":39.9},{"descricao":"MERCADO","valor":49.69}],"timestamp":1783044953028},
+                    {"data":"03/07","faturamento":15.2,"rendaExtra":0,"gasolina":22.38,"pessoal":66.89,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-74.07,"detalheGastos":[{"descricao":"PADARIA","valor":15},{"descricao":"CIGARRO","valor":5},{"descricao":"MERCADO","valor":46.89}],"timestamp":1783126799279},
+                    {"data":"04/07","faturamento":35.56,"rendaExtra":0,"gasolina":0,"pessoal":19.89,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":15.67,"detalheGastos":[{"descricao":"CIGARRO","valor":10},{"descricao":"PADARIA","valor":9.89}],"timestamp":1783215680812},
+                    {"data":"05/07","faturamento":0,"rendaExtra":0,"gasolina":22.38,"pessoal":7.75,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-30.13,"detalheGastos":[{"descricao":"CIGARRO","valor":7.75}],"timestamp":1783300454528},
+                    {"data":"06/07","faturamento":80.52,"rendaExtra":0,"gasolina":22.38,"pessoal":16.75,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":41.39,"detalheGastos":[{"descricao":"CIGARRO","valor":12.75},{"descricao":"PADARIA","valor":4}],"timestamp":1783387143099},
+                    {"data":"07/07","faturamento":16.6,"rendaExtra":18,"gasolina":0,"pessoal":21.2,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":13.4,"detalheGastos":[{"descricao":"CIGARRO","valor":5},{"descricao":"PADARIA","valor":4},{"descricao":"MERCADO","valor":12.2}],"timestamp":1783472595094}
+                ],
+                "mesesAnteriores": [
+                    {"periodo":"MAIO DE 2026","totalFaturamento":171.57,"saldoFinal":27.67,"historico":[{"data":"30/05","faturamento":77.8,"gasolina":20,"pessoal":13,"manutencao":0,"investimento":0,"reservaFinanceira":7,"saldoDia":37.8,"timestamp":1780191986086},{"data":"31/05","faturamento":59.17,"gasolina":27.22,"pessoal":0,"manutencao":0,"investimento":0,"reservaFinanceira":7,"saldoDia":24.95,"timestamp":1780280286094},{"data":"01/06","faturamento":34.6,"gasolina":42.68,"pessoal":5,"manutencao":15,"investimento":0,"reservaFinanceira":7,"saldoDia":-35.08,"timestamp":1780364146149}]},
+                    {"periodo":"JUNHO DE 2026","faturamentoTotal":1197.57,"rendaExtraTotal":635.72,"pessoalTotal":942.15,"saldoFinalNoMes":-22.66,"descritivoGastos":[{"descricao":"Cigarro","valor":167.5},{"descricao":"Pão","valor":13.2},{"descricao":"Farmácia","valor":10.99},{"descricao":"Padaria","valor":41.7},{"descricao":"Mercado","valor":349.56},{"descricao":"Conta Celular","valor":49.28},{"descricao":"MERCADO","valor":136.28},{"descricao":"CIGARRO","valor":55.25},{"descricao":"PADARIA","valor":13.5}],"historico":[{"data":"01/06","faturamento":34.6,"gasolina":42.68,"pessoal":5,"manutencao":15,"investimento":0,"reservaFinanceira":7,"saldoDia":74.89,"timestamp":1780364315217,"rendaExtra":109.97},{"data":"02/06","faturamento":41.7,"rendaExtra":0,"gasolina":22.58,"pessoal":15.75,"manutencao":15,"reservaFinanceira":7,"investimento":0,"saldoDia":-18.63,"detalheGastos":[{"descricao":"Cigarro","valor":12.75},{"descricao":"Pão","valor":3}],"timestamp":1780451413155},{"data":"03/06","faturamento":26.7,"rendaExtra":0,"gasolina":0,"pessoal":15.99,"manutencao":15,"reservaFinanceira":7,"investimento":0,"saldoDia":-11.29,"detalheGastos":[{"descricao":"Cigarro","valor":5},{"descricao":"Farmácia","valor":10.99}],"timestamp":1780517002866},{"data":"04/06","faturamento":27.91,"rendaExtra":0,"gasolina":0,"pessoal":20.75,"manutencao":15,"reservaFinanceira":7,"investimento":0,"saldoDia":-14.84,"detalheGastos":[{"descricao":"Pão","valor":4.2},{"descricao":"Cigarro","valor":16.55}],"timestamp":1780622992175},{"data":"05/06","faturamento":39.7,"rendaExtra":40,"gasolina":35.81,"pessoal":9.8,"manutencao":0,"reservaFinanceira":7,"investimento":0,"saldoDia":27.09,"detalheGastos":[],"timestamp":1780713281830},{"data":"06/06","faturamento":0,"rendaExtra":0,"gasolina":0,"pessoal":7.75,"manutencao":0,"reservaFinanceira":19,"investimento":0,"saldoDia":-26.75,"detalheGastos":[{"descricao":"Cigarro","valor":7.75}],"timestamp":1780796366624},{"data":"07/06","faturamento":98.52,"rendaExtra":0,"gasolina":0,"pessoal":16.1,"manutencao":0,"reservaFinanceira":7,"investimento":0,"saldoDia":75.42,"detalheGastos":[{"descricao":"Cigarro","valor":8.9},{"descricao":"Padaria","valor":7.2}],"timestamp":1780882681147},{"data":"09/06","faturamento":91.26,"rendaExtra":0,"gasolina":42.38,"pessoal":57.73,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-8.85,"detalheGastos":[],"timestamp":1781056693503},{"data":"08/06","faturamento":65.38,"rendaExtra":9.95,"gasolina":50,"pessoal":62.29,"manutencao":15,"reservaFinanceira":7,"investimento":0,"saldoDia":-58.96,"detalheGastos":[{"descricao":"Mercado","valor":52.29},{"descricao":"Cigarro","valor":10}],"timestamp":1780970996396},{"data":"10/06","faturamento":34.15,"rendaExtra":0,"gasolina":42.68,"pessoal":32.36,"manutencao":0,"reservaFinanceira":8,"investimento":0,"saldoDia":-48.89,"detalheGastos":[],"timestamp":1781112852071},{"data":"11/06","faturamento":54.49,"rendaExtra":0,"gasolina":20,"pessoal":13,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":21.49,"detalheGastos":[{"descricao":"Cigarro","valor":13}],"timestamp":1781226868706},{"data":"12/06","faturamento":22.9,"rendaExtra":15,"gasolina":50,"pessoal":40.08,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-52.18,"detalheGastos":[{"descricao":"Cigarro","valor":8.55},{"descricao":"Mercado","valor":31.53}],"timestamp":1781313866886},{"data":"14/06","faturamento":70,"rendaExtra":20,"gasolina":22.38,"pessoal":5,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":62.62,"detalheGastos":[{"descricao":"Cigarro","valor":5}],"timestamp":1781486646814},{"data":"15/06","faturamento":32.1,"rendaExtra":0,"gasolina":42.38,"pessoal":13,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-23.28,"detalheGastos":[{"descricao":"Pão","valor":3},{"descricao":"Cigarro","valor":10}],"timestamp":1781574985866},{"data":"16/06","faturamento":47.16,"rendaExtra":0,"gasolina":25,"pessoal":5,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":17.16,"detalheGastos":[{"descricao":"Cigarro","valor":5}],"timestamp":1781655979688},{"data":"17/06","faturamento":56.9,"rendaExtra":0,"gasolina":47.38,"pessoal":13,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-3.48,"detalheGastos":[{"descricao":"Cigarro","valor":13}],"timestamp":1781748379510},{"data":"18/06","faturamento":48.81,"rendaExtra":0,"gasolina":25,"pessoal":8,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":15.81,"detalheGastos":[{"descricao":"Cigarro","valor":5},{"descricao":"Pão","valor":3}],"timestamp":1781833293128},{"data":"19/06","faturamento":41.52,"rendaExtra":0,"gasolina":45,"pessoal":22,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-25.48,"detalheGastos":[{"descricao":"Padaria","valor":12},{"descricao":"Cigarro","valor":10}],"timestamp":1781917423735},{"data":"20/06","faturamento":83.22,"rendaExtra":0,"gasolina":20,"pessoal":5,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":58.22,"detalheGastos":[{"descricao":"Cigarro","valor":5}],"timestamp":1782008284124},{"data":"21/06","faturamento":19.8,"rendaExtra":0,"gasolina":30,"pessoal":8,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-18.2,"detalheGastos":[{"descricao":"Cigarro","valor":8}],"timestamp":1782093713031},{"data":"22/06","faturamento":24.16,"rendaExtra":0,"gasolina":20,"pessoal":42.79,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-38.63,"detalheGastos":[{"descricao":"Mercado","valor":34.79},{"descricao":"Cigarro","valor":8}],"timestamp":1782179235156},{"data":"23/06","faturamento":15.3,"rendaExtra":0,"gasolina":20,"pessoal":105.14,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-109.84,"detalheGastos":[{"descricao":"Mercado","valor":37.86},{"descricao":"Padaria","valor":10},{"descricao":"Cigarro","valor":8},{"descricao":"Conta Celular","valor":49.28}],"timestamp":1782260205900},{"data":"24/06","faturamento":7.3,"rendaExtra":0,"gasolina":30,"pessoal":67.75,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-90.45,"detalheGastos":[{"descricao":"Cigarro","valor":8},{"descricao":"Mercado","valor":59.75}],"timestamp":1782342184184},{"data":"25/06","faturamento":51.96,"rendaExtra":40.8,"gasolina":26.86,"pessoal":145.84,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-79.94,"detalheGastos":[{"descricao":"Padaria","valor":12.5},{"descricao":"Mercado","valor":133.34}],"timestamp":1782439615734},{"data":"26/06","faturamento":17.3,"rendaExtra":0,"gasolina":35.81,"pessoal":20,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-38.51,"detalheGastos":[{"descricao":"MERCADO","valor":12},{"descricao":"CIGARRO","valor":8}],"timestamp":1782495458517},{"data":"27/06","faturamento":39.74,"rendaExtra":0,"gasolina":20,"pessoal":12.75,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":6.99//9,"detalheGastos":[{"descricao":"CIGARRO","valor":12.75}],"timestamp":1782581961812},{"data":"28/06","faturamento":43.33,"rendaExtra":400,"gasolina":0,"pessoal":118.8,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":324.53,"detalheGastos":[{"descricao":"MERCADO","valor":105.3},{"descricao":"CIGARRO","valor":13.5}],"timestamp":1782668427818},{"data":"29/06","faturamento":41.4,"rendaExtra":0,"gasolina":26.86,"pessoal":5,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":9.54,"detalheGastos":[{"descricao":"CIGARRO","valor":5}],"timestamp":1782755006650},{"data":"30/06","faturamento":20.26,"rendaExtra":0,"gasolina":20,"pessoal":48.48,"manutencao":0,"reservaFinanceira":0,"investimento":0,"saldoDia":-48.22,"detalheGastos":[{"descricao":"CIGARRO","valor":16},{"descricao":"MERCADO","valor":18.98},{"descricao":"PADARIA","valor":13.5}],"timestamp":1782841585550}]}
+                ],
+                "sugestoesGastos": ["CIGARRO", "PADARIA", "MERCADO", "ÓLEO MOTOR", "FARMÁCIA", "CONTA CELULAR"]
+            };
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+        }
         
         let itensGastosTemporarios = [];
         let lancamentoEmEdicao = null;
@@ -392,23 +416,22 @@
             return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // AGORA BUSCA A DATA COM DIA/MÊS/ANO COMPLETO PARA EVITAR CONFLITOS DE TRAVA
         function obtenerDataHoje() {
             return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' });
         }
 
+        // CONFIRMADO: TRAVA SÓ ENTRA EM AÇÃO PARA BLOQUEAR O BOTÃO DE SALVAR SE A DATA COM DIA/MÊS/ANO EXATO ESTIVER REGISTRADA NO HISTÓRICO ATIVO.
         function verificarTravaDiaria() {
             const hoje = obtenerDataHoje();
-            const jaLancado = dados.historico.some(item => item.data === hoje);
+            const jaLancado = dados.historico.some(item => item.data === hoje || item.data === hoje.substring(0,5));
             const btnSalvar = document.getElementById('btn-salvar-principal');
             const btnDetalhar = document.getElementById('btn-detalhar');
 
             if (jaLancado) {
-                btnSalvar.innerText = `⚠️ ${hoje} JÁ LANÇADO`;
+                btnSalvar.innerText = `⚠️ ${hoje.substring(0,5)} JÁ LANÇADO`;
                 btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
                 btnSalvar.disabled = true;
                 
-                // MANTÉM OS OUTROS BOTÕES E INPUTS COMPATÍVEIS SEM CONGELAR O APP INTEIRO
                 ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
                     document.getElementById(id).disabled = true;
                     document.getElementById(id).className = "input-bloqueado";
@@ -431,7 +454,9 @@
             dados.historico.forEach(item => { totalHistoricoAtivo += parseFloat(item.saldoDia) || 0; });
 
             let totalMesesFechados = 0;
-            dados.mesesAnteriores.forEach(mes => { totalMesesFechados += parseFloat(mes.saldoFinalNoMes) || 0; });
+            dados.mesesAnteriores.forEach(mes => { 
+                totalMesesFechados += parseFloat(mes.saldoFinalNoMes || mes.saldoFinal) || 0; 
+            });
 
             dados.saldoAcumulado = totalHistoricoAtivo + totalMesesFechados;
 
@@ -503,22 +528,25 @@
                 mContainer.innerHTML = ''; mVazios.classList.remove('hidden');
             } else {
                 mVazios.classList.add('hidden');
-                mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => `
+                mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => {
+                    const faturamentoExibido = mes.faturamentoTotal || mes.totalFaturamento || 0;
+                    const liquidoExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : (mes.saldoFinal !== undefined ? mes.saldoFinal : 0);
+                    return `
                     <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs cursor-pointer">
                         <div>
                             <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo}</h4>
-                            <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(mes.faturamentoTotal)}</span></p>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(faturamentoExibido)}</span></p>
                         </div>
                         <div class="text-right flex items-center gap-2" onclick="event.stopPropagation();">
                             <div class="mr-1">
                                 <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
-                                <span class="font-bold text-blue-400">${formatarMoeda(mes.saldoFinalNoMes)}</span>
+                                <span class="font-bold text-blue-400">${formatarMoeda(liquidoExibido)}</span>
                             </div>
                             <button onclick="editarNomeMesAnterior(${idx})" class="text-gray-400 hover:text-white p-1 text-sm" title="Editar nome">✏️</button>
                             <button onclick="deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm" title="Excluir">🗑️</button>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
             verificarTravaDiaria();
         }
@@ -652,8 +680,12 @@
 
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
 
+            // EXIBE APENAS DIA E MÊS NA TABELA PARA FICAR COMPACTO E LIMPO
+            const dataHojeCompleta = obtenerDataHoje();
+            const dataDiaMesCurta = dataHojeCompleta.substring(0, 5);
+
             dados.historico.push({
-                data: obtenerDataHoje(),
+                data: dataDiaMesCurta,
                 faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
                 saldoDia,
                 detalheGastos: [...itensGastosTemporarios],
@@ -688,7 +720,8 @@
                 dados.historico.forEach(item => {
                     if (item.detalheGastos) {
                         item.detalheGastos.forEach(g => {
-                            mapaItens[g.descricao] = (mapaItens[g.descricao] || 0) + parseFloat(g.valor);
+                            const descUpper = g.descricao.toUpperCase();
+                            mapaItens[descUpper] = (mapaItens[descUpper] || 0) + parseFloat(g.valor);
                         });
                     }
                 });
@@ -759,7 +792,8 @@
 
                 if (item.detalheGastos) {
                     item.detalheGastos.forEach(g => {
-                        descritivoCompilado[g.descricao] = (descritivoCompilado[g.descricao] || 0) + parseFloat(g.valor);
+                        const dUpper = g.descricao.toUpperCase();
+                        descritivoCompilado[dUpper] = (descritivoCompilado[dUpper] || 0) + parseFloat(g.valor);
                     });
                 }
             });
@@ -787,32 +821,41 @@
         function abrirResumoMesArquivado(index) {
             const mes = dados.mesesAnteriores[index];
             document.getElementById('mes-arq-titulo').innerText = mes.periodo;
-            document.getElementById('mes-arq-fat').innerText = formatarMoeda(mes.faturamentoTotal);
-            document.getElementById('mes-arq-renda').innerText = formatarMoeda(mes.rendaExtraTotal);
+            
+            const fatExibido = mes.faturamentoTotal !== undefined ? mes.faturamentoTotal : (mes.totalFaturamento || 0);
+            const rendaExibida = mes.rendaExtraTotal || 0;
+            const liqExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : (mes.saldoFinal || 0);
+            
+            document.getElementById('mes-arq-fat').innerText = formatarMoeda(fatExibido);
+            document.getElementById('mes-arq-renda').innerText = formatarMoeda(rendaExibida);
             
             let gas = 0, man = 0, res = 0, inv = 0;
-            mes.historico.forEach(h => {
-                gas += parseFloat(h.gasolina) || 0;
-                man += parseFloat(h.manutencao) || 0;
-                res += parseFloat(h.reservaFinanceira) || 0;
-                inv += parseFloat(h.investimento) || 0;
-            });
+            if (mes.historico) {
+                mes.historico.forEach(h => {
+                    gas += parseFloat(h.gasolina) || 0;
+                    man += parseFloat(h.manutencao) || 0;
+                    res += parseFloat(h.reservaFinanceira) || 0;
+                    inv += parseFloat(h.investimento) || 0;
+                });
+            }
 
             document.getElementById('mes-arq-gas').innerText = formatarMoeda(gas);
             document.getElementById('mes-arq-manut').innerText = formatarMoeda(man);
-            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(mes.pessoalTotal);
+            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(mes.pessoalTotal || mes.pessoal || 0);
             document.getElementById('mes-arq-reserva').innerText = formatarMoeda(res);
             document.getElementById('mes-arq-inv').innerText = formatarMoeda(inv);
-            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(mes.saldoFinalNoMes);
+            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(liqExibido);
 
             const container = document.getElementById('mes-arq-descritivo-container');
             container.innerHTML = '';
-            if (mes.descritivoGastos && mes.descritivoGastos.length > 0) {
-                mes.descritivoGastos.forEach(g => {
+            
+            const listaDeGastos = mes.descritivoGastos || [];
+            if (listaDeGastos.length > 0) {
+                listaDeGastos.forEach(g => {
                     container.innerHTML += `<div class="flex justify-between py-0.5 border-b border-gray-900"><span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span></div>`;
                 });
             } else {
-                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo de gastos.</div>`;
+                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo de gastos detalhado.</div>`;
             }
 
             document.getElementById('subjanela-mes-aquivado').classList.add('active');
@@ -831,4 +874,89 @@
 
         function abrirEdicao(index) {
             lancamentoEmEdicao = index; const item = dados.historico[index];
-            document.getElementById('edit-data
+            document.getElementById('edit-data').value = item.data;
+            document.getElementById('edit-faturamento').value = item.faturamento;
+            document.getElementById('edit-renda-extra').value = item.rendaExtra;
+            document.getElementById('edit-gasolina').value = item.gasolina;
+            document.getElementById('edit-pessoal').value = item.pessoal;
+            document.getElementById('edit-manutencao').value = item.manutencao;
+            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
+            document.getElementById('edit-investimento').value = item.investimento;
+            document.getElementById('modal-edicao').classList.add('active');
+        }
+        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
+        
+        function salvarEdicao() {
+            if (lancamentoEmEdicao === null) return;
+            const item = dados.historico[lancamentoEmEdicao];
+            item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
+            item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
+            item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
+            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
+            item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
+            item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
+            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModal(); atualizarUI();
+        }
+        function deletarLancamento() {
+            if (confirm('Deletar registro deste dia?')) {
+                dados.historico.splice(lancamentoEmEdicao, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                fecharModal(); atualizarUI();
+            }
+        }
+        function deletarMesAnterior(index) {
+            if (confirm('Deseja realmente excluir este mês arquivado?')) {
+                dados.mesesAnteriores.splice(index, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+        function limparDados() {
+            if (confirm('Zerar o aplicativo inteiro?')) {
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [],  sugestoesGastos: [] };
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+        
+        function exportarBackup() {
+            const agora = new Date();
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const ano = agora.getFullYear();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutes = String(agora.getMinutes()).padStart(2, '0');
+            
+            const dataHoraFormatada = `${dia}-${mes}-${ano}_${horas}h${minutes}`;
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `backup_financeiro_${dataHoraFormatada}.txt`); dl.click();
+        }
+        
+        // AGORA REALIZA A IMPORTAÇÃO DE FORMA RESILIENTE CONFERINDO VARIÁVEIS DO FORMATO REAL DO USUÁRIO
+        function importarBackup(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                try {
+                    const backupBruto = JSON.parse(reader.result);
+                    if (backupBruto && (backupBruto.historico || backupBruto.mesesAnteriores)) {
+                        dados = backupBruto;
+                        localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                        atualizarUI();
+                        alert('Backup restaurado com sucesso absoluto!');
+                    } else {
+                        alert('Formato de arquivo inválido.');
+                    }
+                } catch (e) { alert('Erro na decodificação do arquivo de backup.'); }
+            };
+            if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
+        }
+
+        atualizarUI();
+    </script>
+</body>
+</html>
