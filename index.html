@@ -7,12 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Configurações Obrigatórias para Instalação (PWA/Mobile) -->
+    <link rel="manifest" href="./manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças Pro">
     <meta name="theme-color" content="#111111">
     <meta name="application-name" content="Finanças Pro">
+
+    <!-- Registro do Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker ativo!', reg.scope))
+            .catch(err => console.log('Erro no Service Worker:', err));
+        });
+      }
+    </script>
 
     <style>
         body {
@@ -93,7 +105,7 @@
 </head>
 <body class="p-4 max-w-md mx-auto pb-24">
 
-    <!-- Botão de Instalação Dinâmico (Aparece se o navegador suportar) -->
+    <!-- Botão de Instalação Dinâmico -->
     <div id="pwa-install-container" class="hidden mb-4">
         <button onclick="dispararInstalacaoPWA()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-lg animate-pulse">
             📲 Instalar Aplicativo no Celular
@@ -413,7 +425,6 @@
             });
         }
 
-        // CONFIGURAÇÃO DE DISTRIBUIÇÃO LIMPA (ZERO DADOS DE TERCEIROS)
         const BACKUP_INTERNO_CONSOLIDADO = {
             "saldoAcumulado": 0,
             "historico": [],
@@ -911,7 +922,7 @@
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
             item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
             item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
-            item.saldoDia = (item.faturamento + item.investimento) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModal(); atualizarUI();
         }
