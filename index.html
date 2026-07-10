@@ -6,11 +6,13 @@
     <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Configurações Obrigatórias para Instalação (PWA/Mobile) -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças Pro">
     <meta name="theme-color" content="#111111">
+    <meta name="application-name" content="Finanças Pro">
 
     <style>
         body {
@@ -90,6 +92,13 @@
     </style>
 </head>
 <body class="p-4 max-w-md mx-auto pb-24">
+
+    <!-- Botão de Instalação Dinâmico (Aparece se o navegador suportar) -->
+    <div id="pwa-install-container" class="hidden mb-4">
+        <button onclick="dispararInstalacaoPWA()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-lg animate-pulse">
+            📲 Instalar Aplicativo no Celular
+        </button>
+    </div>
 
     <header class="text-center my-5">
         <h1 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Caixa Geral Acumulado</h1>
@@ -384,6 +393,26 @@
     </footer>
 
     <script>
+        // CAPTURA DE EVENTO DE INSTALAÇÃO (PWA)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btnContainer = document.getElementById('pwa-install-container');
+            if (btnContainer) btnContainer.classList.remove('hidden');
+        });
+
+        function dispararInstalacaoPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    document.getElementById('pwa-install-container').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            });
+        }
+
         // CONFIGURAÇÃO DE DISTRIBUIÇÃO LIMPA (ZERO DADOS DE TERCEIROS)
         const BACKUP_INTERNO_CONSOLIDADO = {
             "saldoAcumulado": 0,
