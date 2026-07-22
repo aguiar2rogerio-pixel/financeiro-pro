@@ -114,8 +114,7 @@
 
     <!-- Botão de Instalação Dinâmico -->
     <div id="pwa-install-container" class="hidden mb-4">
-        <button onclick="dispararInstalacaoPWA()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-lg"
-            >
+        <button onclick="dispararInstalacaoPWA()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-lg">
             📲 Instalar Aplicativo no Celular
         </button>
     </div>
@@ -127,7 +126,7 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div class="bg-gray-900 border-2 border-gray-800 p-3 rounded-2xl">
-                <span class="block text-[9px] text-orange-400 font-bold uppercase tracking-wider mb-1">Guardado</span>
+                <span class="block text-[9px] text-orange-400 font-bold uppercase tracking-wider mb-1">Guardado (Manutenção)</span>
                 <span id="saldo-guardado" class="text-xl font-black text-orange-400">R$ 0,00</span>
             </div>
             <div class="bg-gray-900 border-2 border-gray-800 p-3 rounded-2xl">
@@ -143,7 +142,7 @@
                 <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Último Registro</h3>
                 <span id="last-date" class="text-[10px] text-gray-400 font-black"></span>
             </div>
-            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="grid grid-cols-2 gap-2 text-center text-xs">
                 <div class="bg-gray-800 p-2 rounded-xl">
                     <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Entradas</span>
                     <span id="last-ganho" class="font-bold text-green-400">R$ 0</span>
@@ -151,10 +150,6 @@
                 <div class="bg-gray-800 p-2 rounded-xl">
                     <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Saídas</span>
                     <span id="last-gastos" class="font-bold text-red-400">R$ 0</span>
-                </div>
-                <div class="bg-gray-800 p-2 rounded-xl">
-                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Reservas</span>
-                    <span id="last-reserva" class="font-bold text-orange-400">R$ 0</span>
                 </div>
             </div>
         </div>
@@ -190,27 +185,14 @@
         <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-2">
             <div class="flex justify-between items-center">
                 <label class="block text-xs font-black text-red-400 uppercase tracking-wide ml-1">Gastos Pessoais (-)</label>
-                <button id="btn-detalhar" onclick="abrirSubjanelaGastos()" class="bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase"
-                    >
+                <button id="btn-detalhar" onclick="abrirSubjanelaGastos()" class="bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase">
                     📝 Detalhar Gastos
                 </button>
             </div>
             <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-xs font-black text-orange-400 mb-1 ml-1 uppercase tracking-wide">Reserva Financeira</label>
-                <input type="number" id="reserva-financeira" inputmode="decimal" placeholder="0,00" class="input-autonomo">
-            </div>
-            <div>
-                <label class="block text-xs font-black text-purple-400 mb-1 ml-1 uppercase tracking-wide">Poupança</label>
-                <input type="number" id="investimento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
-            </div>
-        </div>
-
-        <button id="btn-salvar-principal" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-w"
-            >
+        <button id="btn-salvar-principal" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider">
             Salvar Lançamento do Dia
         </button>
     </div>
@@ -228,9 +210,7 @@
                 <span class="block text-[9px] text-white font-bold uppercase">Saldo Reserva Manut.</span>
                 <span id="saldo-reserva-manutencao" class="font-bold text-blue-400">R$ 0,00</span>
             </div>
-            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pe</span><span id="total-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('reservaFinanceira', 'Reserva Finan.')" class="bg-gray-800 p-2 rounded-xl cursor-pointer text-center"><span class="block text-[9px] text-orange-400 font-bold upperc">Reserva</span><span id="total-reserva-aba" class="font-bold text-orange-400">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('investimento', 'Poupança Acumulada')" class="bg-gray-800 p-2 rounded-xl col-span-2 cursor-pointer text-center"><span class="block text-[9px] text-purple-400 font-bold uppercase">Poupança</span><span id="total-investimento-aba" class="font-bold text-purple-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer col-span-2 text-center"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
         </div>
         <button onclick="abrirFecharMes()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider">
             📅 Fechar Balanço Mensal
@@ -390,9 +370,7 @@
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Reserva Manutenção:</span><span id="mes-arq-manut" class="font-bold text-red-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Gastos Pessoais Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-orange-400">Reserva Financeira:</span><span id="mes-arq-reserva" class="font-bold text-orange-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1"><span class="text-purple-400">Poupança Guardada:</span><span id="mes-arq-inv" class="font-bold text-purple-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1"><span class="text-gray-400">Gastos Pessoais Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
             </div>
 
             <div class="space-y-1">
@@ -427,9 +405,6 @@
                         <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase">📋 Reabrir</button>
                     </div>
                 </div>
-
-                <div><label class="block text-orange-400 font-bold uppercase text-[10px] mb-0.5">Reserva Financeira</label><input type="number" id="edit-reserva-financeira" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
-                <div><label class="block text-purple-400 font-bold uppercase text-[10px] mb-0.5">Poupança</label><input type="number" id="edit-investimento" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
             </div>
             <div class="grid grid-cols-3 gap-2 pt-2 text-xs font-bold">
                 <button onclick="salvarEdicao()" class="bg-green-600 py-2.5 rounded-xl text-white">Salvar</button>
@@ -526,7 +501,7 @@
                 btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
                 btnSalvar.disabled = true;
                 
-                ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
+                ['faturamento', 'renda-extra', 'gasolina', 'manutencao'].forEach(id => {
                     document.getElementById(id).disabled = true;
                     document.getElementById(id).className = "input-bloqueado";
                 });
@@ -536,53 +511,37 @@
                 btnSalvar.disabled = false;
                 btnDetalhar.disabled = false;
                 
-                ['faturamento', 'renda-extra', 'gasolina', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
+                ['faturamento', 'renda-extra', 'gasolina', 'manutencao'].forEach(id => {
                     document.getElementById(id).disabled = false;
                     document.getElementById(id).className = "input-autonomo";
                 });
             }
         }
 
-        
         function atualizarUI() {
             let totalEntradas = 0;
             let totalSaidas = 0;
-            let totalPoupanca = 0;
-            let totalReservaFin = 0;
 
             // Processar Histórico Ativo
             dados.historico.forEach(item => {
                 totalEntradas += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0);
-                totalSaidas += (parseFloat(item.gasolina) || 0) + (parseFloat(item.manutencao) || 0) + (parseFloat(item.pessoal) || 0) + (parseFloat(item.reservaFinanceira) || 0) + (parseFloat(item.investimento) || 0);
-                totalPoupanca += parseFloat(item.investimento) || 0;
-                totalReservaFin += parseFloat(item.reservaFinanceira) || 0;
+                totalSaidas += (parseFloat(item.gasolina) || 0) + (parseFloat(item.manutencao) || 0) + (parseFloat(item.pessoal) || 0);
             });
 
             // Processar Meses Anteriores
             dados.mesesAnteriores.forEach(mes => {
                 totalEntradas += (parseFloat(mes.faturamentoTotal) || 0) + (parseFloat(mes.rendaExtraTotal) || 0);
                 
-                // Calcular saídas do mês arquivado
                 let saidasMes = 0;
-                let poupMes = 0;
-                let resMes = 0;
-                
                 if (mes.historico) {
                     mes.historico.forEach(h => {
-                        saidasMes += (parseFloat(h.gasolina) || 0) + (parseFloat(h.manutencao) || 0) + (parseFloat(h.pessoal) || 0) + (parseFloat(h.reservaFinanceira) || 0) + (parseFloat(h.investimento) || 0);
-                        poupMes += parseFloat(h.investimento) || 0;
-                        resMes += parseFloat(h.reservaFinanceira) || 0;
+                        saidasMes += (parseFloat(h.gasolina) || 0) + (parseFloat(h.manutencao) || 0) + (parseFloat(h.pessoal) || 0);
                     });
                 }
                 totalSaidas += saidasMes;
-                totalPoupanca += poupMes;
-                totalReservaFin += resMes;
             });
 
             // Calcular Saldo da Reserva de Manutenção (Aportes - Gastos)
-            let saldoReservaManut = 0;
-            // Aportes estão no histórico e meses anteriores (já contados em totalSaidas como 'manutencao')
-            // Mas precisamos do saldo líquido dela especificamente
             let aportesManut = 0;
             dados.historico.forEach(item => { aportesManut += parseFloat(item.manutencao) || 0; });
             dados.mesesAnteriores.forEach(mes => {
@@ -594,12 +553,12 @@
             let gastosManut = 0;
             (dados.historicoManutencao || []).forEach(g => { gastosManut += parseFloat(g.valor) || 0; });
             
-            saldoReservaManut = aportesManut - gastosManut;
+            const saldoReservaManut = aportesManut - gastosManut;
             dados.saldoManutencao = saldoReservaManut;
 
             // Cálculos Finais
             const totalAcumulado = totalEntradas - totalSaidas;
-            const guardado = totalPoupanca + totalReservaFin + saldoReservaManut;
+            const guardado = saldoReservaManut; // Exclusivamente a Reserva de Manutenção
             const disponivel = totalAcumulado - guardado;
 
             // Atualizar Cards do Topo
@@ -614,7 +573,7 @@
             // Atualizar Card de Manutenção no Balanço
             document.getElementById('saldo-reserva-manutencao').innerText = formatarMoeda(saldoReservaManut);
 
-            // Restante da UI Original (Histórico e Balanço do Período)
+            // Último Registro
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
@@ -623,33 +582,28 @@
                 
                 const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
                 const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.manutencao) || 0) + (parseFloat(ultimo.pessoal) || 0);
-                const retidoTotal = (parseFloat(ultimo.reservaFinanceira) || 0) + (parseFloat(ultimo.investimento) || 0);
 
                 document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
                 document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
-                document.getElementById('last-reserva').innerText = formatarMoeda(retidoTotal);
             } else {
                 resumoContainer.classList.add('hidden');
             }
 
-            let totalFat = 0, totalRenda = 0, totalGas = 0, totalMan = 0, totalPes = 0, totalInv = 0, totalRes = 0;
+            // Balanço do Período
+            let totalFat = 0, totalRenda = 0, totalGas = 0, totalPes = 0;
             dados.historico.forEach(item => {
                 totalFat += parseFloat(item.faturamento) || 0;
                 totalRenda += parseFloat(item.rendaExtra) || 0;
                 totalGas += parseFloat(item.gasolina) || 0;
-                totalMan += parseFloat(item.manutencao) || 0;
                 totalPes += parseFloat(item.pessoal) || 0;
-                totalRes += parseFloat(item.reservaFinanceira) || 0;
-                totalInv += parseFloat(item.investimento) || 0;
             });
 
             document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
             document.getElementById('total-renda-extra').innerText = formatarMoeda(totalRenda);
             document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
             document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
-            document.getElementById('total-reserva-aba').innerText = formatarMoeda(totalRes);
-            document.getElementById('total-investimento-aba').innerText = formatarMoeda(totalInv);
 
+            // Tabela do Histórico Recente
             const tbody = document.getElementById('historico-body');
             tbody.innerHTML = '';
             if (dados.historico.length === 0) {
@@ -670,6 +624,7 @@
                 });
             }
 
+            // Lista de Meses Arquivados
             const mContainer = document.getElementById('meses-anteriores-container');
             const mVazios = document.getElementById('meses-vazios');
             if (dados.mesesAnteriores.length === 0) {
@@ -698,7 +653,6 @@
             }
             verificarTravaDiaria();
         }
-    
 
         function renderizarBaloesDinamicos() {
             const input = document.getElementById('gasto-item-desc').value.trim().toUpperCase();
@@ -824,17 +778,15 @@
             const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
             const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
             const manutencao = parseFloat(document.getElementById('manutencao').value) || 0;
-            const reservaFinanceira = parseFloat(document.getElementById('reserva-financeira').value) || 0;
-            const investimento = parseFloat(document.getElementById('investimento').value) || 0;
 
-            const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao - reservaFinanceira - investimento;
+            const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal - manutencao;
 
             const dataHojeCompleta = obtenerDataHoje();
             const dataDiaMesCurta = dataHojeCompleta.substring(0, 5);
 
             dados.historico.push({
                 data: dataDiaMesCurta,
-                faturamento, rendaExtra, gasolina, pessoal, manutencao, reservaFinanceira, investimento,
+                faturamento, rendaExtra, gasolina, pessoal, manutencao,
                 saldoDia,
                 detalheGastos: [...itensGastosTemporarios],
                 timestamp: new Date().getTime()
@@ -842,7 +794,7 @@
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
-            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'manutencao', 'reserva-financeira', 'investimento'].forEach(id => {
+            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'manutencao'].forEach(id => {
                 document.getElementById(id).value = '';
             });
             itensGastosTemporarios = [];
@@ -969,7 +921,7 @@
                 gatilhoDownload.click();
             } catch (err) { console.error(err); }
 
-            let fat = 0, renda = 0, gas = 0, man = 0, pes = 0, res = 0, inv = 0;
+            let fat = 0, renda = 0, gas = 0, man = 0, pes = 0;
             let descritivoCompilado = {};
 
             dados.historico.forEach(item => {
@@ -978,8 +930,6 @@
                 gas += parseFloat(item.gasolina) || 0;
                 man += parseFloat(item.manutencao) || 0;
                 pes += parseFloat(item.pessoal) || 0;
-                res += parseFloat(item.reservaFinanceira) || 0;
-                inv += parseFloat(item.investimento) || 0;
 
                 if (item.detalheGastos) {
                     item.detalheGastos.forEach(g => {
@@ -993,7 +943,7 @@
                 descricao: k, valor: descritivoCompilado[k]
             }));
 
-            const saldoFinalNoMes = (fat + renda) - gas - man - pes - res - inv;
+            const saldoFinalNoMes = (fat + renda) - gas - man - pes;
 
             dados.mesesAnteriores.push({
                 periodo: labelMes,
@@ -1020,21 +970,17 @@
             document.getElementById('mes-arq-fat').innerText = formatarMoeda(fatExibido);
             document.getElementById('mes-arq-renda').innerText = formatarMoeda(rendaExibida);
             
-            let gas = 0, man = 0, res = 0, inv = 0;
+            let gas = 0, man = 0;
             if (mes.historico) {
                 mes.historico.forEach(h => {
                     gas += parseFloat(h.gasolina) || 0;
                     man += parseFloat(h.manutencao) || 0;
-                    res += parseFloat(h.reservaFinanceira) || 0;
-                    inv += parseFloat(h.investimento) || 0;
                 });
             }
 
             document.getElementById('mes-arq-gas').innerText = formatarMoeda(gas);
             document.getElementById('mes-arq-manut').innerText = formatarMoeda(man);
             document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(mes.pessoalTotal || mes.pessoal || 0);
-            document.getElementById('mes-arq-reserva').innerText = formatarMoeda(res);
-            document.getElementById('mes-arq-inv').innerText = formatarMoeda(inv);
             document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(liqExibido);
 
             const container = document.getElementById('mes-arq-descritivo-container');
@@ -1071,8 +1017,6 @@
             document.getElementById('edit-gasolina').value = item.gasolina;
             document.getElementById('edit-pessoal').value = item.pessoal;
             document.getElementById('edit-manutencao').value = item.manutencao;
-            document.getElementById('edit-reserva-financeira').value = item.reservaFinanceira;
-            document.getElementById('edit-investimento').value = item.investimento;
             document.getElementById('modal-edicao').classList.add('active');
         }
         function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
@@ -1085,9 +1029,7 @@
             item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
             item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
             item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
-            item.reservaFinanceira = parseFloat(document.getElementById('edit-reserva-financeira').value) || 0;
-            item.investimento = parseFloat(document.getElementById('edit-investimento').value) || 0;
-            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao - item.reservaFinanceira - item.investimento;
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal - item.manutencao;
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModal(); atualizarUI();
         }
@@ -1107,7 +1049,7 @@
         }
         function limparDados() {
             if (confirm('Zerar o aplicativo inteiro?')) {
-                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [],  sugestoesGastos: [] };
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
@@ -1142,6 +1084,85 @@
                 } catch (e) { alert('Erro na decodificação do arquivo de backup.'); }
             };
             if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
+        }
+
+        // Funções da Reserva de Manutenção
+        function abrirModalDebitoManutencao() {
+            document.getElementById('debito-manut-valor').value = '';
+            document.getElementById('debito-manut-desc').value = '';
+            document.getElementById('modal-debito-manutencao').classList.add('active');
+        }
+
+        function fecharModalDebitoManutencao() {
+            document.getElementById('modal-debito-manutencao').classList.remove('active');
+        }
+
+        function salvarDebitoManutencao() {
+            const valor = parseFloat(document.getElementById('debito-manut-valor').value) || 0;
+            const descricao = document.getElementById('debito-manut-desc').value.trim();
+
+            if (valor <= 0) {
+                alert('Informe um valor válido.');
+                return;
+            }
+
+            if (!dados.historicoManutencao) {
+                dados.historicoManutencao = [];
+            }
+
+            dados.historicoManutencao.push({
+                data: obtenerDataHoje(),
+                valor,
+                descricao: descricao || 'Gasto Geral Oficina/Manutenção',
+                timestamp: new Date().getTime()
+            });
+
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalDebitoManutencao();
+            atualizarUI();
+        }
+
+        function abrirHistoricoManutencao() {
+            const container = document.getElementById('lista-historico-manutencao');
+            container.innerHTML = '';
+
+            const lista = dados.historicoManutencao || [];
+
+            if (lista.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 text-xs py-4 italic">Nenhum gasto registrado nesta reserva.</div>';
+            } else {
+                [...lista].reverse().forEach((item, index) => {
+                    const idxReal = lista.length - 1 - index;
+                    const div = document.createElement('div');
+                    div.className = 'bg-gray-800 p-3 rounded-xl flex justify-between items-center text-xs border border-gray-700';
+                    div.innerHTML = `
+                        <div>
+                            <span class="block text-[10px] text-gray-400 font-bold">${item.data}</span>
+                            <span class="text-white uppercase font-bold">${item.descricao}</span>
+                        </div>
+                        <div class="text-right flex items-center gap-2">
+                            <span class="font-black text-red-400 text-sm">-${formatarMoeda(item.valor)}</span>
+                            <button onclick="deletarGastoManutencao(${idxReal})" class="text-red-500 font-bold px-1 text-sm">✕</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            document.getElementById('modal-historico-manutencao').classList.add('active');
+        }
+
+        function fecharHistoricoManutencao() {
+            document.getElementById('modal-historico-manutencao').classList.remove('active');
+        }
+
+        function deletarGastoManutencao(index) {
+            if (confirm('Remover este registro de gasto da manutenção?')) {
+                dados.historicoManutencao.splice(index, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                abrirHistoricoManutencao();
+                atualizarUI();
+            }
         }
 
         atualizarUI();
@@ -1180,5 +1201,5 @@
             </div>
         </div>
     </div>
-    </body>
+</body>
 </html>
