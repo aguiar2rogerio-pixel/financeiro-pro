@@ -188,11 +188,11 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Crédito (+)</label>
-                    <input type="number" id="manutencao" inputmode="decimal" oninput="calcularReservaManutencaoDia()" placeholder="0,00" class="input-autonomo font-bold">
+                    <input type="number" id="manutencao" style="display:none;" inputmode="decimal" oninput="calcularReservaManutencaoDia()" placeholder="0,00" class="input-autonomo font-bold">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Débito (-)</label>
-                    <button type="button" id="btn-debito-manutencao" onclick="abrirModalDebitoManutencao()" class="w-full h-[52px] bg-orange-950 hover:bg-orange-900 border-2 border-orange-600 text-white font-bold text-xs rounded-xl uppercase flex items-center justify-center gap-1">
+                    <button type="button" id="btn-debito-manutencao" style="display:none;" onclick="abrirModalDebitoManutencao()" class="w-full h-[52px] bg-orange-950 hover:bg-orange-900 border-2 border-orange-600 text-white font-bold text-xs rounded-xl uppercase flex items-center justify-center gap-1">
                         🛠️ Detalhar
                     </button>
                 </div>
@@ -580,7 +580,7 @@
 
         
         function atualizarUI() {
-            let totalEntradas = parseFloat(dados.saldoTransportado) || 0;
+            let totalEntradas = parseFloat(dados.saldoTransportado || 0);
             let totalSaidas = 0;
             let totalDinheiroGuardado = 0;
 
@@ -599,9 +599,10 @@
                 saldoEl.className = `text-4xl font-black ${totalAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
             }
 
-            if(document.getElementById('saldo-guardado-manutencao')) {
-                document.getElementById('saldo-guardado-manutencao').innerText = '---';
-            }
+            // Cards de Saldo (Removendo Manutenção)
+            const cardManut = document.getElementById('saldo-guardado-manutencao');
+            if (cardManut) cardManut.parentElement.classList.add('hidden'); // Esconde o card de manutenção
+            
             if(document.getElementById('saldo-guardado-investimento')) {
                 document.getElementById('saldo-guardado-investimento').innerText = formatarMoeda(totalDinheiroGuardado);
             }
@@ -624,27 +625,11 @@
             if(document.getElementById('total-gasolina')) document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
             if(document.getElementById('total-pessoal')) document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
             if(document.getElementById('total-guardado')) document.getElementById('total-guardado').innerText = formatarMoeda(totalGua);
-            if(document.getElementById('saldo-reserva-manutencao')) {
-                document.getElementById('saldo-reserva-manutencao').innerText = '---';
-            }
+            
+            const cardResManut = document.getElementById('saldo-reserva-manutencao');
+            if (cardResManut) cardResManut.parentElement.classList.add('hidden');
 
-            // ÚLTIMO REGISTRO
-            const resumoContainer = document.getElementById('ultimo-resumo-container');
-            if (resumoContainer) {
-                if (dados.historico.length > 0) {
-                    const ultimo = dados.historico[dados.historico.length - 1];
-                    resumoContainer.classList.remove('hidden');
-                    document.getElementById('last-date').innerText = `${ultimo.data}`;
-                    const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
-                    const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0);
-                    document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
-                    document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
-                } else {
-                    resumoContainer.classList.add('hidden');
-                }
-            }
-
-            // TABELA HISTÓRICO RECENTE
+            // Histórico e Meses (Mantenha o padrão)
             const tbody = document.getElementById('historico-body');
             if (tbody) {
                 tbody.innerHTML = '';
@@ -656,9 +641,8 @@
                         const tr = document.createElement('tr');
                         tr.className = 'border-t border-gray-800 text-xs';
                         const sDia = parseFloat(item.saldoDia) || 0;
-                        const indPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
                         tr.innerHTML = `
-                            <td class="p-3 text-white font-black">${item.data}${indPlanilha}</td>
+                            <td class="p-3 text-white font-black">${item.data}</td>
                             <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-500' : 'text-red-500'}">${formatarMoeda(sDia)}</td>
                             <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border-2 border-blue-600 bg-blue-950 px-2.5 py-1 rounded-md text-xs">Ajustar</button></td>
                         `;
@@ -667,34 +651,19 @@
                 }
             }
 
-            // MESES ARQUIVADOS
             const mContainer = document.getElementById('meses-anteriores-container');
-            const mVazios = document.getElementById('meses-vazios');
             if (mContainer) {
-                if (dados.mesesAnteriores.length === 0) {
-                    mContainer.innerHTML = ''; if(mVazios) mVazios.classList.remove('hidden');
-                } else {
-                    if(mVazios) mVazios.classList.add('hidden');
-                    mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => {
-                        const faturamentoExibido = mes.faturamentoTotal || 0;
-                        const liquidoExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : 0;
-                        return `
-                        <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs cursor-pointer mb-2">
-                            <div>
-                                <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo}</h4>
-                                <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(faturamentoExibido)}</span></p>
-                            </div>
-                            <div class="text-right flex items-center gap-2" onclick="event.stopPropagation();">
-                                <div class="mr-1">
-                                    <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
-                                    <span class="font-bold text-blue-400">${formatarMoeda(liquidoExibido)}</span>
-                                </div>
-                                <button onclick="editarNomeMesAnterior(${idx})" class="text-gray-400 hover:text-white p-1 text-sm">✏️</button>
-                                <button onclick="deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm">🗑️</button>
-                            </div>
+                mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => {
+                    const liqExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : 0;
+                    return `
+                    <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs cursor-pointer mb-2">
+                        <div><h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo}</h4></div>
+                        <div class="text-right flex items-center gap-2">
+                            <span class="font-bold text-blue-400">${formatarMoeda(liqExibido)}</span>
+                            <button onclick="event.stopPropagation(); deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm">🗑️</button>
                         </div>
-                    `}).join('');
-                }
+                    </div>`;
+                }).join('');
             }
             if(typeof verificarTravaDiaria === 'function') verificarTravaDiaria();
         }
@@ -1135,34 +1104,24 @@
             if (!labelMes) { alert('Digite um nome para o período.'); return; }
 
             let fat = 0, renda = 0, gas = 0, pes = 0, gua = 0;
-            let descritivoCompilado = {};
-
             dados.historico.forEach(item => {
                 fat += parseFloat(item.faturamento) || 0;
                 renda += parseFloat(item.rendaExtra) || 0;
                 gas += parseFloat(item.gasolina) || 0;
                 pes += parseFloat(item.pessoal) || 0;
                 gua += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
-
-                if (item.detalheGastos) {
-                    item.detalheGastos.forEach(g => {
-                        const dUpper = g.descricao.toUpperCase();
-                        descritivoCompilado[dUpper] = (descritivoCompilado[dUpper] || 0) + parseFloat(g.valor);
-                    });
-                }
             });
-
-            let listaDescritivoFinal = Object.keys(descritivoCompilado).map(k => ({
-                descricao: k, valor: descritivoCompilado[k]
-            }));
 
             const saldoFinalDesteMes = (parseFloat(dados.saldoTransportado || 0) + fat + renda) - gas - pes;
 
             dados.mesesAnteriores.push({
                 periodo: labelMes,
-                faturamentoTotal: fat, rendaExtraTotal: renda, gasolinaTotal: gas, pessoalTotal: pes, guardadoTotal: gua,
+                faturamentoTotal: fat, 
+                rendaExtraTotal: renda, 
+                gasolinaTotal: gas, 
+                pessoalTotal: pes, 
+                guardadoTotal: gua,
                 saldoFinalNoMes: saldoFinalDesteMes,
-                descritivoGastos: listaDescritivoFinal,
                 historico: [...dados.historico]
             });
 
