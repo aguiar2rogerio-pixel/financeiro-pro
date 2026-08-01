@@ -3,146 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Controle Financeiro Pro - Restaurador</title>
+    <title>Controle Financeiro Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configurações PWA -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finanças Pro">
+    <meta name="theme-color" content="#111111">
+    <meta name="application-name" content="Finanças Pro">
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker ativo!', reg.scope))
+            .catch(err => console.log('Erro SW:', err));
+        });
+      }
+    </script>
+
     <style>
-        body { background-color: #111111; color: #ffffff; font-family: sans-serif; }
-        .input-autonomo { background-color: #1f2937; border: 2px solid #4b5563; color: #ffffff; padding: 0.75rem; border-radius: 1rem; width: 100%; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        body {
+            background-color: #111111;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .input-autonomo {
+            background-color: #1f2937;
+            border: 2px solid #4b5563;
+            color: #ffffff;
+            font-size: 1.25rem;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            width: 100%;
+        }
+        .input-autonomo:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #111827;
+        }
+        .input-bloqueado {
+            background-color: #111827;
+            border: 2px dashed #4b5563;
+            color: #9ca3af;
+            font-size: 1.25rem;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            width: 100%;
+            cursor: not-allowed;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #1f2937; padding: 1.5rem; border-radius: 1.5rem; width: 90%; max-width: 400px; }
+        .modal-content {
+            background-color: #1f2937;
+            border: 2px solid #6b7280;
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            width: 92%;
+            max-width: 380px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .sugestao-tag {
+            background-color: #111827;
+            color: #ffffff;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            border: 2px solid #374151;
+        }
+        .sugestao-tag:active { background-color: #2563eb; border-color: #3b82f6; }
+        .header-fixo th { position: sticky; top: 0; z-index: 10; background-color: #1f2937; }
+        .linha-auditoria-clicavel { cursor: pointer; transition: background-color 0.2s ease; }
+        .linha-auditoria-clicavel:hover { background-color: #111827; }
     </style>
 </head>
-<body class="p-4 max-w-md mx-auto">
+<body class="p-4 max-w-md mx-auto pb-24">
 
-    <header class="text-center my-8">
-        <h1 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Acumulado</h1>
-        <div id="saldo-total" class="text-5xl font-black text-green-500">R$ 0,00</div>
+    <!-- Instalação PWA -->
+    <div id="pwa-install-container" class="hidden mb-4">
+        <button onclick="dispararInstalacaoPWA()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-lg">
+            📲 Instalar Aplicativo no Celular
+        </button>
+    </div>
+
+    <!-- CABEÇALHO COM SALDOS -->
+    <header class="text-center my-5 space-y-4">
+        <div>
+            <h1 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Total Acumulado</h1>
+            <div id="saldo-total" class="text-4xl font-black text-green-500">R$ 0,00</div>
+        </div>
         
-        <div class="grid grid-cols-2 gap-4 mt-6">
-            <div class="bg-gray-900 p-3 rounded-2xl border border-gray-800">
-                <span class="block text-[10px] text-emerald-400 font-bold uppercase mb-1">Guardado</span>
-                <span id="saldo-guardado-investimento" class="text-lg font-black text-emerald-400">R$ 0,00</span>
+        <!-- CARDS DE SALDO FIXOS -->
+        <div class="grid grid-cols-3 gap-2">
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl hidden">
+                <span class="block text-[8px] text-orange-400 font-bold uppercase tracking-wider mb-1">Res. Manutenção</span>
+                <span id="saldo-guardado-manutencao" class="text-sm font-black text-orange-400">R$ 0,00</span>
             </div>
-            <div class="bg-gray-900 p-3 rounded-2xl border border-gray-800">
-                <span class="block text-[10px] text-blue-400 font-bold uppercase mb-1">Disponível</span>
-                <span id="saldo-disponivel" class="text-lg font-black text-blue-400">R$ 0,00</span>
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl col-span-1">
+                <span class="block text-[8px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Dinheiro Guardado</span>
+                <span id="saldo-guardado-investimento" class="text-sm font-black text-emerald-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl col-span-2">
+                <span class="block text-[8px] text-blue-400 font-bold uppercase tracking-wider mb-1">Disponível</span>
+                <span id="saldo-disponivel" class="text-sm font-black text-blue-400">R$ 0,00</span>
             </div>
         </div>
     </header>
 
-    <main class="space-y-6">
-        <div class="bg-gray-900 p-4 rounded-3xl border-2 border-gray-800">
-            <h2 class="text-xs font-bold text-gray-500 uppercase mb-4 tracking-tighter">Lançamento do Dia</h2>
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <input id="faturamento" type="number" placeholder="Ganho" class="input-autonomo">
-                <input id="gasolina" type="number" placeholder="Combustível" class="input-autonomo">
-                <input id="pessoal" type="number" placeholder="Gastos" class="input-autonomo">
-                <input id="guardado-valor" type="number" placeholder="Guardar" class="input-autonomo">
+    <div id="ultimo-resumo-container" class="hidden mb-5">
+        <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-3">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Último Registro</h3>
+                <span id="last-date" class="text-[10px] text-gray-400 font-black"></span>
             </div>
-            <button onclick="salvarLancamento()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-sm">Salvar Lançamento</button>
+            <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                <div class="bg-gray-800 p-2 rounded-xl">
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Entradas</span>
+                    <span id="last-ganho" class="font-bold text-green-400">R$ 0</span>
+                </div>
+                <div class="bg-gray-800 p-2 rounded-xl">
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Saídas</span>
+                    <span id="last-gastos" class="font-bold text-red-400">R$ 0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO PRINCIPAL -->
+    <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Faturamento</label>
+                <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+            <div>
+                <label class="block text-xs font-black text-green-400 mb-1 ml-1 uppercase tracking-wide">Renda Extra (+)</label>
+                <input type="number" id="renda-extra" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
         </div>
 
-        <div class="flex gap-2">
-            <button onclick="abrirFecharMes()" class="flex-1 bg-yellow-600 text-black py-3 rounded-xl font-bold text-xs uppercase">Fechar Mês</button>
-            <label class="flex-1 bg-gray-800 text-white py-3 rounded-xl font-bold text-xs uppercase text-center cursor-pointer">
-                📥 Ler Backup
-                <input type="file" class="hidden" onchange="importarBackup(event)">
-            </label>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Combustível</label>
+                <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+            <div>
+                <label class="block text-xs font-black text-emerald-400 mb-1 ml-1 uppercase tracking-wide">Din. Guardado (+)</label>
+                <input type="number" id="guardado-valor" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
         </div>
 
-        <div class="mt-8">
-            <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Histórico Recente</h3>
-            <div id="historico-body" class="space-y-2"></div>
+        <!-- RESGATE / TRANSFERÊNCIA DO DINHEIRO GUARDADO -->
+        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+            <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-black text-emerald-400 uppercase tracking-wide ml-1">Resgate Dinheiro Guardado (-)</label>
+                <span class="text-[9px] text-gray-400 font-bold uppercase">→ Envia p/ Disponível</span>
+            </div>
+            <input type="number" id="guardado-resgate" inputmode="decimal" placeholder="0,00 (Resgatar p/ Disponível)" class="input-autonomo">
         </div>
-        
-        <div class="mt-8">
-            <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Meses Arquivados</h3>
-            <div id="meses-anteriores-container" class="space-y-2"></div>
-        </div>
-    </main>
 
-    <!-- Modal Fechamento -->
+        <!-- RESERVA DE MANUTENÇÃO (ESCONDIDA) -->
+        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-3 hidden">
+            <span class="block text-xs font-black text-orange-400 uppercase tracking-wide ml-1">Reserva Manutenção</span>
+            <input type="number" id="manutencao" inputmode="decimal" oninput="calcularReservaManutencaoDia()" placeholder="0,00" class="input-autonomo font-bold">
+            <button type="button" id="btn-debito-manutencao" onclick="abrirModalDebitoManutencao()" class="hidden"></button>
+            <input type="text" id="manutencao-calculado" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+        </div>
+
+        <!-- GASTOS PESSOAIS -->
+        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex justify-between items-center">
+                <label class="block text-xs font-black text-red-400 uppercase tracking-wide ml-1">Gastos Pessoais (-)</label>
+                <button id="btn-detalhar" onclick="abrirSubjanelaGastos()" class="bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase">
+                    📝 Detalhar Gastos
+                </button>
+            </div>
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+        </div>
+
+        <button id="btn-salvar-principal" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider">
+            Salvar Lançamento do Dia
+        </button>
+    </div>
+
+    <!-- BALANÇO DO PERÍODO -->
+    <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xs font-black text-yellow-500 uppercase tracking-wider">Balanço do Período Atual</h2>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+            <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400">R$ 0,00</span></div>
+            <div class="bg-gray-800 p-2 rounded-xl cursor-pointer hidden">
+                <span class="block text-[9px] text-white font-bold uppercase">Res. Manutenção</span>
+                <span id="saldo-reserva-manutencao" class="font-bold text-orange-400">R$ 0,00</span>
+            </div>
+            <div onclick="auditarCategoria('guardadoLiquido', 'Dinheiro Guardado')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Dinheiro Guardado</span><span id="total-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+        </div>
+        <button onclick="abrirFecharMes()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider">
+            📅 Fechar Balanço Mensal
+        </button>
+    </div>
+
+    <!-- HISTÓRICO RECENTE -->
+    <div class="mt-6">
+        <div class="flex justify-between items-center mb-2 px-1">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
+            <button onclick="limparDados()" class="text-[9px] text-red-500 font-bold uppercase border border-red-900 px-2 py-1 rounded-lg">Zerar Tudo</button>
+        </div>
+        <div class="overflow-y-auto max-h-[280px] rounded-xl border-2 border-gray-800 shadow-md bg-gray-900">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="header-fixo text-white text-[10px] uppercase font-bold tracking-wider border-b border-gray-700">
+                        <th class="p-3">Data</th>
+                        <th class="p-3">Saldo Líquido</th>
+                        <th class="p-3 text-right">Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="historico-body" class="text-sm"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MESES ARQUIVADOS -->
+    <div class="mt-6">
+        <div class="flex justify-between items-center mb-2 px-1">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Meses Arquivados</h2>
+        </div>
+        <div id="meses-anteriores-container" class="space-y-2"></div>
+        <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
+    </div>
+
+    <div class="mt-8 flex gap-2">
+        <button onclick="exportarBackup()" class="flex-1 bg-gray-800 text-white font-bold py-3 rounded-xl text-[10px] uppercase border border-gray-700">📦 Salvar Backup Manual</button>
+        <label class="flex-1 bg-gray-800 text-white font-bold py-3 rounded-xl text-[10px] uppercase border border-gray-700 text-center cursor-pointer">
+            📥 Ler Backup
+            <input type="file" class="hidden" onchange="importarBackup(event)">
+        </label>
+    </div>
+
+    <!-- MODAIS ORIGINAIS MANTIDOS -->
+    <div id="subjanela-gastos" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider">Planilha de Gastos</h3>
+                <button onclick="fecharSubjanelaGastos()" class="text-gray-400 font-black text-xl">✕</button>
+            </div>
+            <input type="hidden" id="modo-planilha-contexto" value="principal">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Descrição do Gasto</label>
+                    <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Padaria..." class="input-autonomo text-sm">
+                    <div id="container-sugestoes" class="mt-2 flex flex-wrap"></div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Valor (R$)</label>
+                    <input type="number" id="gasto-item-val" inputmode="decimal" placeholder="0,00" class="input-autonomo text-sm">
+                </div>
+                <button onclick="adicionarItemNaLista()" class="w-full bg-red-600 py-3 rounded-xl text-white font-bold text-xs uppercase tracking-widest">Adicionar Item</button>
+            </div>
+            <div class="max-h-[200px] overflow-y-auto rounded-xl border border-gray-800 bg-gray-950">
+                <table class="w-full text-left text-xs">
+                    <tbody id="lista-gastos-correntes-body"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t border-gray-700">
+                <span class="text-xs font-bold text-gray-400 uppercase">Total Acumulado:</span>
+                <span id="subjanela-total-acumulado" class="text-lg font-black text-red-500">R$ 0,00</span>
+            </div>
+            <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-600 py-4 rounded-xl text-white font-black uppercase text-sm shadow-lg">Confirmar e Salvar</button>
+        </div>
+    </div>
+
     <div id="modal-fechar-mes" class="modal-overlay">
-        <div class="modal-content">
-            <h2 class="text-white font-bold mb-4">Fechar Mês</h2>
-            <input id="input-nome-mes-fechamento" type="text" class="input-autonomo mb-4" placeholder="Ex: JULHO DE 2026">
+        <div class="modal-content space-y-4">
+            <h2 class="text-lg font-black text-yellow-500 uppercase tracking-wider">Fechar Balanço Mensal</h2>
+            <p class="text-xs text-gray-400 leading-relaxed">Isso irá arquivar todos os lançamentos atuais e iniciar um novo período com o saldo transportado.</p>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nome do Período (Ex: JULHO 2026)</label>
+                <input type="text" id="input-nome-mes-fechamento" class="input-autonomo text-sm" placeholder="Digite o nome do mês">
+            </div>
             <div class="flex gap-2">
-                <button onclick="confirmarFecharMes()" class="flex-1 bg-green-600 py-3 rounded-xl font-bold">Confirmar</button>
-                <button onclick="document.getElementById('modal-fechar-mes').classList.remove('active')" class="flex-1 bg-gray-700 py-3 rounded-xl font-bold">Cancelar</button>
+                <button onclick="confirmarFecharMes()" class="flex-1 bg-green-600 py-3 rounded-xl text-white font-bold uppercase text-xs">Confirmar</button>
+                <button onclick="fecharModalMes()" class="flex-1 bg-gray-700 py-3 rounded-xl text-white font-bold uppercase text-xs">Cancelar</button>
             </div>
         </div>
     </div>
 
     <script>
-        let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || { 
-            saldoTransportado: 0, 
-            historico: [], 
-            mesesAnteriores: [], 
-            sugestoesGastos: [] 
+        const BACKUP_INTERNO_CONSOLIDADO = {
+            "saldoTransportado": 0,
+            "historico": [],
+            "mesesAnteriores": [],
+            "sugestoesGastos": ["MERCADO", "PADARIA", "COMBUSTÍVEL", "FARMÁCIA"]
         };
 
-        function formatarMoeda(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || JSON.parse(JSON.stringify(BACKUP_INTERNO_CONSOLIDADO));
+        
+        let itensGastosTemporarios = [];
+        let lancamentoEmEdicao = null;
+        let debitoManutencaoTemporario = { valor: 0, descricao: '' };
+
+        function formatarMoeda(valor) {
+            return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function obtenerDataHoje() {
+            return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+        }
 
         function atualizarUI() {
-            let entries = parseFloat(dados.saldoTransportado || 0);
-            let exits = 0;
-            let saved = 0;
+            let totalEntradas = parseFloat(dados.saldoTransportado || 0);
+            let totalSaidas = 0;
+            let totalDinheiroGuardado = 0;
 
             dados.historico.forEach(item => {
-                entries += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0);
-                exits += (parseFloat(item.gasolina) || 0) + (parseFloat(item.pessoal) || 0);
-                saved += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
+                totalEntradas += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0);
+                totalSaidas += (parseFloat(item.gasolina) || 0) + (parseFloat(item.pessoal) || 0);
+                totalDinheiroGuardado += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
             });
 
-            const total = entries - exits;
-            const avail = total - saved;
+            const totalAcumulado = totalEntradas - totalSaidas; 
+            const disponivel = totalAcumulado - totalDinheiroGuardado;
 
-            document.getElementById('saldo-total').innerText = formatarMoeda(total);
-            document.getElementById('saldo-guardado-investimento').innerText = formatarMoeda(saved);
-            document.getElementById('saldo-disponivel').innerText = formatarMoeda(avail);
+            document.getElementById('saldo-total').innerText = formatarMoeda(totalAcumulado);
+            document.getElementById('saldo-total').className = `text-4xl font-black ${totalAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
 
-            const hBody = document.getElementById('historico-body');
-            hBody.innerHTML = dados.historico.length ? '' : '<p class="text-gray-600 text-xs italic">Vazio</p>';
-            [...dados.historico].reverse().forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = "bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center";
-                div.innerHTML = `<div><span class="text-xs font-bold">${item.data}</span></div><div class="text-xs font-black ${item.saldoDia >=0 ? 'text-green-500':'text-red-500'}">${formatarMoeda(item.saldoDia)}</div>`;
-                hBody.appendChild(div);
+            document.getElementById('saldo-guardado-investimento').innerText = formatarMoeda(totalDinheiroGuardado);
+            document.getElementById('saldo-disponivel').innerText = formatarMoeda(disponivel);
+
+            // Balanço Período
+            let totalFat = 0, totalRenda = 0, totalGas = 0, totalPes = 0, totalGua = 0;
+            dados.historico.forEach(item => {
+                totalFat += parseFloat(item.faturamento) || 0;
+                totalRenda += parseFloat(item.rendaExtra) || 0;
+                totalGas += parseFloat(item.gasolina) || 0;
+                totalPes += parseFloat(item.pessoal) || 0;
+                totalGua += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
             });
 
-            const mBody = document.getElementById('meses-anteriores-container');
-            mBody.innerHTML = dados.mesesAnteriores.map((m, i) => `
-                <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center">
-                    <span class="text-[10px] font-bold text-gray-400">${m.periodo}</span>
-                    <span class="text-xs font-bold text-blue-400">${formatarMoeda(m.saldoFinalNoMes || 0)}</span>
-                </div>
-            `).join('');
+            document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
+            document.getElementById('total-renda-extra').innerText = formatarMoeda(totalRenda);
+            document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
+            document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
+            document.getElementById('total-guardado').innerText = formatarMoeda(totalGua);
+
+            // ÚLTIMO REGISTRO
+            const resumoContainer = document.getElementById('ultimo-resumo-container');
+            if (dados.historico.length > 0) {
+                const ultimo = dados.historico[dados.historico.length - 1];
+                resumoContainer.classList.remove('hidden');
+                document.getElementById('last-date').innerText = `${ultimo.data}`;
+                const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
+                const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0);
+                document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
+                document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
+            } else {
+                resumoContainer.classList.add('hidden');
+            }
+
+            // TABELA HISTÓRICO RECENTE
+            const tbody = document.getElementById('historico-body');
+            tbody.innerHTML = '';
+            if (dados.historico.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-600 italic text-xs">Nenhum registro ativo neste mês</td></tr>';
+            } else {
+                [...dados.historico].reverse().forEach((item, index) => {
+                    const idxReal = dados.historico.length - 1 - index;
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs';
+                    const sDia = parseFloat(item.saldoDia) || 0;
+                    tr.innerHTML = `
+                        <td class="p-3 text-white font-black">${item.data}</td>
+                        <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-500' : 'text-red-500'}">${formatarMoeda(sDia)}</td>
+                        <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border-2 border-blue-600 bg-blue-950 px-2.5 py-1 rounded-md text-xs">Ajustar</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // MESES ARQUIVADOS
+            const mContainer = document.getElementById('meses-anteriores-container');
+            const mVazios = document.getElementById('meses-vazios');
+            if (dados.mesesAnteriores.length === 0) {
+                mContainer.innerHTML = ''; mVazios.classList.remove('hidden');
+            } else {
+                mVazios.classList.add('hidden');
+                mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => `
+                    <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs mb-2">
+                        <div><h4 class="font-bold text-gray-300 uppercase tracking-wider">📅 ${mes.periodo}</h4></div>
+                        <div class="text-right flex items-center gap-2">
+                            <span class="font-bold text-blue-400">${formatarMoeda(mes.saldoFinalNoMes || 0)}</span>
+                            <button onclick="deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         function salvarLancamento() {
             const f = parseFloat(document.getElementById('faturamento').value) || 0;
+            const r = parseFloat(document.getElementById('renda-extra').value) || 0;
             const g = parseFloat(document.getElementById('gasolina').value) || 0;
             const p = parseFloat(document.getElementById('pessoal').value) || 0;
             const gua = parseFloat(document.getElementById('guardado-valor').value) || 0;
+            const res = parseFloat(document.getElementById('guardado-resgate').value) || 0;
 
             dados.historico.push({
-                data: new Date().toLocaleDateString('pt-BR').substring(0,5),
-                faturamento: f, gasolina: g, pessoal: p, guardado: gua,
-                saldoDia: f - g - p,
+                data: obtenerDataHoje().substring(0,5),
+                faturamento: f, rendaExtra: r, gasolina: g, pessoal: p, 
+                guardado: gua, guardadoResgate: res,
+                saldoDia: (f + r) - g - p,
                 timestamp: Date.now()
             });
 
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            ['faturamento','gasolina','pessoal','guardado-valor'].forEach(id => document.getElementById(id).value = '');
+            ['faturamento','renda-extra','gasolina','pessoal','guardado-valor','guardado-resgate'].forEach(id => document.getElementById(id).value = '');
             atualizarUI();
         }
 
-        function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
-
         function confirmarFecharMes() {
             const label = document.getElementById('input-nome-mes-fechamento').value.trim().toUpperCase();
-            if(!label) return alert('Nomeie o período');
+            if (!label) return alert('Digite um nome para o período.');
 
             let fat = 0, renda = 0, gas = 0, pes = 0, gua = 0;
             dados.historico.forEach(item => {
@@ -154,22 +457,21 @@
             });
 
             const final = (parseFloat(dados.saldoTransportado || 0) + fat + renda) - gas - pes;
-            dados.mesesAnteriores.push({ periodo: label, saldoFinalNoMes: final, historico: [...dados.historico] });
+            dados.mesesAnteriores.push({ periodo: label, saldoFinalNoMes: final, faturamentoTotal: fat, rendaExtraTotal: renda, gasolinaTotal: gas, pessoalTotal: pes, guardadoTotal: gua });
             dados.saldoTransportado = final;
             dados.historico = [];
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
-            document.getElementById('modal-fechar-mes').classList.remove('active');
+            fecharModalMes();
             atualizarUI();
-            alert('Mês fechado!');
+            alert('Mês fechado com sucesso!');
         }
 
-        function importarBackup(e) {
+        function importarBackup(event) {
             const reader = new FileReader();
             reader.onload = function() {
                 try {
                     const b = JSON.parse(reader.result);
-                    if(b) {
-                        // Forçar compatibilidade: se não tiver saldoTransportado, ele assume o que estiver no backup ou 0
+                    if (b) {
                         dados = {
                             saldoTransportado: b.saldoTransportado || 0,
                             historico: b.historico || [],
@@ -180,10 +482,22 @@
                         atualizarUI();
                         alert('Backup restaurado!');
                     }
-                } catch(err) { alert('Erro no arquivo'); }
+                } catch (e) { alert('Erro no arquivo.'); }
             };
-            if(e.target.files.length > 0) reader.readAsText(e.target.files[0]);
+            if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
         }
+
+        function exportarBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `backup_financeiro_${Date.now()}.txt`); dl.click();
+        }
+
+        function abrirFecharMes() { document.getElementById('modal-fechar-mes').classList.add('active'); }
+        function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
+        function limparDados() { if(confirm('Zerar tudo?')) { dados = JSON.parse(JSON.stringify(BACKUP_INTERNO_CONSOLIDADO)); localStorage.setItem('financeiro_pro', JSON.stringify(dados)); atualizarUI(); } }
+        function abrirSubjanelaGastos() { document.getElementById('subjanela-gastos').classList.add('active'); }
+        function fecharSubjanelaGastos() { document.getElementById('subjanela-gastos').classList.remove('active'); }
 
         atualizarUI();
     </script>
