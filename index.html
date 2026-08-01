@@ -516,7 +516,7 @@
             "sugestoesGastos": ["MERCADO", "PADARIA", "COMBUSTÍVEL", "FARMÁCIA"]
         };
 
-        let dados = JSON.parse(localStorage.getItem('financeiro_pro'));
+        let dados = JSON.parse(localStorage.getItem('financeiro_pro')) || { saldoTransportado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [] };
         
         if (!dados || !dados.historico) {
             dados = JSON.parse(JSON.stringify(BACKUP_INTERNO_CONSOLIDADO));
@@ -578,14 +578,127 @@
             }
         }
 
+        
         function atualizarUI() {
-            let totalEntradas = 0;
+            let totalEntradas = parseFloat(dados.saldoTransportado) || 0;
             let totalSaidas = 0;
+            let totalDinheiroGuardado = 0;
 
             dados.historico.forEach(item => {
                 totalEntradas += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0);
                 totalSaidas += (parseFloat(item.gasolina) || 0) + (parseFloat(item.pessoal) || 0);
+                totalDinheiroGuardado += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
             });
+
+            const totalAcumulado = totalEntradas - totalSaidas; 
+            const disponivel = totalAcumulado - totalDinheiroGuardado;
+
+            const saldoEl = document.getElementById('saldo-total');
+            if (saldoEl) {
+                saldoEl.innerText = formatarMoeda(totalAcumulado);
+                saldoEl.className = `text-4xl font-black ${totalAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
+            }
+
+            if(document.getElementById('saldo-guardado-manutencao')) {
+                document.getElementById('saldo-guardado-manutencao').innerText = '---';
+            }
+            if(document.getElementById('saldo-guardado-investimento')) {
+                document.getElementById('saldo-guardado-investimento').innerText = formatarMoeda(totalDinheiroGuardado);
+            }
+            if(document.getElementById('saldo-disponivel')) {
+                document.getElementById('saldo-disponivel').innerText = formatarMoeda(disponivel);
+            }
+
+            // Balanço Período
+            let totalFat = 0, totalRenda = 0, totalGas = 0, totalPes = 0, totalGua = 0;
+            dados.historico.forEach(item => {
+                totalFat += parseFloat(item.faturamento) || 0;
+                totalRenda += parseFloat(item.rendaExtra) || 0;
+                totalGas += parseFloat(item.gasolina) || 0;
+                totalPes += parseFloat(item.pessoal) || 0;
+                totalGua += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
+            });
+
+            if(document.getElementById('total-faturamento')) document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
+            if(document.getElementById('total-renda-extra')) document.getElementById('total-renda-extra').innerText = formatarMoeda(totalRenda);
+            if(document.getElementById('total-gasolina')) document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
+            if(document.getElementById('total-pessoal')) document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
+            if(document.getElementById('total-guardado')) document.getElementById('total-guardado').innerText = formatarMoeda(totalGua);
+            if(document.getElementById('saldo-reserva-manutencao')) {
+                document.getElementById('saldo-reserva-manutencao').innerText = '---';
+            }
+
+            // ÚLTIMO REGISTRO
+            const resumoContainer = document.getElementById('ultimo-resumo-container');
+            if (resumoContainer) {
+                if (dados.historico.length > 0) {
+                    const ultimo = dados.historico[dados.historico.length - 1];
+                    resumoContainer.classList.remove('hidden');
+                    document.getElementById('last-date').innerText = `${ultimo.data}`;
+                    const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
+                    const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0);
+                    document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
+                    document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
+                } else {
+                    resumoContainer.classList.add('hidden');
+                }
+            }
+
+            // TABELA HISTÓRICO RECENTE
+            const tbody = document.getElementById('historico-body');
+            if (tbody) {
+                tbody.innerHTML = '';
+                if (dados.historico.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-600 italic text-xs">Nenhum registro ativo neste mês</td></tr>';
+                } else {
+                    [...dados.historico].reverse().forEach((item, index) => {
+                        const idxReal = dados.historico.length - 1 - index;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        const sDia = parseFloat(item.saldoDia) || 0;
+                        const indPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
+                        tr.innerHTML = `
+                            <td class="p-3 text-white font-black">${item.data}${indPlanilha}</td>
+                            <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-500' : 'text-red-500'}">${formatarMoeda(sDia)}</td>
+                            <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border-2 border-blue-600 bg-blue-950 px-2.5 py-1 rounded-md text-xs">Ajustar</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            // MESES ARQUIVADOS
+            const mContainer = document.getElementById('meses-anteriores-container');
+            const mVazios = document.getElementById('meses-vazios');
+            if (mContainer) {
+                if (dados.mesesAnteriores.length === 0) {
+                    mContainer.innerHTML = ''; if(mVazios) mVazios.classList.remove('hidden');
+                } else {
+                    if(mVazios) mVazios.classList.add('hidden');
+                    mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => {
+                        const faturamentoExibido = mes.faturamentoTotal || 0;
+                        const liquidoExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : 0;
+                        return `
+                        <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs cursor-pointer mb-2">
+                            <div>
+                                <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo}</h4>
+                                <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(faturamentoExibido)}</span></p>
+                            </div>
+                            <div class="text-right flex items-center gap-2" onclick="event.stopPropagation();">
+                                <div class="mr-1">
+                                    <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
+                                    <span class="font-bold text-blue-400">${formatarMoeda(liquidoExibido)}</span>
+                                </div>
+                                <button onclick="editarNomeMesAnterior(${idx})" class="text-gray-400 hover:text-white p-1 text-sm">✏️</button>
+                                <button onclick="deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm">🗑️</button>
+                            </div>
+                        </div>
+                    `}).join('');
+                }
+            }
+            if(typeof verificarTravaDiaria === 'function') verificarTravaDiaria();
+        }
+    );
 
             dados.mesesAnteriores.forEach(mes => {
                 totalEntradas += (parseFloat(mes.faturamentoTotal) || 0) + (parseFloat(mes.rendaExtraTotal) || 0);
@@ -1016,9 +1129,51 @@
         }
         function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
 
+        
         function confirmarFecharMes() {
             const labelMes = document.getElementById('input-nome-mes-fechamento').value.trim().toUpperCase();
             if (!labelMes) { alert('Digite um nome para o período.'); return; }
+
+            let fat = 0, renda = 0, gas = 0, pes = 0, gua = 0;
+            let descritivoCompilado = {};
+
+            dados.historico.forEach(item => {
+                fat += parseFloat(item.faturamento) || 0;
+                renda += parseFloat(item.rendaExtra) || 0;
+                gas += parseFloat(item.gasolina) || 0;
+                pes += parseFloat(item.pessoal) || 0;
+                gua += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
+
+                if (item.detalheGastos) {
+                    item.detalheGastos.forEach(g => {
+                        const dUpper = g.descricao.toUpperCase();
+                        descritivoCompilado[dUpper] = (descritivoCompilado[dUpper] || 0) + parseFloat(g.valor);
+                    });
+                }
+            });
+
+            let listaDescritivoFinal = Object.keys(descritivoCompilado).map(k => ({
+                descricao: k, valor: descritivoCompilado[k]
+            }));
+
+            const saldoFinalDesteMes = (parseFloat(dados.saldoTransportado || 0) + fat + renda) - gas - pes;
+
+            dados.mesesAnteriores.push({
+                periodo: labelMes,
+                faturamentoTotal: fat, rendaExtraTotal: renda, gasolinaTotal: gas, pessoalTotal: pes, guardadoTotal: gua,
+                saldoFinalNoMes: saldoFinalDesteMes,
+                descritivoGastos: listaDescritivoFinal,
+                historico: [...dados.historico]
+            });
+
+            dados.saldoTransportado = saldoFinalDesteMes;
+            dados.historico = [];
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalMes(); 
+            atualizarUI();
+            alert('Mês fechado com sucesso! Saldo transportado para o próximo período.');
+        }
+    
 
             try {
                 const backupDataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
