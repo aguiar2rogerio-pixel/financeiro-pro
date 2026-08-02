@@ -3,629 +3,1272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gerenciador Financeiro</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Controle Financeiro Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configurações PWA -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finanças Pro">
+    <meta name="theme-color" content="#111111">
+    <meta name="application-name" content="Finanças Pro">
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker ativo!', reg.scope))
+            .catch(err => console.log('Erro SW:', err));
+        });
+      }
+    </script>
+
     <style>
-        :root {
-            --bg-principal: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --texto-principal: #f8fafc;
-            --texto-secundario: #94a3b8;
-            --verde-ganho: #10b981;
-            --verde-fundo: rgba(16, 185, 129, 0.08);
-            --vermelho-gasto: #ef4444;
-            --vermelho-fundo: rgba(239, 68, 68, 0.08);
-            --azul-acao: #3b82f6;
-            --amarelo-alerta: #f59e0b;
-            --raio-borda: 12px;
+        body {
+            background-color: #111111;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-principal); color: var(--texto-principal); padding: 12px; padding-bottom: 40px; }
-
-        .container { max-width: 480px; margin: 0 auto; }
-
-        /* TOPO E CONFIG */
-        .top-bar-config { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .btn-config { background: none; border: none; color: var(--texto-secundario); font-size: 1.2rem; cursor: pointer; }
-
-        .header-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--raio-borda);
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        .header-card .label { font-size: 0.75rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.5px; }
-        .header-card .valor { font-size: 1.8rem; font-weight: bold; margin-top: 4px; color: var(--verde-ganho); }
-
-        .top-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .mini-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--raio-borda);
-            padding: 12px;
-            text-align: center;
-        }
-        .mini-card .label { font-size: 0.75rem; color: var(--texto-secundario); }
-        .mini-card .valor { font-size: 1.1rem; font-weight: bold; margin-top: 2px; }
-
-        /* ÚLTIMO REGISTRO */
-        .card-ultimo-registro {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--raio-borda);
-            padding: 10px 14px;
-            margin-bottom: 16px;
-        }
-        .ultimo-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--texto-secundario); font-weight: bold; margin-bottom: 6px; }
-        .ultimo-valores { display: flex; justify-content: space-around; text-align: center; }
-        .ultimo-box .lbl { font-size: 0.65rem; color: var(--texto-secundario); }
-        .ultimo-box .val { font-size: 0.9rem; font-weight: bold; }
-
-        /* FORMULÁRIO DE LANÇAMENTO */
-        .form-secao {
-            border-radius: var(--raio-borda);
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 1px solid var(--card-border);
-        }
-        .secao-entradas { background: var(--verde-fundo); border-color: rgba(16, 185, 129, 0.2); }
-        .secao-saidas { background: var(--vermelho-fundo); border-color: rgba(239, 68, 68, 0.2); }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; }
-        .form-group.full-width { grid-column: span 2; }
-        
-        label { font-size: 0.75rem; color: var(--texto-secundario); font-weight: 600; text-transform: uppercase; }
-        
-        /* CAMPO COM BOTÃO EMBUTIDO */
-        .input-inline-wrapper {
-            display: flex;
-            background: #0f172a;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            overflow: hidden;
-            align-items: center;
-        }
-        .input-inline-wrapper input {
-            border: none;
-            background: transparent;
-            padding: 10px;
-            color: #fff;
-            font-size: 1rem;
+        .input-autonomo {
+            background-color: #1f2937;
+            border: 2px solid #4b5563;
+            color: #ffffff;
+            font-size: 1.25rem;
+            padding: 0.75rem;
+            border-radius: 1rem;
             width: 100%;
+        }
+        .input-autonomo:focus {
             outline: none;
+            border-color: #3b82f6;
+            background-color: #111827;
         }
-        .toggle-embutido {
-            display: flex;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px;
-            margin-right: 4px;
-            border-radius: 6px;
-            gap: 2px;
-        }
-        .btn-emb {
-            border: none;
-            background: transparent;
-            color: var(--texto-secundario);
-            font-size: 0.65rem;
-            font-weight: bold;
-            padding: 4px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-emb.active-g { background: var(--verde-ganho); color: #fff; }
-        .btn-emb.active-r { background: var(--azul-acao); color: #fff; }
-
-        input, select {
-            background: #0f172a;
-            border: 1px solid var(--card-border);
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 1rem;
+        .input-bloqueado {
+            background-color: #111827;
+            border: 2px dashed #4b5563;
+            color: #9ca3af;
+            font-size: 1.25rem;
+            padding: 0.75rem;
+            border-radius: 1rem;
             width: 100%;
+            cursor: not-allowed;
         }
-
-        .btn-principal {
-            width: 100%;
-            background: var(--azul-acao);
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: var(--raio-borda);
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .btn-secundario {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--texto-principal);
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        /* SEÇÃO DE BALANÇO DA SEMANA/PERÍODO */
-        .secao-titulo { font-size: 0.9rem; color: var(--texto-secundario); text-transform: uppercase; margin: 20px 0 10px 0; font-weight: bold; }
-        .balanco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .card-balanco {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .card-balanco .lbl { font-size: 0.7rem; color: var(--texto-secundario); text-transform: uppercase; }
-        .card-balanco .val { font-size: 1rem; font-weight: bold; margin-top: 2px; }
-
-        /* HISTÓRICO RECENTE */
-        .tabela-historico { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        .tabela-historico th, .tabela-historico td {
-            padding: 10px 8px;
-            text-align: left;
-            border-bottom: 1px solid var(--card-border);
-            font-size: 0.8rem;
-        }
-        .tabela-historico th { color: var(--texto-secundario); text-transform: uppercase; font-size: 0.7rem; }
-        .tag-detalhado { font-size: 0.65rem; color: var(--amarelo-alerta); display: block; }
-
-        /* MODAIS */
-        .modal {
+        .modal-overlay {
+            display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
+            background-color: rgba(0, 0, 0, 0.9);
             z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
-        .modal.active { display: flex; }
+        .modal-overlay.active { display: flex; }
         .modal-content {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--raio-borda);
-            width: 100%;
-            max-width: 440px;
-            max-height: 90vh;
+            background-color: #1f2937;
+            border: 2px solid #6b7280;
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            width: 92%;
+            max-width: 380px;
+            max-height: 85vh;
             overflow-y: auto;
-            padding: 16px;
         }
+        .sugestao-tag {
+            background-color: #111827;
+            color: #ffffff;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            border: 2px solid #374151;
+        }
+        .sugestao-tag:active { background-color: #2563eb; border-color: #3b82f6; }
+        .header-fixo th { position: sticky; top: 0; z-index: 10; background-color: #1f2937; }
+        .linha-auditoria-clicavel { cursor: pointer; transition: background-color 0.2s ease; }
+        .linha-auditoria-clicavel:hover { background-color: #111827; }
     </style>
 </head>
-<body>
+<body class="p-4 max-w-md mx-auto pb-24">
 
-<div class="container">
-    <!-- CONFIGURAÇÃO / BACKUP DISCRETO -->
-    <div class="top-bar-config">
-        <button class="btn-config" onclick="abrirModal('modal-config')" title="Configurações e Backup">⚙️</button>
+    <!-- Instalação PWA -->
+    <div id="pwa-install-container" class="hidden mb-4">
+        <button onclick="dispararInstalacaoPWA()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-lg">
+            📲 Instalar Aplicativo no Celular
+        </button>
     </div>
 
-    <!-- CARDS DO TOPO -->
-    <div class="header-card">
-        <div class="label">Total Acumulado</div>
-        <div class="valor" id="txt-total-acumulado">R$ 0,00</div>
-    </div>
-
-    <div class="top-cards-grid">
-        <div class="mini-card">
-            <div class="label">Reservar Dinheiro</div>
-            <div class="valor" id="txt-reservar-dinheiro" style="color: var(--azul-acao);">R$ 0,00</div>
+    <!-- CABEÇALHO COM SALDOS -->
+    <header class="text-center my-5 space-y-4">
+        <div>
+            <h1 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Total Acumulado</h1>
+            <div id="saldo-total" class="text-4xl font-black text-green-500">R$ 0,00</div>
         </div>
-        <div class="mini-card">
-            <div class="label">Disponível</div>
-            <div class="valor" id="txt-disponivel" style="color: var(--verde-ganho);">R$ 0,00</div>
-        </div>
-    </div>
-
-    <!-- ÚLTIMO REGISTRO -->
-    <div class="card-ultimo-registro">
-        <div class="ultimo-header">
-            <span>ÚLTIMO REGISTRO</span>
-            <span id="txt-ultimo-data">--/--</span>
-        </div>
-        <div class="ultimo-valores">
-            <div class="ultimo-box">
-                <div class="lbl">ENTRADAS</div>
-                <div class="val" style="color: var(--verde-ganho);" id="txt-ultimo-entradas">R$ 0,00</div>
+        
+        <!-- CARDS DE SALDO FIXOS -->
+        <div class="grid grid-cols-3 gap-2">
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl">
+                <span class="block text-[8px] text-orange-400 font-bold uppercase tracking-wider mb-1">Res. Manutenção</span>
+                <span id="saldo-guardado-manutencao" class="text-sm font-black text-orange-400">R$ 0,00</span>
             </div>
-            <div class="ultimo-box">
-                <div class="lbl">SAÍDAS</div>
-                <div class="val" style="color: var(--vermelho-gasto);" id="txt-ultimo-saidas">R$ 0,00</div>
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl">
+                <span class="block text-[8px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Dinheiro Guardado</span>
+                <span id="saldo-guardado-investimento" class="text-sm font-black text-emerald-400">R$ 0,00</span>
+            </div>
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl">
+                <span class="block text-[8px] text-blue-400 font-bold uppercase tracking-wider mb-1">Disponível</span>
+                <span id="saldo-disponivel" class="text-sm font-black text-blue-400">R$ 0,00</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- FORMULÁRIO DE LANÇAMENTO DIÁRIO -->
-    <form id="form-lancamento" onsubmit="salvarLancamento(event)">
-        <!-- ENTRADAS -->
-        <div class="form-secao secao-entradas">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Faturamento (+)</label>
-                    <input type="number" step="0.01" id="input-faturamento" placeholder="0,00">
+    <div id="ultimo-resumo-container" class="hidden mb-5">
+        <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-3">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Último Registro</h3>
+                <span id="last-date" class="text-[10px] text-gray-400 font-black"></span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                <div class="bg-gray-800 p-2 rounded-xl">
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Entradas</span>
+                    <span id="last-ganho" class="font-bold text-green-400">R$ 0</span>
                 </div>
-                <div class="form-group">
-                    <label>Renda Extra (+)</label>
-                    <input type="number" step="0.01" id="input-renda-extra" placeholder="0,00">
+                <div class="bg-gray-800 p-2 rounded-xl">
+                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Saídas</span>
+                    <span id="last-gastos" class="font-bold text-red-400">R$ 0</span>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- SAÍDAS & RESERVA -->
-        <div class="form-secao secao-saidas">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Combustível (-)</label>
-                    <input type="number" step="0.01" id="input-combustivel" placeholder="0,00">
+    <!-- FORMULÁRIO PRINCIPAL -->
+    <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Faturamento</label>
+                <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+            <div>
+                <label class="block text-xs font-black text-green-400 mb-1 ml-1 uppercase tracking-wide">Renda Extra (+)</label>
+                <input type="number" id="renda-extra" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Combustível</label>
+                <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+            <div>
+                <label class="block text-xs font-black text-emerald-400 mb-1 ml-1 uppercase tracking-wide">Din. Guardado (+)</label>
+                <input type="number" id="guardado-valor" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+        </div>
+
+        <!-- RESGATE / TRANSFERÊNCIA DO DINHEIRO GUARDADO -->
+        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800">
+            <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-black text-emerald-400 uppercase tracking-wide ml-1">Resgate Dinheiro Guardado (-)</label>
+                <span class="text-[9px] text-gray-400 font-bold uppercase">→ Envia p/ Disponível</span>
+            </div>
+            <input type="number" id="guardado-resgate" inputmode="decimal" placeholder="0,00 (Resgatar p/ Disponível)" class="input-autonomo">
+        </div>
+
+        <!-- RESERVA DE MANUTENÇÃO -->
+        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-3">
+            <span class="block text-xs font-black text-orange-400 uppercase tracking-wide ml-1">Reserva Manutenção</span>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Crédito (+)</label>
+                    <input type="number" id="manutencao" inputmode="decimal" oninput="calcularReservaManutencaoDia()" placeholder="0,00" class="input-autonomo font-bold">
                 </div>
-                
-                <!-- RESERVAR DINHEIRO COM BOTÕES EMBUTIDOS NA MESMA ALTURA -->
-                <div class="form-group">
-                    <label>Reservar Dinheiro</label>
-                    <div class="input-inline-wrapper">
-                        <input type="number" step="0.01" id="input-reserva-valor" placeholder="0,00">
-                        <div class="toggle-embutido">
-                            <button type="button" id="btn-emb-guardar" class="btn-emb active-g" onclick="setModoReserva('guardar')">+ Guardar</button>
-                            <button type="button" id="btn-emb-resgatar" class="btn-emb" onclick="setModoReserva('resgatar')">- Resgatar</button>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Débito (-)</label>
+                    <button type="button" id="btn-debito-manutencao" onclick="abrirModalDebitoManutencao()" class="w-full h-[52px] bg-orange-950 hover:bg-orange-900 border-2 border-orange-600 text-white font-bold text-xs rounded-xl uppercase flex items-center justify-center gap-1">
+                        🛠️ Detalhar
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">R$ Calculado do Dia</label>
+                <input type="text" id="manutencao-calculado" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+            </div>
+        </div>
+
+        <!-- GASTOS PESSOAIS -->
+        <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-2">
+            <div class="flex justify-between items-center">
+                <label class="block text-xs font-black text-red-400 uppercase tracking-wide ml-1">Gastos Pessoais (-)</label>
+                <button id="btn-detalhar" onclick="abrirSubjanelaGastos()" class="bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg uppercase">
+                    📝 Detalhar Gastos
+                </button>
+            </div>
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+        </div>
+
+        <button id="btn-salvar-principal" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider">
+            Salvar Lançamento do Dia
+        </button>
+    </div>
+
+    <!-- BALANÇO DO PERÍODO -->
+    <div class="mt-6 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xs font-black text-yellow-500 uppercase tracking-wider">Balanço do Período Atual</h2>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+            <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('manutencaoLiquida', 'Reserva Manutenção (Período)')" class="bg-gray-800 p-2 rounded-xl cursor-pointer">
+                <span class="block text-[9px] text-white font-bold uppercase">Res. Manutenção</span>
+                <span id="saldo-reserva-manutencao" class="font-bold text-orange-400">R$ 0,00</span>
+            </div>
+            <div onclick="auditarCategoria('guardadoLiquido', 'Dinheiro Guardado')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Dinheiro Guardado</span><span id="total-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('pessoal', 'Gastos Pessoais')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Gastos Pessoais</span><span id="total-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+        </div>
+        <button onclick="abrirFecharMes()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider">
+            📅 Fechar Balanço Mensal
+        </button>
+    </div>
+
+    <!-- HISTÓRICO RECENTE -->
+    <div class="mt-6">
+        <div class="flex justify-between items-center mb-2 px-1">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Histórico Recente</h2>
+            <button onclick="limparDados()" class="text-[9px] text-red-500 font-bold uppercase border border-red-900 px-2 py-1 rounded-lg">Zerar Tudo</button>
+        </div>
+        <div class="overflow-y-auto max-h-[280px] rounded-xl border-2 border-gray-800 shadow-md bg-gray-900">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="header-fixo text-white text-[10px] uppercase font-bold tracking-wider border-b border-gray-700">
+                        <th class="p-3">Data</th>
+                        <th class="p-3">Saldo Líquido</th>
+                        <th class="p-3 text-right">Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="historico-body" class="text-sm"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MESES ARQUIVADOS -->
+    <div class="mt-6">
+        <div class="flex justify-between items-center mb-2 px-1">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Meses Arquivados</h2>
+        </div>
+        <div id="meses-anteriores-container" class="space-y-2"></div>
+        <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
+    </div>
+
+    <!-- SUBJANELA DE GASTOS PESSOAIS -->
+    <div id="subjanela-gastos" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider">Planilha de Gastos</h3>
+                <button onclick="fecharSubjanelaGastos()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            
+            <div class="space-y-2 bg-gray-950 p-2.5 rounded-xl border border-gray-800">
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-white mb-1">Descrição</label>
+                        <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Padaria" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
+                        <div id="container-sugestoes" class="mt-2 flex flex-wrap max-h-24 overflow-y-auto pt-1"></div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-white mb-0.5">Valor (R$)</label>
+                        <div class="flex gap-1">
+                            <input type="number" id="gasto-item-val" inputmode="decimal" onkeydown="if(event.key==='Enter'){adicionarItemNaLista();}" placeholder="0,00" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
+                            <button onclick="adicionarItemNaLista()" class="bg-red-600 text-white font-black px-4 rounded-lg text-base">+</button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-group full-width" style="margin-top: 4px;">
-                    <label>Despesas (-)</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="number" id="input-despesas-total" placeholder="0,00" readonly style="background: #1e293b;">
-                        <button type="button" class="btn-secundario" style="width: auto; white-space: nowrap;" onclick="abrirModal('modal-planilha-despesas')">📝 Registrar Despesas</button>
+            <div class="max-h-40 overflow-y-auto border border-gray-700 rounded-xl bg-gray-950">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700">
+                        <tr>
+                            <th class="p-2">Descrição</th>
+                            <th class="p-2">Valor</th>
+                            <th class="p-2 text-right">Excluir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-gastos-correntes-body"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
+                <span class="text-white uppercase text-xs">Total Acumulado:</span>
+                <span id="subjanela-total-acumulado" class="text-red-400">R$ 0,00</span>
+            </div>
+
+            <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+                💾 Confirmar e Enviar para a Tela
+            </button>
+        </div>
+    </div>
+
+    <!-- CONFERÊNCIA -->
+    <div id="subjanela-auditoria" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="auditoria-titulo" class="text-sm font-bold uppercase tracking-wider text-yellow-500">Conferência</h3>
+                    <p id="auditoria-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5"></p>
+                </div>
+                <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead id="auditoria-head" class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0"></thead>
+                    <tbody id="lista-auditoria-body"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
+                <span class="text-white uppercase text-xs">Total:</span>
+                <span id="auditoria-total-acumulado">R$ 0,00</span>
+            </div>
+            <button onclick="fecharSubjanelaAuditoria()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
+        </div>
+    </div>
+
+    <!-- DETALHES DO ITEM DE GASTOS -->
+    <div id="modal-detalhe-gastos" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="detalhe-titulo" class="text-sm font-bold uppercase tracking-wider text-red-400">Detalhes</h3>
+                    <p id="detalhe-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos individuais</p>
+                </div>
+                <button onclick="fecharDetalheGastos()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
+                        <tr>
+                            <th class="p-2.5">Data</th>
+                            <th class="p-2.5 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalhe-gastos-body"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
+                <span class="text-white uppercase text-xs">Total do Item:</span>
+                <span id="detalhe-total-acumulado" class="text-red-400">R$ 0,00</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="voltarParaAuditoria()" class="bg-blue-700 hover:bg-blue-600 text-white font-bold py-3 rounded-xl text-xs uppercase">⬅️ Voltar</button>
+                <button onclick="fecharDetalheGastos()" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESUMO DO MÊS ARQUIVADO -->
+    <div id="subjanela-mes-aquivado" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="mes-arq-titulo" class="text-sm font-bold uppercase tracking-wider text-blue-400">Resumo Fechado</h3>
+                    <p class="text-[9px] text-gray-400 uppercase mt-0.5">Balanço Consolidado do Período</p>
+                </div>
+                <button onclick="fecharSubjanelaMesArquivado()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+
+            <div class="space-y-1 text-xs bg-gray-950 border border-gray-800 p-3 rounded-xl">
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Faturamento:</span><span id="mes-arq-fat" class="font-bold text-green-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Reserva Manutenção:</span><span id="mes-arq-manut" class="font-bold text-orange-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Dinheiro Guardado:</span><span id="mes-arq-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1"><span class="text-gray-400">Gastos Pessoais Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+            </div>
+
+            <div class="space-y-1">
+                <span class="block text-[10px] uppercase font-bold text-gray-400 ml-1">Descritivo Completo de Gastos:</span>
+                <div class="max-h-32 overflow-y-auto border border-gray-800 bg-gray-950 p-2 rounded-xl text-[11px] space-y-1 text-gray-300" id="mes-arq-descritivo-container"></div>
+            </div>
+
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
+                <span class="text-white uppercase text-xs">Fundo Líquido Final:</span>
+                <span id="mes-arq-saldo-final" class="text-blue-400">R$ 0,00</span>
+            </div>
+
+            <button onclick="fecharSubjanelaMesArquivado()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Voltar</button>
+        </div>
+    </div>
+
+    <!-- AJUSTAR LANÇAMENTO DIA -->
+    <div id="modal-edicao" class="modal-overlay">
+        <div class="modal-content space-y-3">
+            <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider border-b border-gray-700 pb-2">Ajustar Lançamento</h3>
+            <div class="space-y-2 text-xs">
+                <div><label class="block text-gray-400 font-bold uppercase text-[10px] mb-0.5">Data</label><input type="text" id="edit-data" disabled class="w-full bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-400 font-bold text-xs"></div>
+                <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Faturamento</label><input type="number" id="edit-faturamento" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                <div><label class="block text-green-400 font-bold uppercase text-[10px] mb-0.5">Renda Extra (+)</label><input type="number" id="edit-renda-extra" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                <div><label class="block text-white font-bold uppercase text-[10px] mb-0.5">Combustível</label><input type="number" id="edit-gasolina" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                <div><label class="block text-emerald-400 font-bold uppercase text-[10px] mb-0.5">Din. Guardado (+)</label><input type="number" id="edit-guardado" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                <div><label class="block text-emerald-400 font-bold uppercase text-[10px] mb-0.5">Resgate Guardado (-)</label><input type="number" id="edit-guardado-resgate" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                <div><label class="block text-orange-400 font-bold uppercase text-[10px] mb-0.5">Crédito Manutenção (+)</label><input type="number" id="edit-manutencao" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                <div><label class="block text-orange-400 font-bold uppercase text-[10px] mb-0.5">Débito Manutenção (-)</label><input type="number" id="edit-manutencao-debito" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs"></div>
+                
+                <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 space-y-1.5">
+                    <label class="block text-red-400 font-bold uppercase text-[10px]">Gastos Pessoais</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="edit-pessoal" readonly class="w-full bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-400 font-bold text-xs" placeholder="0,00">
+                        <button onclick="reabrirPlanilhaNoAjuste()" class="bg-blue-950 border-blue-600 text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase">📋 Reabrir</button>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <button type="submit" class="btn-principal">💾 Salvar Lançamento do Dia</button>
-    </form>
-
-    <!-- BALANÇO DO PERÍODO ATUAL -->
-    <div class="secao-titulo">Balanço do Período Atual</div>
-    <div class="balanco-grid">
-        <div class="card-balanco">
-            <div class="lbl">Faturamento</div>
-            <div class="val" style="color: var(--verde-ganho);" id="bal-faturamento">R$ 0,00</div>
-        </div>
-        <div class="card-balanco">
-            <div class="lbl">Renda Extra</div>
-            <div class="val" style="color: var(--verde-ganho);" id="bal-renda-extra">R$ 0,00</div>
-        </div>
-        <div class="card-balanco">
-            <div class="lbl">Combustível</div>
-            <div class="val" style="color: var(--vermelho-gasto);" id="bal-combustivel">R$ 0,00</div>
-        </div>
-        <div class="card-balanco">
-            <div class="lbl">Reservar Dinheiro</div>
-            <div class="val" style="color: var(--azul-acao);" id="bal-reservar">R$ 0,00</div>
-        </div>
-        <div class="card-balanco" style="grid-column: span 2;">
-            <div class="lbl">Despesas Totais</div>
-            <div class="val" style="color: var(--vermelho-gasto);" id="bal-despesas">R$ 0,00</div>
+            <div class="grid grid-cols-3 gap-2 pt-2 text-xs font-bold">
+                <button onclick="salvarEdicao()" class="bg-green-600 py-2.5 rounded-xl text-white">Salvar</button>
+                <button onclick="deletarLancamento()" class="bg-red-600 py-2.5 rounded-xl text-white">Deletar</button>
+                <button onclick="fecharModal()" class="bg-gray-700 py-2.5 rounded-xl text-gray-300">Voltar</button>
+            </div>
         </div>
     </div>
-    <button class="btn-secundario" style="margin-top: 10px; background: var(--amarelo-alerta); color: #000; font-weight: bold;" onclick="alert('Balanço mensal consolidado com sucesso!')">📅 Fechar Balanço Mensal</button>
 
-    <!-- HISTÓRICO RECENTE -->
-    <div class="secao-titulo">Histórico Recente</div>
-    <table class="tabela-historico">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Saldo Líquido</th>
-                <th style="text-align: right;">Ação</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Preenchido via JavaScript -->
-        </tbody>
-    </table>
+    <input type="hidden" id="modo-planilha-contexto" value="principal">
+    <input type="hidden" id="item-detalhe-selecionado" value="">
 
-    <!-- MESES ARQUIVADOS -->
-    <div class="secao-titulo">Meses Arquivados</div>
-    <div id="container-arquivados">
-        <p style="font-size: 0.8rem; color: var(--texto-secundario);">Nenhum mês arquivado ainda.</p>
-    </div>
-</div>
-
-<!-- SUBJANELA: PLANILHA DE DESPESAS -->
-<div class="modal" id="modal-planilha-despesas">
-    <div class="modal-content">
-        <h3>Planilha de Despesas</h3>
-        <p style="font-size: 0.8rem; color: var(--texto-secundario); margin-bottom: 12px;">Adicione seus gastos do dia por categoria:</p>
-        
-        <div class="form-group" style="margin-bottom: 8px;">
-            <label>Descrição</label>
-            <input type="text" id="despesa-desc" placeholder="Ex: Mercado, Almoço, Troca de óleo">
-        </div>
-        <div class="form-group" style="margin-bottom: 8px;">
-            <label>Categoria</label>
-            <select id="despesa-categoria">
-                <option value="Manutenção">🛠️ Manutenção</option>
-                <option value="Alimentação">🍽️ Refeição / Alimentação</option>
-                <option value="Contas">🏠 Contas de Consumo</option>
-                <option value="Mercado">🛒 Mercado</option>
-                <option value="Pessoal">👤 Pessoal / Lazer</option>
-                <option value="Outros">📦 Outros</option>
-            </select>
-        </div>
-        <div class="form-group" style="margin-bottom: 12px;">
-            <label>Valor (R$)</label>
-            <input type="number" step="0.01" id="despesa-valor" placeholder="0,00">
-        </div>
-
-        <button type="button" class="btn-secundario" onclick="adicionarItemDespesa()" style="margin-bottom: 12px;">+ Adicionar Item</button>
-        <div id="lista-itens-despesa" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px;"></div>
-
-        <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-principal" onclick="confirmarDespesas()">💾 Confirmar e Enviar</button>
-            <button type="button" class="btn-secundario" onclick="fecharModal('modal-planilha-despesas')">Cancelar</button>
+    <!-- MODAL FECHAR MÊS -->
+    <div id="modal-fechar-mes" class="modal-overlay">
+        <div class="modal-content text-center space-y-4">
+            <h3 class="text-base font-bold text-yellow-500 uppercase tracking-wider">Confirmar Fechamento</h3>
+            <div class="space-y-2">
+                <label class="block text-[10px] uppercase font-bold text-gray-400 text-left">Nome do Período/Mês:</label>
+                <input type="text" id="input-nome-mes-fechamento" class="w-full bg-gray-800 border-2 border-gray-700 p-2.5 rounded-xl text-white font-black text-center text-sm uppercase">
+            </div>
+            <div class="bg-blue-950 border border-blue-800 p-3 rounded-xl text-left text-xs space-y-1">
+                <span class="block font-bold text-blue-400 uppercase text-[9px] tracking-wide">🛡️ Escudo de Segurança Ativo:</span>
+                <p class="text-gray-300 text-[11px] leading-tight">Ao clicar em confirmar, um **Backup Automático** será baixado no seu celular antes de reiniciar o painel principal.</p>
+            </div>
+            <div class="flex gap-2 text-xs font-bold pt-1">
+                <button onclick="confirmarFecharMes()" class="flex-1 bg-yellow-600 py-3 rounded-xl text-white">Confirmar e Resetar</button>
+                <button onclick="fecharModalMes()" class="flex-1 bg-gray-800 border border-gray-700 py-3 rounded-xl text-gray-400">Cancelar</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- SUBJANELA: CONFIGURAÇÕES E BACKUP -->
-<div class="modal" id="modal-config">
-    <div class="modal-content">
-        <h3>Configurações e Dados</h3>
-        <p style="font-size: 0.8rem; color: var(--texto-secundario); margin-bottom: 16px;">Gerencie suas cópias de segurança:</p>
-        
-        <button type="button" class="btn-secundario" style="margin-bottom: 8px;" onclick="exportarBackup()">📦 Salvar Backup Manual</button>
-        <button type="button" class="btn-secundario" style="margin-bottom: 16px;" onclick="document.getElementById('input-file-backup').click()">📥 Ler Backup</button>
-        <input type="file" id="input-file-backup" style="display: none;" onchange="importarBackup(event)">
-
-        <button type="button" class="btn-principal" style="background: var(--card-border);" onclick="fecharModal('modal-config')">Fechar</button>
-    </div>
-</div>
-
-<!-- INTELLIGENCE & LÓGICA DO SISTEMA -->
-<script>
-    let modoReserva = 'guardar';
-    let despesasTemporarias = [];
-
-    const STORAGE_KEY_HISTORICO = 'financeiro_historico_v2';
-    const STORAGE_KEY_ARQUIVADOS = 'financeiro_arquivados_v2';
-
-    document.addEventListener('DOMContentLoaded', () => {
-        carregarDadosEAtualizarTela();
-    });
-
-    function setModoReserva(modo) {
-        modoReserva = modo;
-        const btnG = document.getElementById('btn-emb-guardar');
-        const btnR = document.getElementById('btn-emb-resgatar');
-        
-        if (modo === 'guardar') {
-            btnG.className = 'btn-emb active-g';
-            btnR.className = 'btn-emb';
-        } else {
-            btnG.className = 'btn-emb';
-            btnR.className = 'btn-emb active-r';
-        }
-    }
-
-    function abrirModal(id) { document.getElementById(id).classList.add('active'); }
-    function fecharModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    function adicionarItemDespesa() {
-        const descInput = document.getElementById('despesa-desc');
-        const catInput = document.getElementById('despesa-categoria');
-        const valInput = document.getElementById('despesa-valor');
-
-        const desc = descInput.value.trim();
-        const cat = catInput.value;
-        const val = parseFloat(valInput.value);
-
-        if (!desc || isNaN(val) || val <= 0) {
-            alert('Por favor, informe uma descrição e um valor válido.');
-            return;
-        }
-
-        despesasTemporarias.push({ descricao: desc, categoria: cat, valor: val });
-        
-        descInput.value = '';
-        valInput.value = '';
-        descInput.focus();
-
-        renderizarListaDespesasTemporarias();
-    }
-
-    function renderizarListaDespesasTemporarias() {
-        const container = document.getElementById('lista-itens-despesa');
-        container.innerHTML = '';
-
-        despesasTemporarias.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 6px 10px; border-radius: 6px; margin-bottom: 4px; font-size: 0.8rem;';
-            div.innerHTML = `
-                <span><strong>[${item.categoria}]</strong> ${item.descricao}</span>
+    <!-- MODAL DÉBITO MANUTENÇÃO -->
+    <div id="modal-debito-manutencao" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="text-lg font-black text-orange-500 uppercase mb-4">Registrar Gasto (Manutenção)</h2>
+            <div class="space-y-4">
                 <div>
-                    <span style="color: var(--vermelho-gasto); font-weight: bold; margin-right: 8px;">R$ ${item.valor.toFixed(2)}</span>
-                    <button type="button" onclick="removerItemDespesa(${index})" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold;">✕</button>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Valor do Gasto</label>
+                    <input type="number" id="debito-manut-valor" inputmode="decimal" placeholder="0,00" class="input-autonomo">
                 </div>
-            `;
-            container.appendChild(div);
-        });
-    }
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Descrição / Itens</label>
+                    <textarea id="debito-manut-desc" placeholder="Ex: Troca de óleo, Pastilhas..." class="input-autonomo h-24 text-sm"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="fecharModalDebitoManutencao()" class="bg-gray-800 text-white font-bold py-3 rounded-xl uppercase text-xs">Cancelar</button>
+                    <button onclick="confirmarDebitoManutencaoNaTela()" class="bg-orange-600 text-white font-bold py-3 rounded-xl uppercase text-xs">Enviar p/ Tela</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    function removerItemDespesa(index) {
-        despesasTemporarias.splice(index, 1);
-        renderizarListaDespesasTemporarias();
-    }
+    <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-gray-950 border-t border-gray-800 p-2.5 grid grid-cols-2 gap-3 z-50">
+        <button onclick="exportarBackup()" class="bg-gray-900 border border-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-[10px] uppercase">📦 Salvar Backup Manual</button>
+        <label class="bg-gray-900 border border-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-[10px] uppercase text-center cursor-pointer block">
+            📥 Ler Backup <input type="file" id="importFile" accept=".txt" onchange="importarBackup(event)" class="hidden">
+        </label>
+    </footer>
 
-    function confirmarDespesas() {
-        const total = despesasTemporarias.reduce((acc, item) => acc + item.valor, 0);
-        document.getElementById('input-despesas-total').value = total.toFixed(2);
-        fecharModal('modal-planilha-despesas');
-    }
-
-    function salvarLancamento(event) {
-        event.preventDefault();
-
-        const faturamento = parseFloat(document.getElementById('input-faturamento').value) || 0;
-        const rendaExtra = parseFloat(document.getElementById('input-renda-extra').value) || 0;
-        const combustivel = parseFloat(document.getElementById('input-combustivel').value) || 0;
-        const reservaValorInput = parseFloat(document.getElementById('input-reserva-valor').value) || 0;
-        const despesasTotal = parseFloat(document.getElementById('input-despesas-total').value) || 0;
-
-        const valorReservaFinal = modoReserva === 'resgatar' ? -Math.abs(reservaValorInput) : Math.abs(reservaValorInput);
-
-        const hoje = new Date();
-        const dataFormatada = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
-
-        const novoLancamento = {
-            data: dataFormatada,
-            timestamp: hoje.getTime(),
-            faturamento,
-            rendaExtra,
-            combustivel,
-            reservaDinheiro: valorReservaFinal,
-            despesasTotal,
-            detalheDespesas: [...despesasTemporarias]
-        };
-
-        let historico = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORICO)) || [];
-        historico.unshift(novoLancamento);
-        localStorage.setItem(STORAGE_KEY_HISTORICO, JSON.stringify(historico));
-
-        document.getElementById('form-lancamento').reset();
-        despesasTemporarias = [];
-        document.getElementById('lista-itens-despesa').innerHTML = '';
-        setModoReserva('guardar');
-
-        carregarDadosEAtualizarTela();
-        alert('Lançamento salvo com sucesso!');
-    }
-
-    function carregarDadosEAtualizarTela() {
-        const historico = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORICO)) || [];
-
-        let totalFaturamento = 0;
-        let totalRendaExtra = 0;
-        let totalCombustivel = 0;
-        let totalReservarDinheiro = 0;
-        let totalDespesas = 0;
-
-        historico.forEach(item => {
-            totalFaturamento += item.faturamento || 0;
-            totalRendaExtra += item.rendaExtra || 0;
-            totalCombustivel += item.combustivel || 0;
-            totalReservarDinheiro += item.reservaDinheiro || 0;
-            totalDespesas += item.despesasTotal || 0;
+    <script>
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btnContainer = document.getElementById('pwa-install-container');
+            if (btnContainer) btnContainer.classList.remove('hidden');
         });
 
-        const entradasTotais = totalFaturamento + totalRendaExtra;
-        const saidasTotais = totalCombustivel + totalDespesas;
-        
-        const totalAcumulado = entradasTotais - saidasTotais;
-        const disponivel = totalAcumulado - totalReservarDinheiro;
-
-        // Atualiza Cards do Topo
-        document.getElementById('txt-total-acumulado').innerText = `R$ ${totalAcumulado.toFixed(2)}`;
-        document.getElementById('txt-reservar-dinheiro').innerText = `R$ ${totalReservarDinheiro.toFixed(2)}`;
-        document.getElementById('txt-disponivel').innerText = `R$ ${disponivel.toFixed(2)}`;
-
-        // Atualiza Balanço do Período
-        document.getElementById('bal-faturamento').innerText = `R$ ${totalFaturamento.toFixed(2)}`;
-        document.getElementById('bal-renda-extra').innerText = `R$ ${totalRendaExtra.toFixed(2)}`;
-        document.getElementById('bal-combustivel').innerText = `R$ ${totalCombustivel.toFixed(2)}`;
-        document.getElementById('bal-reservar').innerText = `R$ ${totalReservarDinheiro.toFixed(2)}`;
-        document.getElementById('bal-despesas').innerText = `R$ ${totalDespesas.toFixed(2)}`;
-
-        // Atualiza Último Registro
-        if (historico.length > 0) {
-            const ult = historico[0];
-            document.getElementById('txt-ultimo-data').innerText = ult.data;
-            const ultEntradas = (ult.faturamento || 0) + (ult.rendaExtra || 0);
-            const ultSaidas = (ult.combustivel || 0) + (ult.despesasTotal || 0);
-            document.getElementById('txt-ultimo-entradas').innerText = `R$ ${ultEntradas.toFixed(2)}`;
-            document.getElementById('txt-ultimo-saidas').innerText = `R$ ${ultSaidas.toFixed(2)}`;
+        function dispararInstalacaoPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    document.getElementById('pwa-install-container').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            });
         }
 
-        renderizarTabelaHistorico(historico);
-    }
+        const BACKUP_INTERNO_CONSOLIDADO = {
+            "saldoAcumulado": 0,
+            "historico": [],
+            "mesesAnteriores": [],
+            "sugestoesGastos": ["MERCADO", "PADARIA", "COMBUSTÍVEL", "FARMÁCIA"]
+        };
 
-    function renderizarTabelaHistorico(historico) {
-        const tbody = document.querySelector('.tabela-historico tbody');
-        if (!tbody) return;
+        let dados = JSON.parse(localStorage.getItem('financeiro_pro'));
         
-        tbody.innerHTML = '';
+        if (!dados || typeof dados !== 'object') {
+            dados = JSON.parse(JSON.stringify(BACKUP_INTERNO_CONSOLIDADO));
+        }
+        if (!Array.isArray(dados.historico)) dados.historico = [];
+        if (!Array.isArray(dados.mesesAnteriores)) dados.mesesAnteriores = [];
+        if (!Array.isArray(dados.sugestoesGastos)) dados.sugestoesGastos = ["MERCADO", "PADARIA", "COMBUSTÍVEL", "FARMÁCIA"];
+        
+        localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+        
+        let itensGastosTemporarios = [];
+        let lancamentoEmEdicao = null;
+        let debitoManutencaoTemporario = { valor: 0, descricao: '' };
 
-        if (historico.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--texto-secundario);">Nenhum lançamento registrado.</td></tr>';
-            return;
+        function formatarMoeda(valor) {
+            return (parseFloat(valor) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        historico.slice(0, 7).forEach(item => {
-            const entradas = (item.faturamento || 0) + (item.rendaExtra || 0);
-            const saidas = (item.combustivel || 0) + (item.despesasTotal || 0);
-            const saldoLíquido = entradas - saidas;
-            
-            const temDetalhes = item.detalheDespesas && item.detalheDespesas.length > 0;
+        function obtenerDataHoje() {
+            return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+        }
 
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>
-                    ${item.data}
-                    ${temDetalhes ? '<span class="tag-detalhado">📋 DETALHADO</span>' : ''}
-                </td>
-                <td style="color: ${saldoLíquido >= 0 ? 'var(--verde-ganho)' : 'var(--vermelho-gasto)'}; font-weight: bold;">
-                    R$ ${saldoLíquido.toFixed(2)}
-                </td>
-                <td style="text-align: right;">
-                    <button type="button" class="btn-secundario" style="width: auto; padding: 4px 8px;">Ajustar</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+        function verificarTravaDiaria() {
+            const hoje = obtenerDataHoje();
+            const jaLancado = dados.historico.some(item => item && (item.data === hoje || item.data === hoje.substring(0,5)));
+            const btnSalvar = document.getElementById('btn-salvar-principal');
+            const btnDetalhar = document.getElementById('btn-detalhar');
 
-    function exportarBackup() {
-        const dados = {
-            historico: localStorage.getItem(STORAGE_KEY_HISTORICO),
-            arquivados: localStorage.getItem(STORAGE_KEY_ARQUIVADOS)
-        };
-        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup_financeiro_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-    }
-
-    function importarBackup(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const dados = JSON.parse(e.target.result);
-                if (dados.historico) localStorage.setItem(STORAGE_KEY_HISTORICO, dados.historico);
-                if (dados.arquivados) localStorage.setItem(STORAGE_KEY_ARQUIVADOS, dados.arquivados);
-                alert('Backup restaurado com sucesso!');
-                carregarDadosEAtualizarTela();
-                fecharModal('modal-config');
-            } catch (err) {
-                alert('Arquivo de backup inválido.');
+            if (jaLancado) {
+                btnSalvar.innerText = `⚠️ ${hoje.substring(0,5)} JÁ LANÇADO`;
+                btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
+                btnSalvar.disabled = true;
+                
+                ['faturamento', 'renda-extra', 'gasolina', 'guardado-valor', 'guardado-resgate', 'manutencao'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.disabled = true; el.className = "input-bloqueado"; }
+                });
+            } else {
+                btnSalvar.innerText = "Salvar Lançamento do Dia";
+                btnSalvar.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider mt-2";
+                btnSalvar.disabled = false;
+                if (btnDetalhar) btnDetalhar.disabled = false;
+                
+                ['faturamento', 'renda-extra', 'gasolina', 'guardado-valor', 'guardado-resgate', 'manutencao'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.disabled = false; el.className = "input-autonomo"; }
+                });
             }
-        };
-        reader.readAsText(file);
-    }
-</script>
+        }
+
+        function calcularReservaManutencaoDia() {
+            const credito = parseFloat(document.getElementById('manutencao').value) || 0;
+            const debito = debitoManutencaoTemporario.valor || 0;
+            const saldoDiaManut = credito - debito;
+            
+            const campoCalc = document.getElementById('manutencao-calculado');
+            if (campoCalc) {
+                campoCalc.value = formatarMoeda(saldoDiaManut);
+                if (saldoDiaManut < 0) {
+                    campoCalc.className = "input-bloqueado font-bold text-red-500";
+                } else {
+                    campoCalc.className = "input-bloqueado font-bold text-green-400";
+                }
+            }
+        }
+
+        function atualizarUI() {
+            let totalEntradas = 0;
+            let totalSaidas = 0;
+
+            dados.historico.forEach(item => {
+                if (!item) return;
+                totalEntradas += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0);
+                totalSaidas += (parseFloat(item.gasolina) || 0) + (parseFloat(item.pessoal) || 0);
+            });
+
+            dados.mesesAnteriores.forEach(mes => {
+                if (!mes) return;
+                totalEntradas += (parseFloat(mes.faturamentoTotal) || 0) + (parseFloat(mes.rendaExtraTotal) || 0);
+                if (Array.isArray(mes.historico)) {
+                    mes.historico.forEach(h => {
+                        if (!h) return;
+                        totalSaidas += (parseFloat(h.gasolina) || 0) + (parseFloat(h.pessoal) || 0);
+                    });
+                }
+            });
+
+            let saldoReservaManut = 0;
+            dados.historico.forEach(item => { 
+                if (item) saldoReservaManut += (parseFloat(item.manutencao) || 0) - (parseFloat(item.manutencaoDebito) || 0); 
+            });
+            dados.mesesAnteriores.forEach(mes => {
+                if (mes && Array.isArray(mes.historico)) {
+                    mes.historico.forEach(h => { 
+                        if (h) saldoReservaManut += (parseFloat(h.manutencao) || 0) - (parseFloat(h.manutencaoDebito) || 0); 
+                    });
+                }
+            });
+
+            let totalDinheiroGuardado = 0;
+            dados.historico.forEach(item => { 
+                if (item) totalDinheiroGuardado += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0); 
+            });
+            dados.mesesAnteriores.forEach(mes => {
+                if (mes && Array.isArray(mes.historico)) {
+                    mes.historico.forEach(h => { 
+                        if (h) totalDinheiroGuardado += (parseFloat(h.guardado) || 0) - (parseFloat(h.guardadoResgate) || 0); 
+                    });
+                }
+            });
+
+            const totalAcumulado = totalEntradas - totalSaidas; 
+            const disponivel = totalAcumulado - saldoReservaManut - totalDinheiroGuardado;
+
+            const saldoEl = document.getElementById('saldo-total');
+            if (saldoEl) {
+                saldoEl.innerText = formatarMoeda(totalAcumulado);
+                saldoEl.className = `text-4xl font-black ${totalAcumulado >= 0 ? 'text-green-500' : 'text-red-500'}`;
+            }
+
+            document.getElementById('saldo-guardado-manutencao').innerText = formatarMoeda(saldoReservaManut);
+            document.getElementById('saldo-guardado-investimento').innerText = formatarMoeda(totalDinheiroGuardado);
+            document.getElementById('saldo-disponivel').innerText = formatarMoeda(disponivel);
+
+            let totalFat = 0, totalRenda = 0, totalGas = 0, totalPes = 0, totalGua = 0, totalManutLiq = 0;
+            dados.historico.forEach(item => {
+                if (!item) return;
+                totalFat += parseFloat(item.faturamento) || 0;
+                totalRenda += parseFloat(item.rendaExtra) || 0;
+                totalGas += parseFloat(item.gasolina) || 0;
+                totalPes += parseFloat(item.pessoal) || 0;
+                totalGua += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
+                totalManutLiq += (parseFloat(item.manutencao) || 0) - (parseFloat(item.manutencaoDebito) || 0);
+            });
+
+            document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
+            document.getElementById('total-renda-extra').innerText = formatarMoeda(totalRenda);
+            document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
+            document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
+            document.getElementById('total-guardado').innerText = formatarMoeda(totalGua);
+            document.getElementById('saldo-reserva-manutencao').innerText = formatarMoeda(totalManutLiq);
+
+            const resumoContainer = document.getElementById('ultimo-resumo-container');
+            if (dados.historico.length > 0) {
+                const ultimo = dados.historico[dados.historico.length - 1];
+                if (ultimo) {
+                    resumoContainer.classList.remove('hidden');
+                    document.getElementById('last-date').innerText = `${ultimo.data || ''}`;
+                    const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
+                    const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0);
+
+                    document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
+                    document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
+                }
+            } else {
+                resumoContainer.classList.add('hidden');
+            }
+
+            const tbody = document.getElementById('historico-body');
+            tbody.innerHTML = '';
+            if (dados.historico.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-gray-600 italic text-xs">Nenhum registro ativo neste mês</td></tr>';
+            } else {
+                [...dados.historico].reverse().forEach((item, index) => {
+                    if (!item) return;
+                    const idxReal = dados.historico.length - 1 - index;
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs';
+                    const sDia = parseFloat(item.saldoDia) || 0;
+                    const indPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
+                    tr.innerHTML = `
+                        <td class="p-3 text-white font-black">${item.data || ''}${indPlanilha}</td>
+                        <td class="p-3 font-bold ${sDia >= 0 ? 'text-green-500' : 'text-red-500'}">${formatarMoeda(sDia)}</td>
+                        <td class="p-3 text-right"><button onclick="abrirEdicao(${idxReal})" class="text-blue-400 font-bold border-2 border-blue-600 bg-blue-950 px-2.5 py-1 rounded-md text-xs">Ajustar</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const mContainer = document.getElementById('meses-anteriores-container');
+            const mVazios = document.getElementById('meses-vazios');
+            if (dados.mesesAnteriores.length === 0) {
+                mContainer.innerHTML = ''; mVazios.classList.remove('hidden');
+            } else {
+                mVazios.classList.add('hidden');
+                mContainer.innerHTML = dados.mesesAnteriores.map((mes, idx) => {
+                    if (!mes) return '';
+                    const faturamentoExibido = mes.faturamentoTotal || 0;
+                    const liquidoExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : 0;
+                    return `
+                    <div onclick="abrirResumoMesArquivado(${idx})" class="bg-gray-900 p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs cursor-pointer mb-2">
+                        <div>
+                            <h4 class="font-bold text-gray-300 uppercase text-[10px] tracking-wider">📅 ${mes.periodo || 'S/N'}</h4>
+                            <p class="text-gray-400 text-[10px] mt-0.5">Faturamento Total: <span class="text-green-400 font-bold">${formatarMoeda(faturamentoExibido)}</span></p>
+                        </div>
+                        <div class="text-right flex items-center gap-2" onclick="event.stopPropagation();">
+                            <div class="mr-1">
+                                <span class="text-[9px] text-gray-500 block uppercase font-bold">Fundo Líquido</span>
+                                <span class="font-bold text-blue-400">${formatarMoeda(liquidoExibido)}</span>
+                            </div>
+                            <button onclick="editarNomeMesAnterior(${idx})" class="text-gray-400 hover:text-white p-1 text-sm">✏️</button>
+                            <button onclick="deletarMesAnterior(${idx})" class="text-red-500 p-1 text-sm">🗑️</button>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            calcularReservaManutencaoDia();
+            verificarTravaDiaria();
+        }
+
+        function renderizarBaloesDinamicos() {
+            const input = document.getElementById('gasto-item-desc').value.trim().toUpperCase();
+            const container = document.getElementById('container-sugestoes');
+            container.innerHTML = '';
+
+            const listaParaFiltrar = dados.sugestoesGastos || [];
+            const baloesFiltrados = input.length === 0 ? listaParaFiltrar.slice(-6).reverse() : listaParaFiltrar.filter(p => p.includes(input));
+
+            baloesFiltrados.forEach(palavra => {
+                const span = document.createElement('span');
+                span.className = 'sugestao-tag';
+                span.innerText = palavra;
+                span.onclick = function() {
+                    document.getElementById('gasto-item-desc').value = palavra;
+                    container.innerHTML = '';
+                    document.getElementById('gasto-item-val').focus();
+                };
+                container.appendChild(span);
+            });
+        }
+
+        function abrirSubjanelaGastos() {
+            document.getElementById('modo-planilha-contexto').value = "principal";
+            document.getElementById('gasto-item-desc').value = '';
+            document.getElementById('gasto-item-val').value = '';
+            
+            const valorAtual = parseFloat(document.getElementById('pessoal').value) || 0;
+            if (valorAtual === 0) { itensGastosTemporarios = []; }
+            
+            document.getElementById('subjanela-gastos').classList.add('active');
+            renderizarBaloesDinamicos();
+            renderizarListaSubjanela();
+            setTimeout(() => document.getElementById('gasto-item-desc').focus(), 100);
+        }
+
+        function reabrirPlanilhaNoAjuste() {
+            if (lancamentoEmEdicao === null || !dados.historico[lancamentoEmEdicao]) return;
+            document.getElementById('modo-planilha-contexto').value = "ajuste";
+            const itemOriginal = dados.historico[lancamentoEmEdicao];
+            itensGastosTemporarios = Array.isArray(itemOriginal.detalheGastos) ? [...itemOriginal.detalheGastos] : [];
+            document.getElementById('modal-edicao').classList.remove('active');
+            document.getElementById('subjanela-gastos').classList.add('active');
+            renderizarBaloesDinamicos();
+            renderizarListaSubjanela();
+        }
+
+        function fecharSubjanelaGastos() {
+            document.getElementById('subjanela-gastos').classList.remove('active');
+            if (document.getElementById('modo-planilha-contexto').value === "ajuste") {
+                document.getElementById('modal-edicao').classList.add('active');
+            }
+        }
+
+        function adicionarItemNaLista() {
+            const descEl = document.getElementById('gasto-item-desc');
+            const valEl = document.getElementById('gasto-item-val');
+            const descricao = descEl.value.trim().toUpperCase();
+            const valor = parseFloat(valEl.value) || 0;
+
+            if (!descricao || valor <= 0) return;
+
+            itensGastosTemporarios.push({ descricao, valor });
+            descEl.value = ''; valEl.value = '';
+            renderizarBaloesDinamicos();
+            renderizarListaSubjanela();
+            descEl.focus();
+        }
+
+        function removerItemDaLista(index) {
+            itensGastosTemporarios.splice(index, 1);
+            renderizarListaSubjanela();
+        }
+
+        function renderizarListaSubjanela() {
+            const tBody = document.getElementById('lista-gastos-correntes-body');
+            tBody.innerHTML = '';
+            let total = 0;
+            itensGastosTemporarios.forEach((item, index) => {
+                total += parseFloat(item.valor) || 0;
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-gray-800 text-xs';
+                tr.innerHTML = `
+                    <td class="p-2 text-gray-300 uppercase">${item.descricao}</td>
+                    <td class="p-2 text-white font-bold">${formatarMoeda(item.valor)}</td>
+                    <td class="p-2 text-right"><button onclick="removerItemDaLista(${index})" class="text-red-500 font-bold px-1">✕</button></td>
+                `;
+                tBody.appendChild(tr);
+            });
+            document.getElementById('subjanela-total-acumulado').innerText = formatarMoeda(total);
+        }
+
+        function salvarSubjanelaGastos() {
+            let totalCalculado = 0;
+            itensGastosTemporarios.forEach(i => {
+                totalCalculado += parseFloat(i.valor) || 0;
+                if (dados.sugestoesGastos && !dados.sugestoesGastos.includes(i.descricao)) {
+                    dados.sugestoesGastos.push(i.descricao);
+                }
+            });
+            
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+
+            const contexto = document.getElementById('modo-planilha-contexto').value;
+            if (contexto === "ajuste") {
+                document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0';
+                if (lancamentoEmEdicao !== null && dados.historico[lancamentoEmEdicao]) {
+                    dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
+                }
+                document.getElementById('subjanela-gastos').classList.remove('active');
+                document.getElementById('modal-edicao').classList.add('active');
+            } else {
+                document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
+                document.getElementById('subjanela-gastos').classList.remove('active');
+            }
+        }
+
+        function salvarLancamento(event) {
+            const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
+            const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
+            const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
+            const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
+            
+            const manutencaoCredito = parseFloat(document.getElementById('manutencao').value) || 0;
+            const manutencaoDebito = debitoManutencaoTemporario.valor || 0;
+            
+            const guardado = parseFloat(document.getElementById('guardado-valor').value) || 0;
+            const guardadoResgate = parseFloat(document.getElementById('guardado-resgate').value) || 0;
+
+            const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal;
+
+            const dataHojeCompleta = obtenerDataHoje();
+            const dataDiaMesCurta = dataHojeCompleta.substring(0, 5);
+
+            dados.historico.push({
+                data: dataDiaMesCurta,
+                faturamento, rendaExtra, gasolina, pessoal, 
+                manutencao: manutencaoCredito,
+                manutencaoDebito: manutencaoDebito,
+                manutencaoDesc: debitoManutencaoTemporario.descricao,
+                guardado,
+                guardadoResgate,
+                saldoDia,
+                detalheGastos: [...itensGastosTemporarios],
+                timestamp: new Date().getTime()
+            });
+
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+
+            ['faturamento', 'renda-extra', 'gasolina', 'pessoal', 'manutencao', 'guardado-valor', 'guardado-resgate'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            itensGastosTemporarios = [];
+            debitoManutencaoTemporario = { valor: 0, descricao: '' };
+            const btnDebito = document.getElementById('btn-debito-manutencao');
+            if (btnDebito) {
+                btnDebito.innerText = '🛠️ Detalhar';
+                btnDebito.className = 'w-full h-[52px] bg-orange-950 hover:bg-orange-900 border-2 border-orange-600 text-white font-bold text-xs rounded-xl uppercase flex items-center justify-center gap-1';
+            }
+
+            atualizarUI();
+        }
+
+        function auditarCategoria(propriedade, nomeExibicao) {
+            const tituloEl = document.getElementById('auditoria-titulo');
+            const subtituloEl = document.getElementById('auditoria-subtitulo');
+            const headEl = document.getElementById('auditoria-head');
+            const tbodyEl = document.getElementById('lista-auditoria-body');
+            const totalEl = document.getElementById('auditoria-total-acumulado');
+            
+            tituloEl.innerText = `Conferência: ${nomeExibicao}`;
+            tbodyEl.innerHTML = '';
+            let acumuloTotal = 0;
+
+            if (propriedade === 'pessoal') {
+                subtituloEl.innerText = "Descritivo acumulado por item neste mês";
+                headEl.innerHTML = `<tr><th class="p-2.5">Item</th><th class="p-2.5 text-right">Total</th></tr>`;
+                let mapaItens = {};
+
+                dados.historico.forEach(item => {
+                    if (item && Array.isArray(item.detalheGastos)) {
+                        item.detalheGastos.forEach(g => {
+                            if (g && g.descricao) {
+                                const descUpper = g.descricao.toUpperCase();
+                                mapaItens[descUpper] = (mapaItens[descUpper] || 0) + (parseFloat(g.valor) || 0);
+                            }
+                        });
+                    }
+                });
+
+                Object.keys(mapaItens).forEach(desc => {
+                    acumuloTotal += mapaItens[desc];
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs linha-auditoria-clicavel';
+                    tr.innerHTML = `<td class="p-2.5 uppercase font-bold text-gray-300">${desc}</td><td class="p-2.5 text-right font-black text-red-400">${formatarMoeda(mapaItens[desc])}</td>`;
+                    tr.onclick = () => abrirDetalheGastos(desc);
+                    tbodyEl.appendChild(tr);
+                });
+            } else if (propriedade === 'manutencaoLiquida') {
+                subtituloEl.innerText = "Lançamentos de Manutenção do Período";
+                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5">Movimento</th><th class="p-2.5 text-right">Valor</th></tr>`;
+                dados.historico.forEach(item => {
+                    if (!item) return;
+                    const c = parseFloat(item.manutencao) || 0;
+                    const d = parseFloat(item.manutencaoDebito) || 0;
+                    if (c > 0) {
+                        acumuloTotal += c;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data || ''}</td><td class="p-2.5 text-green-400 font-bold">CRÉDITO (+)</td><td class="p-2.5 text-right font-bold text-green-400">+${formatarMoeda(c)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                    if (d > 0) {
+                        acumuloTotal -= d;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data || ''}</td><td class="p-2.5 text-red-400 font-bold">DÉBITO (-)</td><td class="p-2.5 text-right font-bold text-red-400">-${formatarMoeda(d)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                });
+            } else if (propriedade === 'guardadoLiquido') {
+                subtituloEl.innerText = "Movimentação Dinheiro Guardado";
+                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5">Tipo</th><th class="p-2.5 text-right">Valor</th></tr>`;
+                dados.historico.forEach(item => {
+                    if (!item) return;
+                    const g = parseFloat(item.guardado) || 0;
+                    const r = parseFloat(item.guardadoResgate) || 0;
+                    if (g > 0) {
+                        acumuloTotal += g;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data || ''}</td><td class="p-2.5 text-emerald-400 font-bold">APORTE (+)</td><td class="p-2.5 text-right font-bold text-emerald-400">+${formatarMoeda(g)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                    if (r > 0) {
+                        acumuloTotal -= r;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data || ''}</td><td class="p-2.5 text-blue-400 font-bold">RESGATE (-)</td><td class="p-2.5 text-right font-bold text-blue-400">-${formatarMoeda(r)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                });
+            } else {
+                subtituloEl.innerText = "Lançamentos por dia";
+                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
+                dados.historico.forEach(item => {
+                    if (!item) return;
+                    const v = parseFloat(item[propriedade]) || 0;
+                    if (v > 0) {
+                        acumuloTotal += v;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-t border-gray-800 text-xs';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data || ''}</td><td class="p-2.5 text-right font-bold">${formatarMoeda(v)}</td>`;
+                        tbodyEl.appendChild(tr);
+                    }
+                });
+            }
+            totalEl.innerText = formatarMoeda(acumuloTotal);
+            document.getElementById('subjanela-auditoria').classList.add('active');
+        }
+
+        function fecharSubjanelaAuditoria() { document.getElementById('subjanela-auditoria').classList.remove('active'); }
+
+        function abrirDetalheGastos(nomeItem) {
+            document.getElementById('item-detalhe-selecionado').value = nomeItem;
+            document.getElementById('detalhe-titulo').innerText = `Detalhes: ${nomeItem}`;
+            
+            const tbodyEl = document.getElementById('detalhe-gastos-body');
+            tbodyEl.innerHTML = '';
+            let totalItem = 0;
+            
+            dados.historico.forEach(item => {
+                if (item && Array.isArray(item.detalheGastos)) {
+                    item.detalheGastos.forEach(g => {
+                        if (g && g.descricao && g.descricao.toUpperCase() === nomeItem.toUpperCase()) {
+                            totalItem += parseFloat(g.valor) || 0;
+                            const tr = document.createElement('tr');
+                            tr.className = 'border-t border-gray-800 text-xs';
+                            tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data || ''}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(g.valor)}</td>`;
+                            tbodyEl.appendChild(tr);
+                        }
+                    });
+                }
+            });
+            
+            document.getElementById('detalhe-total-acumulado').innerText = formatarMoeda(totalItem);
+            document.getElementById('subjanela-auditoria').classList.remove('active');
+            document.getElementById('modal-detalhe-gastos').classList.add('active');
+        }
+
+        function fecharDetalheGastos() { document.getElementById('modal-detalhe-gastos').classList.remove('active'); }
+        function voltarParaAuditoria() {
+            document.getElementById('modal-detalhe-gastos').classList.remove('active');
+            document.getElementById('subjanela-auditoria').classList.add('active');
+        }
+
+        function abrirFecharMes() {
+            if (dados.historico.length === 0) { alert('Histórico atual está vazio.'); return; }
+            const primeiroValido = dados.historico.find(i => i && i.data);
+            const dPartida = primeiroValido ? primeiroValido.data.split('/') : ['01', '01', '2026'];
+            const mesesStr = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+            let idxMes = (parseInt(dPartida[1]) || 1) - 1;
+            
+            document.getElementById('input-nome-mes-fechamento').value = `${mesesStr[idxMes] || 'MÊS'} DE 2026`;
+            document.getElementById('modal-fechar-mes').classList.add('active');
+        }
+        function fecharModalMes() { document.getElementById('modal-fechar-mes').classList.remove('active'); }
+
+        function confirmarFecharMes() {
+            const labelMes = document.getElementById('input-nome-mes-fechamento').value.trim().toUpperCase();
+            if (!labelMes) { alert('Digite um nome para o período.'); return; }
+
+            try {
+                const backupDataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+                const gatilhoDownload = document.createElement('a');
+                gatilhoDownload.setAttribute("href", backupDataStr);
+                gatilhoDownload.setAttribute("download", `FECHADO_${labelMes.replace(/ /g, '_')}.txt`);
+                gatilhoDownload.click();
+            } catch (err) { console.error(err); }
+
+            let fat = 0, renda = 0, gas = 0, man = 0, pes = 0, gua = 0;
+            let descritivoCompilado = {};
+
+            dados.historico.forEach(item => {
+                if (!item) return;
+                fat += parseFloat(item.faturamento) || 0;
+                renda += parseFloat(item.rendaExtra) || 0;
+                gas += parseFloat(item.gasolina) || 0;
+                man += (parseFloat(item.manutencao) || 0) - (parseFloat(item.manutencaoDebito) || 0);
+                pes += parseFloat(item.pessoal) || 0;
+                gua += (parseFloat(item.guardado) || 0) - (parseFloat(item.guardadoResgate) || 0);
+
+                if (Array.isArray(item.detalheGastos)) {
+                    item.detalheGastos.forEach(g => {
+                        if (g && g.descricao) {
+                            const dUpper = g.descricao.toUpperCase();
+                            descritivoCompilado[dUpper] = (descritivoCompilado[dUpper] || 0) + (parseFloat(g.valor) || 0);
+                        }
+                    });
+                }
+            });
+
+            let listaDescritivoFinal = Object.keys(descritivoCompilado).map(k => ({
+                descricao: k, valor: descritivoCompilado[k]
+            }));
+
+            const saldoFinalNoMes = (fat + renda) - gas - pes;
+
+            dados.mesesAnteriores.push({
+                periodo: labelMes,
+                faturamentoTotal: fat, rendaExtraTotal: renda, pessoalTotal: pes, guardadoTotal: gua,
+                saldoFinalNoMes,
+                descritivoGastos: listaDescritivoFinal,
+                historico: [...dados.historico]
+            });
+
+            dados.historico = [];
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalMes(); 
+            atualizarUI();
+        }
+
+        function abrirResumoMesArquivado(index) {
+            const mes = dados.mesesAnteriores[index];
+            if (!mes) return;
+            document.getElementById('mes-arq-titulo').innerText = mes.periodo || 'Mês Arquivado';
+            
+            const fatExibido = mes.faturamentoTotal !== undefined ? mes.faturamentoTotal : (mes.totalFaturamento || 0);
+            const rendaExibida = mes.rendaExtraTotal || 0;
+            const liqExibido = mes.saldoFinalNoMes !== undefined ? mes.saldoFinalNoMes : (mes.saldoFinal || 0);
+            
+            document.getElementById('mes-arq-fat').innerText = formatarMoeda(fatExibido);
+            document.getElementById('mes-arq-renda').innerText = formatarMoeda(rendaExibida);
+            
+            let gas = 0, man = 0, gua = 0;
+            if (Array.isArray(mes.historico)) {
+                mes.historico.forEach(h => {
+                    if (!h) return;
+                    gas += parseFloat(h.gasolina) || 0;
+                    man += (parseFloat(h.manutencao) || 0) - (parseFloat(h.manutencaoDebito) || 0);
+                    gua += (parseFloat(h.guardado) || 0) - (parseFloat(h.guardadoResgate) || 0);
+                });
+            }
+
+            document.getElementById('mes-arq-gas').innerText = formatarMoeda(gas);
+            document.getElementById('mes-arq-manut').innerText = formatarMoeda(man);
+            document.getElementById('mes-arq-guardado').innerText = formatarMoeda(gua);
+            document.getElementById('mes-arq-pessoal').innerText = formatarMoeda(mes.pessoalTotal || mes.pessoal || 0);
+            document.getElementById('mes-arq-saldo-final').innerText = formatarMoeda(liqExibido);
+
+            const container = document.getElementById('mes-arq-descritivo-container');
+            container.innerHTML = '';
+            
+            const listaDeGastos = mes.descritivoGastos || [];
+            if (listaDeGastos.length > 0) {
+                listaDeGastos.forEach(g => {
+                    if (g) {
+                        container.innerHTML += `<div class="flex justify-between py-0.5 border-b border-gray-900"><span class="uppercase">${g.descricao}</span><span class="font-bold text-red-400">${formatarMoeda(g.valor)}</span></div>`;
+                    }
+                });
+            } else {
+                container.innerHTML = `<div class="text-gray-600 text-[10px] italic text-center">Sem descritivo de gastos detalhado.</div>`;
+            }
+
+            document.getElementById('subjanela-mes-aquivado').classList.add('active');
+        }
+
+        function fecharSubjanelaMesArquivado() { document.getElementById('subjanela-mes-aquivado').classList.remove('active'); }
+
+        function editarNomeMesAnterior(index) {
+            if (!dados.mesesAnteriores[index]) return;
+            const novoNome = prompt("Ajustar nome do período arquivado:", dados.mesesAnteriores[index].periodo);
+            if (novoNome && novoNome.trim() !== "") {
+                dados.mesesAnteriores[index].periodo = novoNome.trim().toUpperCase();
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+
+        function abrirEdicao(index) {
+            lancamentoEmEdicao = index; 
+            const item = dados.historico[index];
+            if (!item) return;
+
+            document.getElementById('edit-data').value = item.data || '';
+            document.getElementById('edit-faturamento').value = item.faturamento || 0;
+            document.getElementById('edit-renda-extra').value = item.rendaExtra || 0;
+            document.getElementById('edit-gasolina').value = item.gasolina || 0;
+            document.getElementById('edit-pessoal').value = item.pessoal || 0;
+            document.getElementById('edit-manutencao').value = item.manutencao || 0;
+            document.getElementById('edit-manutencao-debito').value = item.manutencaoDebito || 0;
+            document.getElementById('edit-guardado').value = item.guardado || 0;
+            document.getElementById('edit-guardado-resgate').value = item.guardadoResgate || 0;
+            document.getElementById('modal-edicao').classList.add('active');
+        }
+        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
+        
+        function salvarEdicao() {
+            if (lancamentoEmEdicao === null || !dados.historico[lancamentoEmEdicao]) return;
+            const item = dados.historico[lancamentoEmEdicao];
+            item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
+            item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
+            item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
+            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
+            item.manutencao = parseFloat(document.getElementById('edit-manutencao').value) || 0;
+            item.manutencaoDebito = parseFloat(document.getElementById('edit-manutencao-debito').value) || 0;
+            item.guardado = parseFloat(document.getElementById('edit-guardado').value) || 0;
+            item.guardadoResgate = parseFloat(document.getElementById('edit-guardado-resgate').value) || 0;
+            
+            item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal;
+            
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModal(); atualizarUI();
+        }
+        function deletarLancamento() {
+            if (confirm('Deletar registro deste dia?')) {
+                dados.historico.splice(lancamentoEmEdicao, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                fecharModal(); atualizarUI();
+            }
+        }
+        function deletarMesAnterior(index) {
+            if (confirm('Deseja realmente excluir este mês arquivado?')) {
+                dados.mesesAnteriores.splice(index, 1);
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+        function limparDados() {
+            if (confirm('Zerar o aplicativo inteiro?')) {
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [] };
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                atualizarUI();
+            }
+        }
+        
+        function exportarBackup() {
+            const agora = new Date();
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const ano = agora.getFullYear();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutes = String(agora.getMinutes()).padStart(2, '0');
+            const dataHoraFormatada = `${dia}-${mes}-${ano}_${horas}h${minutes}`;
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `backup_financeiro_${dataHoraFormatada}.txt`); dl.click();
+        }
+        
+        function importarBackup(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                try {
+                    const backupBruto = JSON.parse(reader.result);
+                    if (backupBruto && typeof backupBruto === 'object') {
+                        localStorage.removeItem('financeiro_pro');
+                        dados = backupBruto;
+                        if (!Array.isArray(dados.historico)) dados.historico = [];
+                        if (!Array.isArray(dados.mesesAnteriores)) dados.mesesAnteriores = [];
+                        if (!Array.isArray(dados.sugestoesGastos)) dados.sugestoesGastos = [];
+                        localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                        atualizarUI();
+                        alert('Backup restaurado com sucesso!');
+                    } else { alert('Formato de arquivo inválido.'); }
+                } catch (e) { alert('Erro no arquivo de backup.'); }
+            };
+            if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
+        }
+
+        function abrirModalDebitoManutencao() {
+            document.getElementById('debito-manut-valor').value = debitoManutencaoTemporario.valor || '';
+            document.getElementById('debito-manut-desc').value = debitoManutencaoTemporario.descricao || '';
+            document.getElementById('modal-debito-manutencao').classList.add('active');
+        }
+
+        function fecharModalDebitoManutencao() {
+            document.getElementById('modal-debito-manutencao').classList.remove('active');
+        }
+
+        function confirmarDebitoManutencaoNaTela() {
+            const valor = parseFloat(document.getElementById('debito-manut-valor').value) || 0;
+            const descricao = document.getElementById('debito-manut-desc').value.trim();
+
+            debitoManutencaoTemporario = { valor, descricao };
+
+            const btn = document.getElementById('btn-debito-manutencao');
+            if (btn) {
+                if (valor > 0) {
+                    btn.innerText = `🛠️ R$ ${valor.toFixed(2)}`;
+                    btn.className = "w-full h-[52px] bg-red-950 hover:bg-red-900 border-2 border-red-600 text-white font-bold text-xs rounded-xl uppercase flex items-center justify-center gap-1";
+                } else {
+                    btn.innerText = "🛠️ Detalhar";
+                    btn.className = "w-full h-[52px] bg-orange-950 hover:bg-orange-900 border-2 border-orange-600 text-white font-bold text-xs rounded-xl uppercase flex items-center justify-center gap-1";
+                }
+            }
+
+            fecharModalDebitoManutencao();
+            calcularReservaManutencaoDia();
+        }
+
+        atualizarUI();
+    </script>
 </body>
 </html>
