@@ -40,6 +40,7 @@
             padding: 0.75rem;
             border-radius: 1rem;
             width: 100%;
+            height: 52px;
         }
         .input-autonomo:focus {
             outline: none;
@@ -54,6 +55,7 @@
             padding: 0.75rem;
             border-radius: 1rem;
             width: 100%;
+            height: 52px;
             cursor: not-allowed;
         }
         .modal-overlay {
@@ -112,15 +114,18 @@
             <div id="saldo-total" class="text-4xl font-black text-green-500">R$ 0,00</div>
         </div>
         
-        <!-- CARDS DE SALDO FIXOS (Manutenção removida, restando 2 colunas) -->
+        <!-- CARDS DE SALDO FIXOS -->
         <div class="grid grid-cols-2 gap-2">
-            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl">
-                <span class="block text-[8px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Reservar Dinheiro</span>
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl flex flex-col justify-between items-center relative">
+                <span class="block text-[8px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Dinheiro Reservado</span>
                 <span id="saldo-guardado-investimento" class="text-sm font-black text-emerald-400">R$ 0,00</span>
+                <button onclick="abrirModalTransferencia()" class="mt-2 bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[9px] py-1 px-2 rounded-lg uppercase tracking-wider w-full">
+                    ⇄ Resgatar
+                </button>
             </div>
-            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl">
+            <div class="bg-gray-900 border-2 border-gray-800 p-2 rounded-2xl flex flex-col justify-between items-center">
                 <span class="block text-[8px] text-blue-400 font-bold uppercase tracking-wider mb-1">Disponível</span>
-                <span id="saldo-disponivel" class="text-sm font-black text-blue-400">R$ 0,00</span>
+                <span id="saldo-disponivel" class="text-sm font-black text-blue-400 my-auto">R$ 0,00</span>
             </div>
         </div>
     </header>
@@ -146,29 +151,29 @@
 
     <!-- FORMULÁRIO PRINCIPAL -->
     <div class="space-y-4 bg-gray-900 p-4 rounded-2xl border-2 border-gray-800 shadow-xl">
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Faturamento</label>
+        <div class="grid grid-cols-2 gap-3 items-start">
+            <div class="flex flex-col">
+                <label class="block text-xs font-black text-white mb-1.5 ml-1 uppercase tracking-wide h-4">Faturamento</label>
                 <input type="number" id="faturamento" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
-            <div>
-                <label class="block text-xs font-black text-green-400 mb-1 ml-1 uppercase tracking-wide">Renda Extra (+)</label>
+            <div class="flex flex-col">
+                <label class="block text-xs font-black text-green-400 mb-1.5 ml-1 uppercase tracking-wide h-4 truncate">Renda Extra (+)</label>
                 <input type="number" id="renda-extra" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-xs font-black text-white mb-1 ml-1 uppercase tracking-wide">Combustível</label>
+        <div class="grid grid-cols-2 gap-3 items-start">
+            <div class="flex flex-col">
+                <label class="block text-xs font-black text-white mb-1.5 ml-1 uppercase tracking-wide h-4">Combustível</label>
                 <input type="number" id="gasolina" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
-            <div>
-                <label class="block text-xs font-black text-emerald-400 mb-1 ml-1 uppercase tracking-wide">Reservar Dinheiro (+)</label>
+            <div class="flex flex-col">
+                <label class="block text-xs font-black text-emerald-400 mb-1.5 ml-1 uppercase tracking-wide h-4 truncate">Reservar Dinheiro (+)</label>
                 <input type="number" id="guardado-valor" inputmode="decimal" placeholder="0,00" class="input-autonomo">
             </div>
         </div>
 
-        <!-- DESPESAS (ANTIGOS GASTOS PESSOAIS) -->
+        <!-- DESPESAS -->
         <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 space-y-2">
             <div class="flex justify-between items-center">
                 <label class="block text-xs font-black text-red-400 uppercase tracking-wide ml-1">Despesas (-)</label>
@@ -193,7 +198,7 @@
             <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400">R$ 0,00</span></div>
             <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400">R$ 0,00</span></div>
             <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('guardadoLiquido', 'Reservar Dinheiro')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Reservar Dinheiro</span><span id="total-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('guardadoLiquido', 'Dinheiro Reservado')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Dinheiro Reservado</span><span id="total-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
             <div onclick="auditarCategoria('pessoal', 'Despesas')" class="bg-gray-800 p-2 rounded-xl cursor-pointer col-span-2"><span class="block text-[9px] text-white font-bold uppercase">Despesas</span><span id="total-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
         </div>
         <button onclick="abrirFecharMes()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider">
@@ -230,7 +235,7 @@
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
     </div>
 
-    <!-- PLANILHA DE DESPESAS (COM CAMPO DE CATEGORIA) -->
+    <!-- PLANILHA DE DESPESAS (CATEGORIAS DINÂMICAS) -->
     <div id="subjanela-gastos" class="modal-overlay">
         <div class="modal-content space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -242,19 +247,12 @@
                 <div class="space-y-2">
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-white mb-1">Categoria</label>
-                        <select id="gasto-item-cat" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs font-bold">
-                            <option value="ALIMENTAÇÃO">Alimentação</option>
-                            <option value="VEÍCULO">Veículo</option>
-                            <option value="PESSOAL">Pessoal</option>
-                            <option value="MORADIA">Moradia</option>
-                            <option value="LAZER">Lazer</option>
-                            <option value="SAÚDE">Saúde</option>
-                            <option value="OUTROS">Outros</option>
-                        </select>
+                        <select id="gasto-item-cat" onchange="verificarSelecaoCategoria()" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs font-bold"></select>
+                        <input type="text" id="nova-cat-input" placeholder="Digite o nome da nova categoria" class="hidden w-full bg-gray-800 border border-blue-500 p-2 rounded-lg text-white text-xs mt-2 uppercase">
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-white mb-1">Descrição</label>
-                        <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Padaria" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
+                        <input type="text" id="gasto-item-desc" oninput="renderizarBaloesDinamicos()" placeholder="Ex: Mercado, Almoço" class="w-full bg-gray-800 border border-gray-700 p-2 rounded-lg text-white text-xs">
                         <div id="container-sugestoes" class="mt-2 flex flex-wrap max-h-24 overflow-y-auto pt-1"></div>
                     </div>
                     <div>
@@ -289,6 +287,22 @@
             <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
                 💾 Confirmar e Enviar para a Tela
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE RESGATE / TRANSFERÊNCIA -->
+    <div id="modal-transferencia" class="modal-overlay">
+        <div class="modal-content space-y-3">
+            <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider border-b border-gray-700 pb-2">Transferir Dinheiro</h3>
+            <p class="text-xs text-gray-300 leading-tight">Retirar do <strong class="text-emerald-400">Dinheiro Reservado</strong> para disponibilizar em <strong class="text-blue-400">Disponível</strong>.</p>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Valor do Resgate (R$):</label>
+                <input type="number" id="valor-resgate-input" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
+                <button onclick="confirmarResgate()" class="bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl text-white uppercase">Confirmar</button>
+                <button onclick="fecharModalTransferencia()" class="bg-gray-700 py-3 rounded-xl text-gray-300 uppercase">Cancelar</button>
+            </div>
         </div>
     </div>
 
@@ -363,7 +377,7 @@
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Faturamento:</span><span id="mes-arq-fat" class="font-bold text-green-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Reservar Dinheiro:</span><span id="mes-arq-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Dinheiro Reservado:</span><span id="mes-arq-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
                 <div class="flex justify-between py-1"><span class="text-gray-400">Despesas Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
             </div>
 
@@ -457,11 +471,14 @@
             });
         }
 
+        const CATEGORIAS_PADRAO = ["PESSOAL", "MANUTENÇÃO", "MERCADO", "FARMÁCIA", "OUTRO"];
+
         const BACKUP_INTERNO_CONSOLIDADO = {
             "saldoAcumulado": 0,
             "historico": [],
             "mesesAnteriores": [],
-            "sugestoesGastos": ["MERCADO", "PADARIA", "COMBUSTÍVEL", "FARMÁCIA"]
+            "sugestoesGastos": ["MERCADO", "PADARIA", "COMBUSTÍVEL", "FARMÁCIA"],
+            "categoriasCustomizadas": ["PESSOAL", "MANUTENÇÃO", "MERCADO", "FARMÁCIA", "OUTRO"]
         };
 
         let dados = JSON.parse(localStorage.getItem('financeiro_pro'));
@@ -469,6 +486,10 @@
         if (!dados || !dados.historico) {
             dados = JSON.parse(JSON.stringify(BACKUP_INTERNO_CONSOLIDADO));
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+        }
+
+        if (!dados.categoriasCustomizadas) {
+            dados.categoriasCustomizadas = [...CATEGORIAS_PADRAO];
         }
         
         let itensGastosTemporarios = [];
@@ -480,6 +501,34 @@
 
         function obtenerDataHoje() {
             return new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+        }
+
+        function carregarOpcoesCategorias() {
+            const select = document.getElementById('gasto-item-cat');
+            select.innerHTML = '';
+            
+            dados.categoriasCustomizadas.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.toUpperCase();
+                opt.innerText = cat;
+                select.appendChild(opt);
+            });
+
+            const optNova = document.createElement('option');
+            optNova.value = "CADASTRAR_NOVA";
+            optNova.innerText = "+ Cadastrar Nova";
+            select.appendChild(optNova);
+        }
+
+        function verificarSelecaoCategoria() {
+            const select = document.getElementById('gasto-item-cat');
+            const inputNova = document.getElementById('nova-cat-input');
+            if (select.value === "CADASTRAR_NOVA") {
+                inputNova.classList.remove('hidden');
+                inputNova.focus();
+            } else {
+                inputNova.classList.add('hidden');
+            }
         }
 
         function verificarTravaDiaria() {
@@ -528,7 +577,7 @@
                 }
             });
 
-            // Dinheiro Guardado (Aportes)
+            // Dinheiro Guardado (Aportes e Resgates)
             let totalDinheiroGuardado = 0;
             dados.historico.forEach(item => { 
                 totalDinheiroGuardado += (parseFloat(item.guardado) || 0); 
@@ -633,6 +682,40 @@
             verificarTravaDiaria();
         }
 
+        function abrirModalTransferencia() {
+            document.getElementById('valor-resgate-input').value = '';
+            document.getElementById('modal-transferencia').classList.add('active');
+        }
+
+        function fecharModalTransferencia() {
+            document.getElementById('modal-transferencia').classList.remove('active');
+        }
+
+        function confirmarResgate() {
+            const valor = parseFloat(document.getElementById('valor-resgate-input').value) || 0;
+            if (valor <= 0) {
+                alert('Digite um valor válido para resgate.');
+                return;
+            }
+
+            const dataHoje = obtenerDataHoje().substring(0, 5);
+            dados.historico.push({
+                data: dataHoje,
+                faturamento: 0,
+                rendaExtra: 0,
+                gasolina: 0,
+                pessoal: 0,
+                guardado: -valor,
+                saldoDia: 0,
+                detalheGastos: [],
+                timestamp: new Date().getTime()
+            });
+
+            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+            fecharModalTransferencia();
+            atualizarUI();
+        }
+
         function renderizarBaloesDinamicos() {
             const input = document.getElementById('gasto-item-desc').value.trim().toUpperCase();
             const container = document.getElementById('container-sugestoes');
@@ -655,6 +738,8 @@
         }
 
         function abrirSubjanelaGastos() {
+            carregarOpcoesCategorias();
+            document.getElementById('nova-cat-input').classList.add('hidden');
             document.getElementById('modo-planilha-contexto').value = "principal";
             document.getElementById('gasto-item-desc').value = '';
             document.getElementById('gasto-item-val').value = '';
@@ -669,6 +754,8 @@
 
         function reabrirPlanilhaNoAjuste() {
             if (lancamentoEmEdicao === null) return;
+            carregarOpcoesCategorias();
+            document.getElementById('nova-cat-input').classList.add('hidden');
             document.getElementById('modo-planilha-contexto').value = "ajuste";
             const itemOriginal = dados.historico[lancamentoEmEdicao];
             itensGastosTemporarios = itemOriginal.detalheGastos ? [...itemOriginal.detalheGastos] : [];
@@ -686,10 +773,24 @@
         }
 
         function adicionarItemNaLista() {
-            const catEl = document.getElementById('gasto-item-cat');
+            const selectCat = document.getElementById('gasto-item-cat');
+            const inputNovaCat = document.getElementById('nova-cat-input');
             const descEl = document.getElementById('gasto-item-desc');
             const valEl = document.getElementById('gasto-item-val');
-            const categoria = catEl.value;
+            
+            let categoria = selectCat.value;
+            if (categoria === "CADASTRAR_NOVA") {
+                categoria = inputNovaCat.value.trim().toUpperCase();
+                if (!categoria) {
+                    alert('Digite o nome da nova categoria.');
+                    return;
+                }
+                if (!dados.categoriasCustomizadas.includes(categoria)) {
+                    dados.categoriasCustomizadas.push(categoria);
+                    localStorage.setItem('financeiro_pro', JSON.stringify(dados));
+                }
+            }
+
             const descricao = descEl.value.trim().toUpperCase();
             const valor = parseFloat(valEl.value) || 0;
 
@@ -697,6 +798,12 @@
 
             itensGastosTemporarios.push({ categoria, descricao, valor });
             descEl.value = ''; valEl.value = '';
+            
+            carregarOpcoesCategorias();
+            selectCat.value = categoria;
+            inputNovaCat.value = '';
+            inputNovaCat.classList.add('hidden');
+
             renderizarBaloesDinamicos();
             renderizarListaSubjanela();
             descEl.focus();
@@ -716,7 +823,7 @@
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800 text-xs';
                 tr.innerHTML = `
-                    <td class="p-2 text-gray-400 font-bold uppercase text-[10px]">${item.categoria || 'OUTROS'}</td>
+                    <td class="p-2 text-gray-400 font-bold uppercase text-[10px]">${item.categoria || 'OUTRO'}</td>
                     <td class="p-2 text-gray-300 uppercase">${item.descricao}</td>
                     <td class="p-2 text-white font-bold">${formatarMoeda(item.valor)}</td>
                     <td class="p-2 text-right"><button onclick="removerItemDaLista(${index})" class="text-red-500 font-bold px-1">✕</button></td>
@@ -758,7 +865,6 @@
             const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
             const guardado = parseFloat(document.getElementById('guardado-valor').value) || 0;
 
-            // Saldo líquido do dia
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal;
 
             const dataHojeCompleta = obtenerDataHoje();
@@ -802,7 +908,7 @@
                 dados.historico.forEach(item => {
                     if (item.detalheGastos) {
                         item.detalheGastos.forEach(g => {
-                            const cat = g.categoria || 'OUTROS';
+                            const cat = g.categoria || 'OUTRO';
                             const descUpper = g.descricao.toUpperCase();
                             const chave = `[${cat}] ${descUpper}`;
                             mapaItens[chave] = (mapaItens[chave] || 0) + parseFloat(g.valor);
@@ -819,15 +925,17 @@
                     tbodyEl.appendChild(tr);
                 });
             } else if (propriedade === 'guardadoLiquido') {
-                subtituloEl.innerText = "Movimentação Reservar Dinheiro";
+                subtituloEl.innerText = "Movimentação Dinheiro Reservado";
                 headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5">Tipo</th><th class="p-2.5 text-right">Valor</th></tr>`;
                 dados.historico.forEach(item => {
                     const g = parseFloat(item.guardado) || 0;
-                    if (g > 0) {
+                    if (g !== 0) {
                         acumuloTotal += g;
                         const tr = document.createElement('tr');
                         tr.className = 'border-t border-gray-800 text-xs';
-                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-emerald-400 font-bold">APORTE (+)</td><td class="p-2.5 text-right font-bold text-emerald-400">+${formatarMoeda(g)}</td>`;
+                        const tipoLabel = g > 0 ? 'APORTE (+)' : 'RESGATE (-)';
+                        const corClasse = g > 0 ? 'text-emerald-400' : 'text-blue-400';
+                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 ${corClasse} font-bold">${tipoLabel}</td><td class="p-2.5 text-right font-bold ${corClasse}">${formatarMoeda(g)}</td>`;
                         tbodyEl.appendChild(tr);
                     }
                 });
@@ -862,7 +970,7 @@
             dados.historico.forEach(item => {
                 if (item.detalheGastos) {
                     item.detalheGastos.forEach(g => {
-                        const cat = g.categoria || 'OUTROS';
+                        const cat = g.categoria || 'OUTRO';
                         const descUpper = g.descricao.toUpperCase();
                         const chave = `[${cat}] ${descUpper}`;
                         
@@ -923,7 +1031,7 @@
 
                 if (item.detalheGastos) {
                     item.detalheGastos.forEach(g => {
-                        const cat = g.categoria || 'OUTROS';
+                        const cat = g.categoria || 'OUTRO';
                         const dUpper = g.descricao.toUpperCase();
                         const chave = `[${cat}] ${dUpper}`;
                         descritivoCompilado[chave] = (descritivoCompilado[chave] || 0) + parseFloat(g.valor);
@@ -1043,7 +1151,7 @@
         }
         function limparDados() {
             if (confirm('Zerar o aplicativo inteiro?')) {
-                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [] };
+                dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [], categoriasCustomizadas: [...CATEGORIAS_PADRAO] };
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
@@ -1071,6 +1179,9 @@
                     if (backupBruto && (backupBruto.historico || backupBruto.mesesAnteriores)) {
                         localStorage.removeItem('financeiro_pro');
                         dados = backupBruto;
+                        if (!dados.categoriasCustomizadas) {
+                            dados.categoriasCustomizadas = [...CATEGORIAS_PADRAO];
+                        }
                         localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                         atualizarUI();
                         alert('Backup restaurado com sucesso!');
