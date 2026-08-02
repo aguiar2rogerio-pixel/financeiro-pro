@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gerenciador Financeiro</title>
     <link rel="manifest" href="manifest.json">
-    <theme-color content="#0f172a">
     <style>
         :root {
             --bg-principal: #0f172a;
@@ -23,11 +22,14 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-principal); color: var(--texto-principal); padding: 12px; padding-bottom: 30px; }
+        body { background-color: var(--bg-principal); color: var(--texto-principal); padding: 12px; padding-bottom: 40px; }
 
         .container { max-width: 480px; margin: 0 auto; }
 
-        /* CABEÇALHO / CARDS */
+        /* TOPO E CONFIG */
+        .top-bar-config { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+        .btn-config { background: none; border: none; color: var(--texto-secundario); font-size: 1.2rem; cursor: pointer; }
+
         .header-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -36,10 +38,10 @@
             text-align: center;
             margin-bottom: 12px;
         }
-        .header-card .label { font-size: 0.8rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.5px; }
+        .header-card .label { font-size: 0.75rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.5px; }
         .header-card .valor { font-size: 1.8rem; font-weight: bold; margin-top: 4px; color: var(--verde-ganho); }
 
-        .top-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .top-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .mini-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -49,6 +51,19 @@
         }
         .mini-card .label { font-size: 0.75rem; color: var(--texto-secundario); }
         .mini-card .valor { font-size: 1.1rem; font-weight: bold; margin-top: 2px; }
+
+        /* ÚLTIMO REGISTRO */
+        .card-ultimo-registro {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--raio-borda);
+            padding: 10px 14px;
+            margin-bottom: 16px;
+        }
+        .ultimo-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--texto-secundario); font-weight: bold; margin-bottom: 6px; }
+        .ultimo-valores { display: flex; justify-content: space-around; text-align: center; }
+        .ultimo-box .lbl { font-size: 0.65rem; color: var(--texto-secundario); }
+        .ultimo-box .val { font-size: 0.9rem; font-weight: bold; }
 
         /* FORMULÁRIO DE LANÇAMENTO */
         .form-secao {
@@ -61,10 +76,51 @@
         .secao-saidas { background: var(--vermelho-fundo); border-color: rgba(239, 68, 68, 0.2); }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
         .form-group.full-width { grid-column: span 2; }
         
-        label { font-size: 0.75rem; color: var(--texto-secundario); font-weight: 600; }
+        label { font-size: 0.75rem; color: var(--texto-secundario); font-weight: 600; text-transform: uppercase; }
+        
+        /* CAMPO COM BOTÃO EMBUTIDO */
+        .input-inline-wrapper {
+            display: flex;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            overflow: hidden;
+            align-items: center;
+        }
+        .input-inline-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 10px;
+            color: #fff;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+        }
+        .toggle-embutido {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px;
+            margin-right: 4px;
+            border-radius: 6px;
+            gap: 2px;
+        }
+        .btn-emb {
+            border: none;
+            background: transparent;
+            color: var(--texto-secundario);
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-emb.active-g { background: var(--verde-ganho); color: #fff; }
+        .btn-emb.active-r { background: var(--azul-acao); color: #fff; }
+
         input, select {
             background: #0f172a;
             border: 1px solid var(--card-border);
@@ -75,30 +131,6 @@
             width: 100%;
         }
 
-        /* TOGGLE GUARDAR/RESGATAR */
-        .toggle-container {
-            display: flex;
-            background: #0f172a;
-            border-radius: 6px;
-            padding: 2px;
-            border: 1px solid var(--card-border);
-            margin-bottom: 4px;
-        }
-        .toggle-btn {
-            flex: 1;
-            padding: 4px;
-            font-size: 0.65rem;
-            border: none;
-            background: transparent;
-            color: var(--texto-secundario);
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .toggle-btn.active-guardar { background: var(--verde-ganho); color: #fff; }
-        .toggle-btn.active-resgatar { background: var(--azul-acao); color: #fff; }
-
-        /* BOTÕES DE AÇÃO */
         .btn-principal {
             width: 100%;
             background: var(--azul-acao);
@@ -122,8 +154,9 @@
             width: 100%;
         }
 
-        /* BALANÇO & DADOS */
-        .balanco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
+        /* SEÇÃO DE BALANÇO DA SEMANA/PERÍODO */
+        .secao-titulo { font-size: 0.9rem; color: var(--texto-secundario); text-transform: uppercase; margin: 20px 0 10px 0; font-weight: bold; }
+        .balanco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .card-balanco {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -131,8 +164,21 @@
             border-radius: 8px;
             cursor: pointer;
         }
+        .card-balanco .lbl { font-size: 0.7rem; color: var(--texto-secundario); text-transform: uppercase; }
+        .card-balanco .val { font-size: 1rem; font-weight: bold; margin-top: 2px; }
 
-        /* MODAIS / SUBJANELAS */
+        /* HISTÓRICO RECENTE */
+        .tabela-historico { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .tabela-historico th, .tabela-historico td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.8rem;
+        }
+        .tabela-historico th { color: var(--texto-secundario); text-transform: uppercase; font-size: 0.7rem; }
+        .tag-detalhado { font-size: 0.65rem; color: var(--amarelo-alerta); display: block; }
+
+        /* MODAIS */
         .modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -154,15 +200,12 @@
             overflow-y: auto;
             padding: 16px;
         }
-
-        .top-bar-config { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .btn-config { background: none; border: none; color: var(--texto-secundario); font-size: 1.2rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- ÍCONE DE CONFIGURAÇÕES / BACKUP -->
+    <!-- CONFIGURAÇÃO / BACKUP DISCRETO -->
     <div class="top-bar-config">
         <button class="btn-config" onclick="abrirModal('modal-config')" title="Configurações e Backup">⚙️</button>
     </div>
@@ -170,7 +213,7 @@
     <!-- CARDS DO TOPO -->
     <div class="header-card">
         <div class="label">Total Acumulado</div>
-        <div class="valor" id="txt-total-acumulado">R$ 0,00</div>
+        <div class="valor" id="txt-total-acumulado">R$ 983,77</div>
     </div>
 
     <div class="top-cards-grid">
@@ -180,13 +223,31 @@
         </div>
         <div class="mini-card">
             <div class="label">Disponível</div>
-            <div class="valor" id="txt-disponivel" style="color: var(--verde-ganho);">R$ 0,00</div>
+            <div class="valor" id="txt-disponivel" style="color: var(--verde-ganho);">R$ 983,77</div>
+        </div>
+    </div>
+
+    <!-- ÚLTIMO REGISTRO -->
+    <div class="card-ultimo-registro">
+        <div class="ultimo-header">
+            <span>ÚLTIMO REGISTRO</span>
+            <span id="txt-ultimo-data">30/07</span>
+        </div>
+        <div class="ultimo-valores">
+            <div class="ultimo-box">
+                <div class="lbl">ENTRADAS</div>
+                <div class="val" style="color: var(--verde-ganho);" id="txt-ultimo-entradas">R$ 5,96</div>
+            </div>
+            <div class="ultimo-box">
+                <div class="lbl">SAÍDAS</div>
+                <div class="val" style="color: var(--vermelho-gasto);" id="txt-ultimo-saidas">R$ 109,70</div>
+            </div>
         </div>
     </div>
 
     <!-- FORMULÁRIO DE LANÇAMENTO DIÁRIO -->
     <form id="form-lancamento" onsubmit="salvarLancamento(event)">
-        <!-- BLOCOS DE ENTRADAS -->
+        <!-- ENTRADAS -->
         <div class="form-secao secao-entradas">
             <div class="form-grid">
                 <div class="form-group">
@@ -200,22 +261,27 @@
             </div>
         </div>
 
-        <!-- BLOCOS DE SAÍDAS E RESERVA -->
+        <!-- SAÍDAS & RESERVA -->
         <div class="form-secao secao-saidas">
             <div class="form-grid">
                 <div class="form-group">
                     <label>Combustível (-)</label>
                     <input type="number" step="0.01" id="input-combustivel" placeholder="0,00">
                 </div>
-                <div class="form-group">
-                    <div class="toggle-container">
-                        <button type="button" id="btn-modo-guardar" class="toggle-btn active-guardar" onclick="setModoReserva('guardar')">+ Guardar</button>
-                        <button type="button" id="btn-modo-resgatar" class="toggle-btn" onclick="setModoReserva('resgatar')">- Resgatar</button>
-                    </div>
-                    <input type="number" step="0.01" id="input-reserva-valor" placeholder="0,00">
-                </div>
                 
-                <div class="form-group full-width">
+                <!-- RESERVAR DINHEIRO COM BOTÕES EMBUTIDOS NA MESMA ALTURA -->
+                <div class="form-group">
+                    <label>Reservar Dinheiro</label>
+                    <div class="input-inline-wrapper">
+                        <input type="number" step="0.01" id="input-reserva-valor" placeholder="0,00">
+                        <div class="toggle-embutido">
+                            <button type="button" id="btn-emb-guardar" class="btn-emb active-g" onclick="setModoReserva('guardar')">+ Guardar</button>
+                            <button type="button" id="btn-emb-resgatar" class="btn-emb" onclick="setModoReserva('resgatar')">- Resgatar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width" style="margin-top: 4px;">
                     <label>Despesas (-)</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="number" id="input-despesas-total" placeholder="0,00" readonly style="background: #1e293b;">
@@ -228,13 +294,67 @@
         <button type="submit" class="btn-principal">💾 Salvar Lançamento do Dia</button>
     </form>
 
-    <!-- BALANÇO MENSAL -->
-    <div style="margin-top: 24px;">
-        <h3>Balanço do Período</h3>
-        <div class="balanco-grid" id="grid-balanco-cards">
-            <!-- Cards dinamicos via Javascript -->
+    <!-- BALANÇO DO PERÍODO ATUAL -->
+    <div class="secao-titulo">Balanço do Período Atual</div>
+    <div class="balanco-grid">
+        <div class="card-balanco">
+            <div class="lbl">Faturamento</div>
+            <div class="val" style="color: var(--verde-ganho);">R$ 678,22</div>
         </div>
-        <button class="btn-secundario" style="margin-top: 12px; background: var(--amarelo-alerta); color: #000; font-weight: bold;" onclick="solicitarFecharBalanco()">📅 Fechar Balanço Mensal</button>
+        <div class="card-balanco">
+            <div class="lbl">Renda Extra</div>
+            <div class="val" style="color: var(--verde-ganho);">R$ 1.598,00</div>
+        </div>
+        <div class="card-balanco">
+            <div class="lbl">Combustível</div>
+            <div class="val" style="color: var(--vermelho-gasto);">R$ 426,90</div>
+        </div>
+        <div class="card-balanco">
+            <div class="lbl">Reservar Dinheiro</div>
+            <div class="val" style="color: var(--azul-acao);">R$ 0,00</div>
+        </div>
+        <div class="card-balanco" style="grid-column: span 2;">
+            <div class="lbl">Despesas Totais</div>
+            <div class="val" style="color: var(--vermelho-gasto);">R$ 942,15</div>
+        </div>
+    </div>
+    <button class="btn-secundario" style="margin-top: 10px; background: var(--amarelo-alerta); color: #000; font-weight: bold;" onclick="solicitarFecharBalanco()">📅 Fechar Balanço Mensal</button>
+
+    <!-- HISTÓRICO RECENTE -->
+    <div class="secao-titulo">Histórico Recente</div>
+    <table class="tabela-historico">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Saldo Líquido</th>
+                <th style="text-align: right;">Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>30/07 <span class="tag-detalhado">📋 DETALHADO</span></td>
+                <td style="color: var(--vermelho-gasto); font-weight: bold;">-R$ 103,74</td>
+                <td style="text-align: right;"><button class="btn-secundario" style="width: auto; padding: 4px 8px;">Ajustar</button></td>
+            </tr>
+            <tr>
+                <td>29/07 <span class="tag-detalhado">📋 DETALHADO</span></td>
+                <td style="color: var(--vermelho-gasto); font-weight: bold;">-R$ 59,35</td>
+                <td style="text-align: right;"><button class="btn-secundario" style="width: auto; padding: 4px 8px;">Ajustar</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- MESES ARQUIVADOS -->
+    <div class="secao-titulo">Meses Arquivados</div>
+    <div class="card-balanco" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <div class="lbl">📅 JUNHO DE 2026</div>
+            <div style="font-size: 0.8rem; margin-top: 2px;">Faturamento Total: <strong style="color: var(--verde-ganho);">R$ 1.197,57</strong></div>
+        </div>
+        <div style="text-align: right;">
+            <div class="lbl">FUNDO LÍQUIDO</div>
+            <div style="color: var(--vermelho-gasto); font-weight: bold;">-R$ 22,66</div>
+        </div>
     </div>
 </div>
 
@@ -244,11 +364,11 @@
         <h3>Planilha de Despesas</h3>
         <p style="font-size: 0.8rem; color: var(--texto-secundario); margin-bottom: 12px;">Adicione seus gastos do dia por categoria:</p>
         
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 8px;">
             <label>Descrição</label>
             <input type="text" id="despesa-desc" placeholder="Ex: Mercado, Almoço, Troca de óleo">
         </div>
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 8px;">
             <label>Categoria</label>
             <select id="despesa-categoria">
                 <option value="Manutenção">🛠️ Manutenção</option>
@@ -259,16 +379,13 @@
                 <option value="Outros">📦 Outros</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 12px;">
             <label>Valor (R$)</label>
             <input type="number" step="0.01" id="despesa-valor" placeholder="0,00">
         </div>
 
         <button class="btn-secundario" onclick="adicionarItemDespesa()" style="margin-bottom: 12px;">+ Adicionar Item</button>
-
-        <div id="lista-itens-despesa" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px;">
-            <!-- Itens adicionados aparecem aqui -->
-        </div>
+        <div id="lista-itens-despesa" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px;"></div>
 
         <div style="display: flex; gap: 8px;">
             <button class="btn-principal" onclick="confirmarDespesas()">💾 Confirmar e Enviar</button>
@@ -292,30 +409,24 @@
 </div>
 
 <script>
-    let modoReserva = 'guardar'; // 'guardar' ou 'resgatar'
+    let modoReserva = 'guardar';
 
     function setModoReserva(modo) {
         modoReserva = modo;
-        const btnG = document.getElementById('btn-modo-guardar');
-        const btnR = document.getElementById('btn-modo-resgatar');
+        const btnG = document.getElementById('btn-emb-guardar');
+        const btnR = document.getElementById('btn-emb-resgatar');
         
         if (modo === 'guardar') {
-            btnG.className = 'toggle-btn active-guardar';
-            btnR.className = 'toggle-btn';
+            btnG.className = 'btn-emb active-g';
+            btnR.className = 'btn-emb';
         } else {
-            btnG.className = 'toggle-btn';
-            btnR.className = 'toggle-btn active-resgatar';
+            btnG.className = 'btn-emb';
+            btnR.className = 'btn-emb active-r';
         }
     }
 
     function abrirModal(id) { document.getElementById(id).classList.add('active'); }
     function fecharModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    function solicitarFecharBalanco() {
-        if (confirm("Tem certeza de que deseja fechar e arquivar o período atual?")) {
-            // Lógica de fechamento de balanço
-        }
-    }
 </script>
 </body>
 </html>
