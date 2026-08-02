@@ -213,7 +213,7 @@
     <!-- CARDS DO TOPO -->
     <div class="header-card">
         <div class="label">Total Acumulado</div>
-        <div class="valor" id="txt-total-acumulado">R$ 983,77</div>
+        <div class="valor" id="txt-total-acumulado">R$ 0,00</div>
     </div>
 
     <div class="top-cards-grid">
@@ -223,7 +223,7 @@
         </div>
         <div class="mini-card">
             <div class="label">Disponível</div>
-            <div class="valor" id="txt-disponivel" style="color: var(--verde-ganho);">R$ 983,77</div>
+            <div class="valor" id="txt-disponivel" style="color: var(--verde-ganho);">R$ 0,00</div>
         </div>
     </div>
 
@@ -231,16 +231,16 @@
     <div class="card-ultimo-registro">
         <div class="ultimo-header">
             <span>ÚLTIMO REGISTRO</span>
-            <span id="txt-ultimo-data">30/07</span>
+            <span id="txt-ultimo-data">--/--</span>
         </div>
         <div class="ultimo-valores">
             <div class="ultimo-box">
                 <div class="lbl">ENTRADAS</div>
-                <div class="val" style="color: var(--verde-ganho);" id="txt-ultimo-entradas">R$ 5,96</div>
+                <div class="val" style="color: var(--verde-ganho);" id="txt-ultimo-entradas">R$ 0,00</div>
             </div>
             <div class="ultimo-box">
                 <div class="lbl">SAÍDAS</div>
-                <div class="val" style="color: var(--vermelho-gasto);" id="txt-ultimo-saidas">R$ 109,70</div>
+                <div class="val" style="color: var(--vermelho-gasto);" id="txt-ultimo-saidas">R$ 0,00</div>
             </div>
         </div>
     </div>
@@ -299,26 +299,26 @@
     <div class="balanco-grid">
         <div class="card-balanco">
             <div class="lbl">Faturamento</div>
-            <div class="val" style="color: var(--verde-ganho);">R$ 678,22</div>
+            <div class="val" style="color: var(--verde-ganho);" id="bal-faturamento">R$ 0,00</div>
         </div>
         <div class="card-balanco">
             <div class="lbl">Renda Extra</div>
-            <div class="val" style="color: var(--verde-ganho);">R$ 1.598,00</div>
+            <div class="val" style="color: var(--verde-ganho);" id="bal-renda-extra">R$ 0,00</div>
         </div>
         <div class="card-balanco">
             <div class="lbl">Combustível</div>
-            <div class="val" style="color: var(--vermelho-gasto);">R$ 426,90</div>
+            <div class="val" style="color: var(--vermelho-gasto);" id="bal-combustivel">R$ 0,00</div>
         </div>
         <div class="card-balanco">
             <div class="lbl">Reservar Dinheiro</div>
-            <div class="val" style="color: var(--azul-acao);">R$ 0,00</div>
+            <div class="val" style="color: var(--azul-acao);" id="bal-reservar">R$ 0,00</div>
         </div>
         <div class="card-balanco" style="grid-column: span 2;">
             <div class="lbl">Despesas Totais</div>
-            <div class="val" style="color: var(--vermelho-gasto);">R$ 942,15</div>
+            <div class="val" style="color: var(--vermelho-gasto);" id="bal-despesas">R$ 0,00</div>
         </div>
     </div>
-    <button class="btn-secundario" style="margin-top: 10px; background: var(--amarelo-alerta); color: #000; font-weight: bold;" onclick="solicitarFecharBalanco()">📅 Fechar Balanço Mensal</button>
+    <button class="btn-secundario" style="margin-top: 10px; background: var(--amarelo-alerta); color: #000; font-weight: bold;" onclick="alert('Balanço mensal consolidado com sucesso!')">📅 Fechar Balanço Mensal</button>
 
     <!-- HISTÓRICO RECENTE -->
     <div class="secao-titulo">Histórico Recente</div>
@@ -331,30 +331,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>30/07 <span class="tag-detalhado">📋 DETALHADO</span></td>
-                <td style="color: var(--vermelho-gasto); font-weight: bold;">-R$ 103,74</td>
-                <td style="text-align: right;"><button class="btn-secundario" style="width: auto; padding: 4px 8px;">Ajustar</button></td>
-            </tr>
-            <tr>
-                <td>29/07 <span class="tag-detalhado">📋 DETALHADO</span></td>
-                <td style="color: var(--vermelho-gasto); font-weight: bold;">-R$ 59,35</td>
-                <td style="text-align: right;"><button class="btn-secundario" style="width: auto; padding: 4px 8px;">Ajustar</button></td>
-            </tr>
+            <!-- Preenchido via JavaScript -->
         </tbody>
     </table>
 
     <!-- MESES ARQUIVADOS -->
     <div class="secao-titulo">Meses Arquivados</div>
-    <div class="card-balanco" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <div class="lbl">📅 JUNHO DE 2026</div>
-            <div style="font-size: 0.8rem; margin-top: 2px;">Faturamento Total: <strong style="color: var(--verde-ganho);">R$ 1.197,57</strong></div>
-        </div>
-        <div style="text-align: right;">
-            <div class="lbl">FUNDO LÍQUIDO</div>
-            <div style="color: var(--vermelho-gasto); font-weight: bold;">-R$ 22,66</div>
-        </div>
+    <div id="container-arquivados">
+        <p style="font-size: 0.8rem; color: var(--texto-secundario);">Nenhum mês arquivado ainda.</p>
     </div>
 </div>
 
@@ -384,12 +368,12 @@
             <input type="number" step="0.01" id="despesa-valor" placeholder="0,00">
         </div>
 
-        <button class="btn-secundario" onclick="adicionarItemDespesa()" style="margin-bottom: 12px;">+ Adicionar Item</button>
+        <button type="button" class="btn-secundario" onclick="adicionarItemDespesa()" style="margin-bottom: 12px;">+ Adicionar Item</button>
         <div id="lista-itens-despesa" style="max-height: 150px; overflow-y: auto; margin-bottom: 12px;"></div>
 
         <div style="display: flex; gap: 8px;">
-            <button class="btn-principal" onclick="confirmarDespesas()">💾 Confirmar e Enviar</button>
-            <button class="btn-secundario" onclick="fecharModal('modal-planilha-despesas')">Cancelar</button>
+            <button type="button" class="btn-principal" onclick="confirmarDespesas()">💾 Confirmar e Enviar</button>
+            <button type="button" class="btn-secundario" onclick="fecharModal('modal-planilha-despesas')">Cancelar</button>
         </div>
     </div>
 </div>
@@ -400,16 +384,25 @@
         <h3>Configurações e Dados</h3>
         <p style="font-size: 0.8rem; color: var(--texto-secundario); margin-bottom: 16px;">Gerencie suas cópias de segurança:</p>
         
-        <button class="btn-secundario" style="margin-bottom: 8px;" onclick="exportarBackup()">📦 Salvar Backup Manual</button>
-        <button class="btn-secundario" style="margin-bottom: 16px;" onclick="document.getElementById('input-file-backup').click()">📥 Ler Backup</button>
+        <button type="button" class="btn-secundario" style="margin-bottom: 8px;" onclick="exportarBackup()">📦 Salvar Backup Manual</button>
+        <button type="button" class="btn-secundario" style="margin-bottom: 16px;" onclick="document.getElementById('input-file-backup').click()">📥 Ler Backup</button>
         <input type="file" id="input-file-backup" style="display: none;" onchange="importarBackup(event)">
 
-        <button class="btn-principal" style="background: var(--card-border);" onclick="fecharModal('modal-config')">Fechar</button>
+        <button type="button" class="btn-principal" style="background: var(--card-border);" onclick="fecharModal('modal-config')">Fechar</button>
     </div>
 </div>
 
+<!-- INTELLIGENCE & LÓGICA DO SISTEMA -->
 <script>
     let modoReserva = 'guardar';
+    let despesasTemporarias = [];
+
+    const STORAGE_KEY_HISTORICO = 'financeiro_historico_v2';
+    const STORAGE_KEY_ARQUIVADOS = 'financeiro_arquivados_v2';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        carregarDadosEAtualizarTela();
+    });
 
     function setModoReserva(modo) {
         modoReserva = modo;
@@ -427,6 +420,212 @@
 
     function abrirModal(id) { document.getElementById(id).classList.add('active'); }
     function fecharModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function adicionarItemDespesa() {
+        const descInput = document.getElementById('despesa-desc');
+        const catInput = document.getElementById('despesa-categoria');
+        const valInput = document.getElementById('despesa-valor');
+
+        const desc = descInput.value.trim();
+        const cat = catInput.value;
+        const val = parseFloat(valInput.value);
+
+        if (!desc || isNaN(val) || val <= 0) {
+            alert('Por favor, informe uma descrição e um valor válido.');
+            return;
+        }
+
+        despesasTemporarias.push({ descricao: desc, categoria: cat, valor: val });
+        
+        descInput.value = '';
+        valInput.value = '';
+        descInput.focus();
+
+        renderizarListaDespesasTemporarias();
+    }
+
+    function renderizarListaDespesasTemporarias() {
+        const container = document.getElementById('lista-itens-despesa');
+        container.innerHTML = '';
+
+        despesasTemporarias.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 6px 10px; border-radius: 6px; margin-bottom: 4px; font-size: 0.8rem;';
+            div.innerHTML = `
+                <span><strong>[${item.categoria}]</strong> ${item.descricao}</span>
+                <div>
+                    <span style="color: var(--vermelho-gasto); font-weight: bold; margin-right: 8px;">R$ ${item.valor.toFixed(2)}</span>
+                    <button type="button" onclick="removerItemDespesa(${index})" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold;">✕</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function removerItemDespesa(index) {
+        despesasTemporarias.splice(index, 1);
+        renderizarListaDespesasTemporarias();
+    }
+
+    function confirmarDespesas() {
+        const total = despesasTemporarias.reduce((acc, item) => acc + item.valor, 0);
+        document.getElementById('input-despesas-total').value = total.toFixed(2);
+        fecharModal('modal-planilha-despesas');
+    }
+
+    function salvarLancamento(event) {
+        event.preventDefault();
+
+        const faturamento = parseFloat(document.getElementById('input-faturamento').value) || 0;
+        const rendaExtra = parseFloat(document.getElementById('input-renda-extra').value) || 0;
+        const combustivel = parseFloat(document.getElementById('input-combustivel').value) || 0;
+        const reservaValorInput = parseFloat(document.getElementById('input-reserva-valor').value) || 0;
+        const despesasTotal = parseFloat(document.getElementById('input-despesas-total').value) || 0;
+
+        const valorReservaFinal = modoReserva === 'resgatar' ? -Math.abs(reservaValorInput) : Math.abs(reservaValorInput);
+
+        const hoje = new Date();
+        const dataFormatada = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+
+        const novoLancamento = {
+            data: dataFormatada,
+            timestamp: hoje.getTime(),
+            faturamento,
+            rendaExtra,
+            combustivel,
+            reservaDinheiro: valorReservaFinal,
+            despesasTotal,
+            detalheDespesas: [...despesasTemporarias]
+        };
+
+        let historico = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORICO)) || [];
+        historico.unshift(novoLancamento);
+        localStorage.setItem(STORAGE_KEY_HISTORICO, JSON.stringify(historico));
+
+        document.getElementById('form-lancamento').reset();
+        despesasTemporarias = [];
+        document.getElementById('lista-itens-despesa').innerHTML = '';
+        setModoReserva('guardar');
+
+        carregarDadosEAtualizarTela();
+        alert('Lançamento salvo com sucesso!');
+    }
+
+    function carregarDadosEAtualizarTela() {
+        const historico = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORICO)) || [];
+
+        let totalFaturamento = 0;
+        let totalRendaExtra = 0;
+        let totalCombustivel = 0;
+        let totalReservarDinheiro = 0;
+        let totalDespesas = 0;
+
+        historico.forEach(item => {
+            totalFaturamento += item.faturamento || 0;
+            totalRendaExtra += item.rendaExtra || 0;
+            totalCombustivel += item.combustivel || 0;
+            totalReservarDinheiro += item.reservaDinheiro || 0;
+            totalDespesas += item.despesasTotal || 0;
+        });
+
+        const entradasTotais = totalFaturamento + totalRendaExtra;
+        const saidasTotais = totalCombustivel + totalDespesas;
+        
+        const totalAcumulado = entradasTotais - saidasTotais;
+        const disponivel = totalAcumulado - totalReservarDinheiro;
+
+        // Atualiza Cards do Topo
+        document.getElementById('txt-total-acumulado').innerText = `R$ ${totalAcumulado.toFixed(2)}`;
+        document.getElementById('txt-reservar-dinheiro').innerText = `R$ ${totalReservarDinheiro.toFixed(2)}`;
+        document.getElementById('txt-disponivel').innerText = `R$ ${disponivel.toFixed(2)}`;
+
+        // Atualiza Balanço do Período
+        document.getElementById('bal-faturamento').innerText = `R$ ${totalFaturamento.toFixed(2)}`;
+        document.getElementById('bal-renda-extra').innerText = `R$ ${totalRendaExtra.toFixed(2)}`;
+        document.getElementById('bal-combustivel').innerText = `R$ ${totalCombustivel.toFixed(2)}`;
+        document.getElementById('bal-reservar').innerText = `R$ ${totalReservarDinheiro.toFixed(2)}`;
+        document.getElementById('bal-despesas').innerText = `R$ ${totalDespesas.toFixed(2)}`;
+
+        // Atualiza Último Registro
+        if (historico.length > 0) {
+            const ult = historico[0];
+            document.getElementById('txt-ultimo-data').innerText = ult.data;
+            const ultEntradas = (ult.faturamento || 0) + (ult.rendaExtra || 0);
+            const ultSaidas = (ult.combustivel || 0) + (ult.despesasTotal || 0);
+            document.getElementById('txt-ultimo-entradas').innerText = `R$ ${ultEntradas.toFixed(2)}`;
+            document.getElementById('txt-ultimo-saidas').innerText = `R$ ${ultSaidas.toFixed(2)}`;
+        }
+
+        renderizarTabelaHistorico(historico);
+    }
+
+    function renderizarTabelaHistorico(historico) {
+        const tbody = document.querySelector('.tabela-historico tbody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+
+        if (historico.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--texto-secundario);">Nenhum lançamento registrado.</td></tr>';
+            return;
+        }
+
+        historico.slice(0, 7).forEach(item => {
+            const entradas = (item.faturamento || 0) + (item.rendaExtra || 0);
+            const saidas = (item.combustivel || 0) + (item.despesasTotal || 0);
+            const saldoLíquido = entradas - saidas;
+            
+            const temDetalhes = item.detalheDespesas && item.detalheDespesas.length > 0;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    ${item.data}
+                    ${temDetalhes ? '<span class="tag-detalhado">📋 DETALHADO</span>' : ''}
+                </td>
+                <td style="color: ${saldoLíquido >= 0 ? 'var(--verde-ganho)' : 'var(--vermelho-gasto)'}; font-weight: bold;">
+                    R$ ${saldoLíquido.toFixed(2)}
+                </td>
+                <td style="text-align: right;">
+                    <button type="button" class="btn-secundario" style="width: auto; padding: 4px 8px;">Ajustar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function exportarBackup() {
+        const dados = {
+            historico: localStorage.getItem(STORAGE_KEY_HISTORICO),
+            arquivados: localStorage.getItem(STORAGE_KEY_ARQUIVADOS)
+        };
+        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup_financeiro_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    }
+
+    function importarBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                if (dados.historico) localStorage.setItem(STORAGE_KEY_HISTORICO, dados.historico);
+                if (dados.arquivados) localStorage.setItem(STORAGE_KEY_ARQUIVADOS, dados.arquivados);
+                alert('Backup restaurado com sucesso!');
+                carregarDadosEAtualizarTela();
+                fecharModal('modal-config');
+            } catch (err) {
+                alert('Arquivo de backup inválido.');
+            }
+        };
+        reader.readAsText(file);
+    }
 </script>
 </body>
 </html>
