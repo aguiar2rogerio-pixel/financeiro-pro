@@ -16,12 +16,33 @@
     <meta name="application-name" content="Finanças Pro">
 
     <script>
+      /* SERVICE WORKER COM AUTO-REFRESH */
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker ativo!', reg.scope))
-            .catch(err => console.log('Erro SW:', err));
-        });
+          window.addEventListener('load', () => {
+              navigator.serviceWorker.register('./sw.js').then((reg) => {
+                  console.log('Service Worker registrado:', reg.scope);
+                  
+                  reg.onupdatefound = () => {
+                      const installingWorker = reg.installing;
+                      installingWorker.onstatechange = () => {
+                          if (installingWorker.state === 'installed') {
+                              if (navigator.serviceWorker.controller) {
+                                  console.log('Nova versão encontrada! Recarregando...');
+                                  window.location.reload();
+                              }
+                          }
+                      };
+                  };
+              }).catch((err) => console.error('Erro ao registrar Service Worker:', err));
+          });
+
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (!refreshing) {
+                  window.location.reload();
+                  refreshing = true;
+              }
+          });
       }
     </script>
 
@@ -280,122 +301,36 @@
             </div>
 
             <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
-                <span class="text-white uppercase text-xs">Total Acumulado:</span>
+                <span class="text-white uppercase text-xs">Total do Dia:</span>
                 <span id="subjanela-total-acumulado" class="text-red-400">R$ 0,00</span>
             </div>
 
-            <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+            <button onclick="salvarSubjanelaGastos()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
                 💾 Confirmar e Enviar para a Tela
             </button>
         </div>
     </div>
 
-    <!-- MODAL DE RESGATE / TRANSFERÊNCIA -->
+    <!-- MODAL TRANSFERÊNCIA -->
     <div id="modal-transferencia" class="modal-overlay">
-        <div class="modal-content space-y-3">
-            <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider border-b border-gray-700 pb-2">Transferir Dinheiro</h3>
-            <p class="text-xs text-gray-300 leading-tight">Retirar do <strong class="text-emerald-400">Dinheiro Reservado</strong> para disponibilizar em <strong class="text-blue-400">Disponível</strong>.</p>
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Resgatar Dinheiro Reservado</h3>
+                <button onclick="fecharModalTransferencia()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            <p class="text-[11px] text-gray-300 leading-relaxed">Retirar do fundo de <strong class="text-emerald-400">Dinheiro Reservado</strong> para disponibilizar em <strong class="text-blue-400">Disponível</strong>.</p>
             <div>
-                <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Valor do Resgate (R$):</label>
-                <input type="number" id="valor-resgate-input" inputmode="decimal" placeholder="0,00" class="input-autonomo">
+                <label class="block text-[10px] uppercase font-bold text-white mb-1">Valor do Resgate (R$):</label>
+                <input type="number" id="valor-resgate-input" inputmode="decimal" placeholder="0,00" class="input-autonomo font-bold">
             </div>
             <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
-                <button onclick="confirmarResgate()" class="bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl text-white uppercase">Confirmar</button>
-                <button onclick="fecharModalTransferencia()" class="bg-gray-700 py-3 rounded-xl text-gray-300 uppercase">Cancelar</button>
+                <button onclick="confirmarResgate()" class="bg-emerald-600 py-3 rounded-xl text-white">Confirmar</button>
+                <button onclick="fecharModalTransferencia()" class="bg-gray-700 py-3 rounded-xl text-gray-300">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- CONFERÊNCIA -->
-    <div id="subjanela-auditoria" class="modal-overlay">
-        <div class="modal-content space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                <div>
-                    <h3 id="auditoria-titulo" class="text-sm font-bold uppercase tracking-wider text-yellow-500">Conferência</h3>
-                    <p id="auditoria-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5"></p>
-                </div>
-                <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold">✕</button>
-            </div>
-            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
-                <table class="w-full text-left text-xs text-gray-300">
-                    <thead id="auditoria-head" class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0"></thead>
-                    <tbody id="lista-auditoria-body"></tbody>
-                </table>
-            </div>
-            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
-                <span class="text-white uppercase text-xs">Total:</span>
-                <span id="auditoria-total-acumulado">R$ 0,00</span>
-            </div>
-            <button onclick="fecharSubjanelaAuditoria()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
-        </div>
-    </div>
-
-    <!-- DETALHES DO ITEM DE DESPESAS -->
-    <div id="modal-detalhe-gastos" class="modal-overlay">
-        <div class="modal-content space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                <div>
-                    <h3 id="detalhe-titulo" class="text-sm font-bold uppercase tracking-wider text-red-400">Detalhes</h3>
-                    <p id="detalhe-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos individuais</p>
-                </div>
-                <button onclick="fecharDetalheGastos()" class="text-gray-400 text-lg font-bold">✕</button>
-            </div>
-            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
-                <table class="w-full text-left text-xs text-gray-300">
-                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
-                        <tr>
-                            <th class="p-2.5">Data</th>
-                            <th class="p-2.5 text-right">Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detalhe-gastos-body"></tbody>
-                </table>
-            </div>
-            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
-                <span class="text-white uppercase text-xs">Total do Item:</span>
-                <span id="detalhe-total-acumulado" class="text-red-400">R$ 0,00</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="voltarParaAuditoria()" class="bg-blue-700 hover:bg-blue-600 text-white font-bold py-3 rounded-xl text-xs uppercase">⬅️ Voltar</button>
-                <button onclick="fecharDetalheGastos()" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- RESUMO DO MÊS ARQUIVADO -->
-    <div id="subjanela-mes-aquivado" class="modal-overlay">
-        <div class="modal-content space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                <div>
-                    <h3 id="mes-arq-titulo" class="text-sm font-bold uppercase tracking-wider text-blue-400">Resumo Fechado</h3>
-                    <p class="text-[9px] text-gray-400 uppercase mt-0.5">Balanço Consolidado do Período</p>
-                </div>
-                <button onclick="fecharSubjanelaMesArquivado()" class="text-gray-400 text-lg font-bold">✕</button>
-            </div>
-
-            <div class="space-y-1 text-xs bg-gray-950 border border-gray-800 p-3 rounded-xl">
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Faturamento:</span><span id="mes-arq-fat" class="font-bold text-green-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Dinheiro Reservado:</span><span id="mes-arq-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
-                <div class="flex justify-between py-1"><span class="text-gray-400">Despesas Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
-            </div>
-
-            <div class="space-y-1">
-                <span class="block text-[10px] uppercase font-bold text-gray-400 ml-1">Descritivo Completo de Despesas:</span>
-                <div class="max-h-32 overflow-y-auto border border-gray-800 bg-gray-950 p-2 rounded-xl text-[11px] space-y-1 text-gray-300" id="mes-arq-descritivo-container"></div>
-            </div>
-
-            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
-                <span class="text-white uppercase text-xs">Fundo Líquido Final:</span>
-                <span id="mes-arq-saldo-final" class="text-blue-400">R$ 0,00</span>
-            </div>
-
-            <button onclick="fecharSubjanelaMesArquivado()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Voltar</button>
-        </div>
-    </div>
-
-    <!-- AJUSTAR LANÇAMENTO DIA -->
+    <!-- MODAL EDIÇÃO -->
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
             <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider border-b border-gray-700 pb-2">Ajustar Lançamento</h3>
@@ -492,7 +427,7 @@
             dados.categoriasCustomizadas = [...CATEGORIAS_PADRAO];
         }
         
-        let itensGastosTemporarios = [];
+        let itensGastosTemporarios = JSON.parse(localStorage.getItem('rascunho_gastos_dia')) || [];
         let lancamentoEmEdicao = null;
 
         function formatarMoeda(valor) {
@@ -559,6 +494,27 @@
             }
         }
 
+        function salvarRascunhoCampos() {
+            if (lancamentoEmEdicao !== null) return;
+            const rascunho = {
+                faturamento: document.getElementById('faturamento').value,
+                rendaExtra: document.getElementById('renda-extra').value,
+                gasolina: document.getElementById('gasolina').value,
+                guardadoValor: document.getElementById('guardado-valor').value
+            };
+            localStorage.setItem('rascunho_campos_dia', JSON.stringify(rascunho));
+        }
+
+        function carregarRascunhoCampos() {
+            const rascunho = JSON.parse(localStorage.getItem('rascunho_campos_dia'));
+            if (rascunho) {
+                document.getElementById('faturamento').value = rascunho.faturamento || '';
+                document.getElementById('renda-extra').value = rascunho.rendaExtra || '';
+                document.getElementById('gasolina').value = rascunho.gasolina || '';
+                document.getElementById('guardado-valor').value = rascunho.guardadoValor || '';
+            }
+        }
+
         function atualizarUI() {
             let totalEntradas = 0;
             let totalSaidas = 0;
@@ -615,6 +571,12 @@
             document.getElementById('total-gasolina').innerText = formatarMoeda(totalGas);
             document.getElementById('total-pessoal').innerText = formatarMoeda(totalPes);
             document.getElementById('total-guardado').innerText = formatarMoeda(totalGua);
+
+            if (lancamentoEmEdicao === null) {
+                let rascunhoTotal = 0;
+                itensGastosTemporarios.forEach(i => rascunhoTotal += i.valor);
+                document.getElementById('pessoal').value = rascunhoTotal > 0 ? rascunhoTotal : '';
+            }
 
             // ÚLTIMO REGISTRO
             const resumoContainer = document.getElementById('ultimo-resumo-container');
@@ -744,8 +706,7 @@
             document.getElementById('gasto-item-desc').value = '';
             document.getElementById('gasto-item-val').value = '';
             
-            const valorAtual = parseFloat(document.getElementById('pessoal').value) || 0;
-            if (valorAtual === 0) { itensGastosTemporarios = []; }
+            itensGastosTemporarios = JSON.parse(localStorage.getItem('rascunho_gastos_dia')) || [];
             
             document.getElementById('subjanela-gastos').classList.add('active');
             renderizarBaloesDinamicos();
@@ -794,10 +755,12 @@
             const descricao = descEl.value.trim().toUpperCase();
             const valor = parseFloat(valEl.value) || 0;
 
-            if (!descricao || valor <= 0) return;
+            if (!descricao || valor <= 0) {
+                alert('Insira descrição e valor.');
+                return;
+            }
 
             itensGastosTemporarios.push({ categoria, descricao, valor });
-            descEl.value = ''; valEl.value = '';
             
             carregarOpcoesCategorias();
             selectCat.value = categoria;
@@ -849,13 +812,16 @@
                 document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0';
                 if (lancamentoEmEdicao !== null && dados.historico[lancamentoEmEdicao]) {
                     dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
+                    dados.historico[lancamentoEmEdicao].pessoal = totalCalculado;
                 }
                 document.getElementById('subjanela-gastos').classList.remove('active');
                 document.getElementById('modal-edicao').classList.add('active');
             } else {
                 document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
+                localStorage.setItem('rascunho_gastos_dia', JSON.stringify(itensGastosTemporarios));
                 document.getElementById('subjanela-gastos').classList.remove('active');
             }
+            atualizarUI();
         }
 
         function salvarLancamento(event) {
@@ -885,66 +851,47 @@
                 document.getElementById(id).value = '';
             });
             itensGastosTemporarios = [];
+            localStorage.removeItem('rascunho_gastos_dia');
+            localStorage.removeItem('rascunho_campos_dia');
 
             atualizarUI();
         }
 
         function auditarCategoria(propriedade, nomeExibicao) {
             const tituloEl = document.getElementById('auditoria-titulo');
-            const subtituloEl = document.getElementById('auditoria-subtitulo');
-            const headEl = document.getElementById('auditoria-head');
             const tbodyEl = document.getElementById('lista-auditoria-body');
             const totalEl = document.getElementById('auditoria-total-acumulado');
             
             tituloEl.innerText = `Conferência: ${nomeExibicao}`;
             tbodyEl.innerHTML = '';
+            
             let acumuloTotal = 0;
-
+            
             if (propriedade === 'pessoal') {
-                subtituloEl.innerText = "Descritivo acumulado por Categoria/Item neste mês";
-                headEl.innerHTML = `<tr><th class="p-2.5">Categoria / Item</th><th class="p-2.5 text-right">Total</th></tr>`;
-                let mapaItens = {};
-
+                let resumoPorDesc = {};
                 dados.historico.forEach(item => {
                     if (item.detalheGastos) {
                         item.detalheGastos.forEach(g => {
                             const cat = g.categoria || 'OUTRO';
                             const descUpper = g.descricao.toUpperCase();
                             const chave = `[${cat}] ${descUpper}`;
-                            mapaItens[chave] = (mapaItens[chave] || 0) + parseFloat(g.valor);
+                            resumoPorDesc[chave] = (resumoPorDesc[chave] || 0) + parseFloat(g.valor);
+                            acumuloTotal += parseFloat(g.valor);
                         });
                     }
                 });
-
-                Object.keys(mapaItens).forEach(desc => {
-                    acumuloTotal += mapaItens[desc];
+                
+                Object.keys(resumoPorDesc).forEach(k => {
                     const tr = document.createElement('tr');
                     tr.className = 'border-t border-gray-800 text-xs linha-auditoria-clicavel';
-                    tr.innerHTML = `<td class="p-2.5 uppercase font-bold text-gray-300">${desc}</td><td class="p-2.5 text-right font-black text-red-400">${formatarMoeda(mapaItens[desc])}</td>`;
-                    tr.onclick = () => abrirDetalheGastos(desc);
+                    tr.onclick = () => abrirDetalheGastos(k);
+                    tr.innerHTML = `<td class="p-2.5 text-gray-300 uppercase">${k}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(resumoPorDesc[k])}</td>`;
                     tbodyEl.appendChild(tr);
                 });
-            } else if (propriedade === 'guardadoLiquido') {
-                subtituloEl.innerText = "Movimentação Dinheiro Reservado";
-                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5">Tipo</th><th class="p-2.5 text-right">Valor</th></tr>`;
-                dados.historico.forEach(item => {
-                    const g = parseFloat(item.guardado) || 0;
-                    if (g !== 0) {
-                        acumuloTotal += g;
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-t border-gray-800 text-xs';
-                        const tipoLabel = g > 0 ? 'APORTE (+)' : 'RESGATE (-)';
-                        const corClasse = g > 0 ? 'text-emerald-400' : 'text-blue-400';
-                        tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 ${corClasse} font-bold">${tipoLabel}</td><td class="p-2.5 text-right font-bold ${corClasse}">${formatarMoeda(g)}</td>`;
-                        tbodyEl.appendChild(tr);
-                    }
-                });
             } else {
-                subtituloEl.innerText = "Lançamentos por dia";
-                headEl.innerHTML = `<tr><th class="p-2.5">Data</th><th class="p-2.5 text-right">Valor</th></tr>`;
                 dados.historico.forEach(item => {
                     const v = parseFloat(item[propriedade]) || 0;
-                    if (v > 0) {
+                    if (v !== 0) {
                         acumuloTotal += v;
                         const tr = document.createElement('tr');
                         tr.className = 'border-t border-gray-800 text-xs';
@@ -1119,7 +1066,13 @@
             document.getElementById('edit-guardado').value = item.guardado || 0;
             document.getElementById('modal-edicao').classList.add('active');
         }
-        function fecharModal() { document.getElementById('modal-edicao').classList.remove('active'); lancamentoEmEdicao = null; }
+
+        function fecharModal() { 
+            document.getElementById('modal-edicao').classList.remove('active'); 
+            lancamentoEmEdicao = null; 
+            itensGastosTemporarios = JSON.parse(localStorage.getItem('rascunho_gastos_dia')) || [];
+            atualizarUI();
+        }
         
         function salvarEdicao() {
             if (lancamentoEmEdicao === null) return;
@@ -1135,6 +1088,7 @@
             localStorage.setItem('financeiro_pro', JSON.stringify(dados));
             fecharModal(); atualizarUI();
         }
+
         function deletarLancamento() {
             if (confirm('Deletar registro deste dia?')) {
                 dados.historico.splice(lancamentoEmEdicao, 1);
@@ -1142,6 +1096,7 @@
                 fecharModal(); atualizarUI();
             }
         }
+
         function deletarMesAnterior(index) {
             if (confirm('Deseja realmente excluir este mês arquivado?')) {
                 dados.mesesAnteriores.splice(index, 1);
@@ -1149,6 +1104,7 @@
                 atualizarUI();
             }
         }
+
         function limparDados() {
             if (confirm('Zerar o aplicativo inteiro?')) {
                 dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [], categoriasCustomizadas: [...CATEGORIAS_PADRAO] };
@@ -1191,7 +1147,14 @@
             if (event.target.files.length > 0) reader.readAsText(event.target.files[0]);
         }
 
+        carregarRascunhoCampos();
         atualizarUI();
+
+        // Listeners para auto-salvamento dos campos
+        ['faturamento', 'renda-extra', 'gasolina', 'guardado-valor'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', salvarRascunhoCampos);
+        });
     </script>
 </body>
 </html>

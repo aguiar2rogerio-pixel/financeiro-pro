@@ -1,47 +1,51 @@
-const CACHE_NAME = 'financeiro-v5'; // Incrementado para v5 para forçar a atualização do cache
+const CACHE_NAME = 'financeiro-pro-v1.1'; // Mude a versão sempre que atualizar o código
 const ASSETS = [
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  'https://cdn.tailwindcss.com' // Guardando o manual visual para nunca quebrar offline
+  'https://cdn.tailwindcss.com'
 ];
 
-// Instalação do Service Worker e armazenamento dos arquivos essenciais
+// Instalação: Salva arquivos no cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting(); // Força o novo service worker a se ativar imediatamente
+  self.skipWaiting(); // Força a ativação imediata
 });
 
+// Ativação: Limpa caches antigos e assume o controle
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            return caches.delete(cache); // Limpa caches antigos
+            console.log('Removendo cache antigo:', cache);
+            return caches.delete(cache);
           }
         })
       );
     })
   );
+  self.clients.claim(); // Assume o controle das abas abertas imediatamente
 });
 
-// Estratégia de carregamento ultra rápido: Puxa do cache instantaneamente e atualiza em segundo plano
+// Busca: Estratégia Stale-While-Revalidate (Cache primeiro, atualiza em background)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse.status === 200) {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
+            cache.put(event.request, responseToCache);
           });
         }
         return networkResponse;
       }).catch(() => {
-        // Silencia falhas de rede se estiver totalmente offline
+        // Falha de rede silenciosa
       });
 
       return cachedResponse || fetchPromise;
