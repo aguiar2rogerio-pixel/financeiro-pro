@@ -151,20 +151,25 @@
         </div>
     </header>
 
+    <!-- ÚLTIMO REGISTRO (3 COLUNAS COM SDO DIA) -->
     <div id="ultimo-resumo-container" class="hidden mb-5">
         <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-3">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Último Registro</h3>
                 <span id="last-date" class="text-[10px] text-gray-400 font-black"></span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-center text-xs">
-                <div class="bg-gray-800 p-2 rounded-xl">
-                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Entradas</span>
-                    <span id="last-ganho" class="font-bold text-green-400">R$ 0</span>
+            <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                <div class="bg-gray-800 p-1.5 rounded-xl">
+                    <span class="block text-[8px] text-white uppercase font-bold mb-0.5 truncate">Entradas</span>
+                    <span id="last-ganho" class="font-bold text-green-400 text-[11px]">R$ 0</span>
                 </div>
-                <div class="bg-gray-800 p-2 rounded-xl">
-                    <span class="block text-[9px] text-white uppercase font-bold mb-0.5">Saídas</span>
-                    <span id="last-gastos" class="font-bold text-red-400">R$ 0</span>
+                <div class="bg-gray-800 p-1.5 rounded-xl">
+                    <span class="block text-[8px] text-white uppercase font-bold mb-0.5 truncate">Saídas</span>
+                    <span id="last-gastos" class="font-bold text-red-400 text-[11px]">R$ 0</span>
+                </div>
+                <div class="bg-gray-800 p-1.5 rounded-xl">
+                    <span class="block text-[8px] text-white uppercase font-bold mb-0.5 truncate">Sdo Dia</span>
+                    <span id="last-saldo-dia" class="font-bold text-[11px]">R$ 0</span>
                 </div>
             </div>
         </div>
@@ -202,12 +207,18 @@
                     📝 Incluir Despesas
                 </button>
             </div>
-            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculado" class="input-bloqueado font-bold">
+            <input type="number" id="pessoal" readonly placeholder="R$ 0,00 calculated" class="input-bloqueado font-bold">
         </div>
 
-        <button id="btn-salvar-principal" onclick="salvarLancamento(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider">
-            Salvar Lançamento do Dia
-        </button>
+        <!-- BOTÃO SALVAR E AVISO EXPLICATIVO -->
+        <div>
+            <button id="btn-salvar-principal" onclick="confirmarFechamentoDia(event)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-xl text-base shadow-md uppercase tracking-normal">
+                Salvar e Fechar o Dia
+            </button>
+            <p id="aviso-trava-botao" class="text-[10px] text-gray-400 text-center mt-2 leading-tight">
+                🔒 Depois de salvo, este dia ficará fechado para novos lançamentos.
+            </p>
+        </div>
     </div>
 
     <!-- BALANÇO DO PERÍODO -->
@@ -254,6 +265,21 @@
         </div>
         <div id="meses-anteriores-container" class="space-y-2"></div>
         <div id="meses-vazios" class="text-center text-gray-600 text-xs italic p-3">Nenhum mês arquivado ainda</div>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO DE FECHAMENTO DO DIA -->
+    <div id="modal-confirmar-dia" class="modal-overlay">
+        <div class="modal-content text-center space-y-4">
+            <h3 class="text-base font-bold text-blue-400 uppercase tracking-wider">Confirmar Fechamento</h3>
+            <p class="text-xs text-gray-300 leading-relaxed">
+                Tem certeza que deseja fechar o dia de hoje? <br><br>
+                <strong class="text-yellow-400">Atenção:</strong> Após salvar, novos lançamentos serão bloqueados para esta data.
+            </p>
+            <div class="flex gap-2 text-xs font-bold pt-2">
+                <button onclick="executarSalvarDia()" class="flex-1 bg-blue-600 py-3 rounded-xl text-white uppercase">Sim, Fechar Dia</button>
+                <button onclick="fecharModalConfirmarDia()" class="flex-1 bg-gray-800 border border-gray-700 py-3 rounded-xl text-gray-300 uppercase">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <!-- PLANILHA DE DESPESAS (CATEGORIAS DINÂMICAS) -->
@@ -471,21 +497,24 @@
             const jaLancado = dados.historico.some(item => item.data === hoje || item.data === hoje.substring(0,5));
             const btnSalvar = document.getElementById('btn-salvar-principal');
             const btnDetalhar = document.getElementById('btn-detalhar');
+            const avisoBotao = document.getElementById('aviso-trava-botao');
 
             if (jaLancado) {
                 btnSalvar.innerText = `⚠️ ${hoje.substring(0,5)} JÁ LANÇADO`;
-                btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider mt-2 cursor-not-allowed";
+                btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-3.5 rounded-xl text-sm uppercase tracking-normal cursor-not-allowed";
                 btnSalvar.disabled = true;
+                if (avisoBotao) avisoBotao.classList.add('hidden');
                 
                 ['faturamento', 'renda-extra', 'gasolina', 'guardado-valor'].forEach(id => {
                     document.getElementById(id).disabled = true;
                     document.getElementById(id).className = "input-bloqueado";
                 });
             } else {
-                btnSalvar.innerText = "Salvar Lançamento do Dia";
-                btnSalvar.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-lg shadow-md uppercase tracking-wider mt-2";
+                btnSalvar.innerText = "Salvar e Fechar o Dia";
+                btnSalvar.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-xl text-base shadow-md uppercase tracking-normal";
                 btnSalvar.disabled = false;
                 btnDetalhar.disabled = false;
+                if (avisoBotao) avisoBotao.classList.remove('hidden');
                 
                 ['faturamento', 'renda-extra', 'gasolina', 'guardado-valor'].forEach(id => {
                     document.getElementById(id).disabled = false;
@@ -578,7 +607,7 @@
                 document.getElementById('pessoal').value = rascunhoTotal > 0 ? rascunhoTotal : '';
             }
 
-            // ÚLTIMO REGISTRO
+            // ÚLTIMO REGISTRO (3 COLUNAS)
             const resumoContainer = document.getElementById('ultimo-resumo-container');
             if (dados.historico.length > 0) {
                 const ultimo = dados.historico[dados.historico.length - 1];
@@ -586,9 +615,14 @@
                 document.getElementById('last-date').innerText = `${ultimo.data}`;
                 const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
                 const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0);
+                const sdoDia = parseFloat(ultimo.saldoDia) !== undefined ? parseFloat(ultimo.saldoDia) : (ganhoTotal - despesaTotal);
 
                 document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
                 document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
+                
+                const sdoEl = document.getElementById('last-saldo-dia');
+                sdoEl.innerText = formatarMoeda(sdoDia);
+                sdoEl.className = `font-bold text-[11px] ${sdoDia >= 0 ? 'text-green-400' : 'text-red-400'}`;
             } else {
                 resumoContainer.classList.add('hidden');
             }
@@ -824,7 +858,19 @@
             atualizarUI();
         }
 
-        function salvarLancamento(event) {
+        /* FLUXO DE CONFIRMAÇÃO DO FECHAMENTO DO DIA */
+        function confirmarFechamentoDia(event) {
+            if (event) event.preventDefault();
+            document.getElementById('modal-confirmar-dia').classList.add('active');
+        }
+
+        function fecharModalConfirmarDia() {
+            document.getElementById('modal-confirmar-dia').classList.remove('active');
+        }
+
+        function executarSalvarDia() {
+            fecharModalConfirmarDia();
+
             const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
             const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
             const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
