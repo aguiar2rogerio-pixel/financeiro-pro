@@ -395,6 +395,7 @@
                     <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
                         <tr>
                             <th class="p-2.5">Data</th>
+                            <th class="p-2.5">Descrição</th>
                             <th class="p-2.5 text-right">Valor</th>
                         </tr>
                     </thead>
@@ -1038,26 +1039,36 @@
             let acumuloTotal = 0;
             
             if (propriedade === 'pessoal') {
-                let resumoPorDesc = {};
+                const resumoPorCategoria = {};
+                let totalCentavos = 0;
+
                 dados.historico.forEach(item => {
-                    if (item.detalheGastos) {
+                    if (item.detalheGastos && item.detalheGastos.length > 0) {
                         item.detalheGastos.forEach(g => {
-                            const cat = g.categoria || 'OUTRO';
-                            const descUpper = g.descricao.toUpperCase();
-                            const chave = `[${cat}] ${descUpper}`;
-                            resumoPorDesc[chave] = (resumoPorDesc[chave] || 0) + parseValor(g.valor);
-                            acumuloTotal += parseValor(g.valor);
+                            const categoria = (g.categoria || 'OUTRO').trim().toUpperCase();
+                            const valorCentavos = paraCentavos(g.valor);
+                            resumoPorCategoria[categoria] = (resumoPorCategoria[categoria] || 0) + valorCentavos;
+                            totalCentavos += valorCentavos;
                         });
+                    } else {
+                        // Compatibilidade com lançamentos antigos que não tinham planilha detalhada.
+                        const valorCentavos = paraCentavos(item.pessoal);
+                        if (valorCentavos > 0) {
+                            resumoPorCategoria.OUTRO = (resumoPorCategoria.OUTRO || 0) + valorCentavos;
+                            totalCentavos += valorCentavos;
+                        }
                     }
                 });
-                
-                Object.keys(resumoPorDesc).forEach(k => {
+
+                Object.keys(resumoPorCategoria).sort().forEach(categoria => {
                     const tr = document.createElement('tr');
-                    tr.className = 'border-t border-gray-800 text-xs linha-auditoria-clicavel';
-                    tr.onclick = () => abrirDetalheGastos(k);
-                    tr.innerHTML = `<td class="p-2.5 text-gray-300 uppercase">${k}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(resumoPorDesc[k])}</td>`;
+                    tr.className = 'border-t border-gray-800 text-xs linha-auditoria-clicavel cursor-pointer';
+                    tr.onclick = () => abrirDetalheGastosPorCategoria(categoria);
+                    tr.innerHTML = `<td class="p-2.5 text-gray-300 uppercase font-bold">${categoria}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(resumoPorCategoria[categoria] / 100)}</td>`;
                     tbodyEl.appendChild(tr);
                 });
+
+                acumuloTotal = totalCentavos / 100;
             } else {
                 dados.historico.forEach(item => {
                     const v = parseValor(item[propriedade]) || 0;
@@ -1076,35 +1087,47 @@
 
         function fecharSubjanelaAuditoria() { document.getElementById('subjanela-auditoria').classList.remove('active'); }
 
-        function abrirDetalheGastos(chaveComposta) {
-            document.getElementById('item-detalhe-selecionado').value = chaveComposta;
-            document.getElementById('detalhe-titulo').innerText = `Detalhes: ${chaveComposta}`;
-            
+        function abrirDetalheGastosPorCategoria(categoriaSelecionada) {
+            const categoriaNormalizada = (categoriaSelecionada || 'OUTRO').trim().toUpperCase();
+            document.getElementById('item-detalhe-selecionado').value = categoriaNormalizada;
+            document.getElementById('detalhe-titulo').innerText = `Detalhes: ${categoriaNormalizada}`;
+            document.getElementById('detalhe-subtitulo').innerText = 'Lançamentos individuais da categoria';
+
             const tbodyEl = document.getElementById('detalhe-gastos-body');
             tbodyEl.innerHTML = '';
-            let totalItem = 0;
-            
+            let totalCentavos = 0;
+
             dados.historico.forEach(item => {
-                if (item.detalheGastos) {
+                if (item.detalheGastos && item.detalheGastos.length > 0) {
                     item.detalheGastos.forEach(g => {
-                        const cat = g.categoria || 'OUTRO';
-                        const descUpper = g.descricao.toUpperCase();
-                        const chave = `[${cat}] ${descUpper}`;
-                        
-                        if (chave === chaveComposta || descUpper === chaveComposta.toUpperCase()) {
-                            totalItem += parseValor(g.valor);
+                        const categoria = (g.categoria || 'OUTRO').trim().toUpperCase();
+                        if (categoria === categoriaNormalizada) {
+                            const valorCentavos = paraCentavos(g.valor);
+                            totalCentavos += valorCentavos;
                             const tr = document.createElement('tr');
                             tr.className = 'border-t border-gray-800 text-xs';
-                            tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(g.valor)}</td>`;
+                            tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-gray-300 uppercase">${g.descricao}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(valorCentavos / 100)}</td>`;
                             tbodyEl.appendChild(tr);
                         }
                     });
+                } else if (categoriaNormalizada === 'OUTRO' && paraCentavos(item.pessoal) > 0) {
+                    const valorCentavos = paraCentavos(item.pessoal);
+                    totalCentavos += valorCentavos;
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-t border-gray-800 text-xs';
+                    tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-gray-300 uppercase">Lançamento antigo</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(valorCentavos / 100)}</td>`;
+                    tbodyEl.appendChild(tr);
                 }
             });
-            
-            document.getElementById('detalhe-total-acumulado').innerText = formatarMoeda(totalItem);
+
+            document.getElementById('detalhe-total-acumulado').innerText = formatarMoeda(totalCentavos / 100);
             document.getElementById('subjanela-auditoria').classList.remove('active');
             document.getElementById('modal-detalhe-gastos').classList.add('active');
+        }
+
+        // Compatibilidade com chamadas antigas que ainda possam existir em dados ou interface.
+        function abrirDetalheGastos(categoria) {
+            abrirDetalheGastosPorCategoria(categoria);
         }
 
         function fecharDetalheGastos() { document.getElementById('modal-detalhe-gastos').classList.remove('active'); }
