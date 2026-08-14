@@ -230,7 +230,7 @@
             <div onclick="auditarCategoria('faturamento', 'Faturamento')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Faturamento</span><span id="total-faturamento" class="font-bold text-green-400">R$ 0,00</span></div>
             <div onclick="auditarCategoria('rendaExtra', 'Renda Extra')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Renda Extra</span><span id="total-renda-extra" class="font-bold text-green-400">R$ 0,00</span></div>
             <div onclick="auditarCategoria('gasolina', 'Combustível')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Combustível</span><span id="total-gasolina" class="font-bold text-red-400">R$ 0,00</span></div>
-            <div onclick="auditarCategoria('guardadoLiquido', 'Dinheiro Reservado')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Dinheiro Reservado</span><span id="total-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+            <div onclick="auditarCategoria('guardado', 'Dinheiro Reservado')" class="bg-gray-800 p-2 rounded-xl cursor-pointer"><span class="block text-[9px] text-white font-bold uppercase">Dinheiro Reservado</span><span id="total-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
             <div onclick="auditarCategoria('pessoal', 'Despesas')" class="bg-gray-800 p-2 rounded-xl cursor-pointer col-span-2"><span class="block text-[9px] text-white font-bold uppercase">Despesas</span><span id="total-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
         </div>
         <button onclick="abrirFecharMes()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider">
@@ -356,6 +356,91 @@
         </div>
     </div>
 
+    <!-- CONFERÊNCIA -->
+    <div id="subjanela-auditoria" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="auditoria-titulo" class="text-sm font-bold uppercase tracking-wider text-yellow-500">Conferência</h3>
+                    <p id="auditoria-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5"></p>
+                </div>
+                <button onclick="fecharSubjanelaAuditoria()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead id="auditoria-head" class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0"></thead>
+                    <tbody id="lista-auditoria-body"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
+                <span class="text-white uppercase text-xs">Total:</span>
+                <span id="auditoria-total-acumulado">R$ 0,00</span>
+            </div>
+            <button onclick="fecharSubjanelaAuditoria()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
+        </div>
+    </div>
+
+    <!-- DETALHES DO ITEM DE DESPESAS -->
+    <div id="modal-detalhe-gastos" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="detalhe-titulo" class="text-sm font-bold uppercase tracking-wider text-red-400">Detalhes</h3>
+                    <p id="detalhe-subtitulo" class="text-[9px] text-gray-400 uppercase mt-0.5">Lançamentos individuais</p>
+                </div>
+                <button onclick="fecharDetalheGastos()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-60 overflow-y-auto border border-gray-800 rounded-xl bg-gray-950">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-800 text-[10px] font-bold text-white uppercase border-b border-gray-700 sticky top-0">
+                        <tr>
+                            <th class="p-2.5">Data</th>
+                            <th class="p-2.5 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalhe-gastos-body"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold text-sm">
+                <span class="text-white uppercase text-xs">Total do Item:</span>
+                <span id="detalhe-total-acumulado" class="text-red-400">R$ 0,00</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="voltarParaAuditoria()" class="bg-blue-700 hover:bg-blue-600 text-white font-bold py-3 rounded-xl text-xs uppercase">⬅️ Voltar</button>
+                <button onclick="fecharDetalheGastos()" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESUMO DO MÊS ARQUIVADO -->
+    <div id="subjanela-mes-aquivado" class="modal-overlay">
+        <div class="modal-content space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <div>
+                    <h3 id="mes-arq-titulo" class="text-sm font-bold uppercase tracking-wider text-blue-400">Resumo Fechado</h3>
+                    <p class="text-[9px] text-gray-400 uppercase mt-0.5">Balanço Consolidado do Período</p>
+                </div>
+                <button onclick="fecharSubjanelaMesArquivado()" class="text-gray-400 text-lg font-bold">✕</button>
+            </div>
+            <div class="space-y-1 text-xs bg-gray-950 border border-gray-800 p-3 rounded-xl">
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Faturamento:</span><span id="mes-arq-fat" class="font-bold text-green-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Renda Extra:</span><span id="mes-arq-renda" class="font-bold text-green-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Combustível:</span><span id="mes-arq-gas" class="font-bold text-red-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Dinheiro Reservado:</span><span id="mes-arq-guardado" class="font-bold text-emerald-400">R$ 0,00</span></div>
+                <div class="flex justify-between py-1"><span class="text-gray-400">Despesas Totais:</span><span id="mes-arq-pessoal" class="font-bold text-red-400">R$ 0,00</span></div>
+            </div>
+            <div class="space-y-1">
+                <span class="block text-[10px] uppercase font-bold text-gray-400 ml-1">Descritivo Completo de Despesas:</span>
+                <div class="max-h-32 overflow-y-auto border border-gray-800 bg-gray-950 p-2 rounded-xl text-[11px] space-y-1 text-gray-300" id="mes-arq-descritivo-container"></div>
+            </div>
+            <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl font-bold border border-gray-700 text-sm">
+                <span class="text-white uppercase text-xs">Fundo Líquido Final:</span>
+                <span id="mes-arq-saldo-final" class="text-blue-400">R$ 0,00</span>
+            </div>
+            <button onclick="fecharSubjanelaMesArquivado()" class="w-full bg-gray-700 text-gray-300 font-bold py-3 rounded-xl text-xs uppercase">Voltar</button>
+        </div>
+    </div>
+
     <!-- MODAL EDIÇÃO -->
     <div id="modal-edicao" class="modal-overlay">
         <div class="modal-content space-y-3">
@@ -456,8 +541,31 @@
         let itensGastosTemporarios = JSON.parse(localStorage.getItem('rascunho_gastos_dia')) || [];
         let lancamentoEmEdicao = null;
 
+        function parseValor(valor) {
+            if (typeof valor === 'number') return Number.isFinite(valor) ? valor : 0;
+            let texto = String(valor ?? '').trim().replace(/\s/g, '').replace(/^R\$\s*/i, '');
+            if (!texto) return 0;
+            if (texto.includes(',') && texto.includes('.')) {
+                texto = texto.lastIndexOf(',') > texto.lastIndexOf('.')
+                    ? texto.replace(/\./g, '').replace(',', '.')
+                    : texto.replace(/,/g, '');
+            } else if (texto.includes(',')) {
+                texto = texto.replace(',', '.');
+            }
+            const numero = Number(texto);
+            return Number.isFinite(numero) ? numero : 0;
+        }
+
+        function paraCentavos(valor) {
+            return Math.round(parseValor(valor) * 100);
+        }
+
+        function totalItensEmCentavos(itens) {
+            return (itens || []).reduce((total, item) => total + paraCentavos(item.valor), 0);
+        }
+
         function formatarMoeda(valor) {
-            return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            return parseValor(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
         function obtenerDataHoje() {
@@ -503,6 +611,7 @@
                 btnSalvar.innerText = `⚠️ ${hoje.substring(0,5)} JÁ LANÇADO`;
                 btnSalvar.className = "w-full bg-yellow-600 text-white font-bold py-3.5 rounded-xl text-sm uppercase tracking-normal cursor-not-allowed";
                 btnSalvar.disabled = true;
+                btnDetalhar.disabled = true;
                 if (avisoBotao) avisoBotao.classList.add('hidden');
                 
                 ['faturamento', 'renda-extra', 'gasolina', 'guardado-valor'].forEach(id => {
@@ -549,15 +658,15 @@
             let totalSaidas = 0;
 
             dados.historico.forEach(item => {
-                totalEntradas += (parseFloat(item.faturamento) || 0) + (parseFloat(item.rendaExtra) || 0);
-                totalSaidas += (parseFloat(item.gasolina) || 0) + (parseFloat(item.pessoal) || 0);
+                totalEntradas += (parseValor(item.faturamento) || 0) + (parseValor(item.rendaExtra) || 0);
+                totalSaidas += (parseValor(item.gasolina) || 0) + (parseValor(item.pessoal) || 0);
             });
 
             dados.mesesAnteriores.forEach(mes => {
-                totalEntradas += (parseFloat(mes.faturamentoTotal) || 0) + (parseFloat(mes.rendaExtraTotal) || 0);
+                totalEntradas += (parseValor(mes.faturamentoTotal) || 0) + (parseValor(mes.rendaExtraTotal) || 0);
                 if (mes.historico) {
                     mes.historico.forEach(h => {
-                        totalSaidas += (parseFloat(h.gasolina) || 0) + (parseFloat(h.pessoal) || 0);
+                        totalSaidas += (parseValor(h.gasolina) || 0) + (parseValor(h.pessoal) || 0);
                     });
                 }
             });
@@ -565,12 +674,12 @@
             // Dinheiro Guardado (Aportes e Resgates)
             let totalDinheiroGuardado = 0;
             dados.historico.forEach(item => { 
-                totalDinheiroGuardado += (parseFloat(item.guardado) || 0); 
+                totalDinheiroGuardado += (parseValor(item.guardado) || 0); 
             });
             dados.mesesAnteriores.forEach(mes => {
                 if (mes.historico) {
                     mes.historico.forEach(h => { 
-                        totalDinheiroGuardado += (parseFloat(h.guardado) || 0); 
+                        totalDinheiroGuardado += (parseValor(h.guardado) || 0); 
                     });
                 }
             });
@@ -588,11 +697,11 @@
             // Balanço Período
             let totalFat = 0, totalRenda = 0, totalGas = 0, totalPes = 0, totalGua = 0;
             dados.historico.forEach(item => {
-                totalFat += parseFloat(item.faturamento) || 0;
-                totalRenda += parseFloat(item.rendaExtra) || 0;
-                totalGas += parseFloat(item.gasolina) || 0;
-                totalPes += parseFloat(item.pessoal) || 0;
-                totalGua += parseFloat(item.guardado) || 0;
+                totalFat += parseValor(item.faturamento) || 0;
+                totalRenda += parseValor(item.rendaExtra) || 0;
+                totalGas += parseValor(item.gasolina) || 0;
+                totalPes += parseValor(item.pessoal) || 0;
+                totalGua += parseValor(item.guardado) || 0;
             });
 
             document.getElementById('total-faturamento').innerText = formatarMoeda(totalFat);
@@ -602,9 +711,8 @@
             document.getElementById('total-guardado').innerText = formatarMoeda(totalGua);
 
             if (lancamentoEmEdicao === null) {
-                let rascunhoTotal = 0;
-                itensGastosTemporarios.forEach(i => rascunhoTotal += i.valor);
-                document.getElementById('pessoal').value = rascunhoTotal > 0 ? rascunhoTotal : '';
+                const rascunhoTotalCentavos = totalItensEmCentavos(itensGastosTemporarios);
+                document.getElementById('pessoal').value = rascunhoTotalCentavos > 0 ? (rascunhoTotalCentavos / 100).toFixed(2) : '';
             }
 
             // ÚLTIMO REGISTRO (3 COLUNAS)
@@ -613,9 +721,10 @@
                 const ultimo = dados.historico[dados.historico.length - 1];
                 resumoContainer.classList.remove('hidden');
                 document.getElementById('last-date').innerText = `${ultimo.data}`;
-                const ganhoTotal = (parseFloat(ultimo.faturamento) || 0) + (parseFloat(ultimo.rendaExtra) || 0);
-                const despesaTotal = (parseFloat(ultimo.gasolina) || 0) + (parseFloat(ultimo.pessoal) || 0);
-                const sdoDia = parseFloat(ultimo.saldoDia) !== undefined ? parseFloat(ultimo.saldoDia) : (ganhoTotal - despesaTotal);
+                const ganhoTotal = (parseValor(ultimo.faturamento) || 0) + (parseValor(ultimo.rendaExtra) || 0);
+                const despesaTotal = (parseValor(ultimo.gasolina) || 0) + (parseValor(ultimo.pessoal) || 0);
+                const saldoDiaNumerico = ultimo.saldoDia !== undefined && ultimo.saldoDia !== null && ultimo.saldoDia !== '' ? parseValor(ultimo.saldoDia) : null;
+                const sdoDia = saldoDiaNumerico !== null ? saldoDiaNumerico : (ganhoTotal - despesaTotal);
 
                 document.getElementById('last-ganho').innerText = formatarMoeda(ganhoTotal);
                 document.getElementById('last-gastos').innerText = formatarMoeda(despesaTotal);
@@ -637,7 +746,7 @@
                     const idxReal = dados.historico.length - 1 - index;
                     const tr = document.createElement('tr');
                     tr.className = 'border-t border-gray-800 text-xs';
-                    const sDia = parseFloat(item.saldoDia) || 0;
+                    const sDia = parseValor(item.saldoDia) || 0;
                     const indPlanilha = (item.detalheGastos && item.detalheGastos.length > 0) ? `<span class="block text-[9px] text-red-500 font-black uppercase mt-0.5">📋 DETALHADO</span>` : '';
                     tr.innerHTML = `
                         <td class="p-3 text-white font-black">${item.data}${indPlanilha}</td>
@@ -688,7 +797,7 @@
         }
 
         function confirmarResgate() {
-            const valor = parseFloat(document.getElementById('valor-resgate-input').value) || 0;
+            const valor = parseValor(document.getElementById('valor-resgate-input').value) || 0;
             if (valor <= 0) {
                 alert('Digite um valor válido para resgate.');
                 return;
@@ -731,6 +840,13 @@
                 };
                 container.appendChild(span);
             });
+        }
+
+        function salvarRascunhoGastos() {
+            const contexto = document.getElementById('modo-planilha-contexto').value;
+            if (contexto !== 'ajuste') {
+                localStorage.setItem('rascunho_gastos_dia', JSON.stringify(itensGastosTemporarios));
+            }
         }
 
         function abrirSubjanelaGastos() {
@@ -787,14 +903,15 @@
             }
 
             const descricao = descEl.value.trim().toUpperCase();
-            const valor = parseFloat(valEl.value) || 0;
+            const valorCentavos = paraCentavos(valEl.value);
 
-            if (!descricao || valor <= 0) {
+            if (!descricao || valorCentavos <= 0) {
                 alert('Insira descrição e valor.');
                 return;
             }
 
-            itensGastosTemporarios.push({ categoria, descricao, valor });
+            itensGastosTemporarios.push({ categoria, descricao, valor: valorCentavos / 100 });
+            salvarRascunhoGastos();
             
             carregarOpcoesCategorias();
             selectCat.value = categoria;
@@ -808,15 +925,15 @@
 
         function removerItemDaLista(index) {
             itensGastosTemporarios.splice(index, 1);
+            salvarRascunhoGastos();
             renderizarListaSubjanela();
         }
 
         function renderizarListaSubjanela() {
             const tBody = document.getElementById('lista-gastos-correntes-body');
             tBody.innerHTML = '';
-            let total = 0;
+            const totalCentavos = totalItensEmCentavos(itensGastosTemporarios);
             itensGastosTemporarios.forEach((item, index) => {
-                total += item.valor;
                 const tr = document.createElement('tr');
                 tr.className = 'border-t border-gray-800 text-xs';
                 tr.innerHTML = `
@@ -827,32 +944,39 @@
                 `;
                 tBody.appendChild(tr);
             });
-            document.getElementById('subjanela-total-acumulado').innerText = formatarMoeda(total);
+            document.getElementById('subjanela-total-acumulado').innerText = formatarMoeda(totalCentavos / 100);
         }
 
         function salvarSubjanelaGastos() {
-            let totalCalculado = 0;
+            const totalCentavos = totalItensEmCentavos(itensGastosTemporarios);
+            const totalCalculado = totalCentavos / 100;
+            const contexto = document.getElementById('modo-planilha-contexto').value;
+
             itensGastosTemporarios.forEach(i => {
-                totalCalculado += i.valor;
                 if (dados.sugestoesGastos && !dados.sugestoesGastos.includes(i.descricao)) {
                     dados.sugestoesGastos.push(i.descricao);
                 }
             });
-            
-            localStorage.setItem('financeiro_pro', JSON.stringify(dados));
 
-            const contexto = document.getElementById('modo-planilha-contexto').value;
-            if (contexto === "ajuste") {
-                document.getElementById('edit-pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '0';
+            if (contexto === 'ajuste') {
+                document.getElementById('edit-pessoal').value = totalCalculado.toFixed(2);
                 if (lancamentoEmEdicao !== null && dados.historico[lancamentoEmEdicao]) {
-                    dados.historico[lancamentoEmEdicao].detalheGastos = [...itensGastosTemporarios];
+                    dados.historico[lancamentoEmEdicao].detalheGastos = itensGastosTemporarios.map(item => ({ ...item }));
                     dados.historico[lancamentoEmEdicao].pessoal = totalCalculado;
+                    dados.historico[lancamentoEmEdicao].saldoDia = (
+                        parseValor(dados.historico[lancamentoEmEdicao].faturamento) +
+                        parseValor(dados.historico[lancamentoEmEdicao].rendaExtra) -
+                        parseValor(dados.historico[lancamentoEmEdicao].gasolina) -
+                        totalCalculado
+                    );
                 }
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 document.getElementById('subjanela-gastos').classList.remove('active');
                 document.getElementById('modal-edicao').classList.add('active');
             } else {
-                document.getElementById('pessoal').value = totalCalculado > 0 ? totalCalculado.toFixed(2) : '';
+                document.getElementById('pessoal').value = totalCentavos > 0 ? totalCalculado.toFixed(2) : '';
                 localStorage.setItem('rascunho_gastos_dia', JSON.stringify(itensGastosTemporarios));
+                localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 document.getElementById('subjanela-gastos').classList.remove('active');
             }
             atualizarUI();
@@ -871,11 +995,11 @@
         function executarSalvarDia() {
             fecharModalConfirmarDia();
 
-            const faturamento = parseFloat(document.getElementById('faturamento').value) || 0;
-            const rendaExtra = parseFloat(document.getElementById('renda-extra').value) || 0;
-            const gasolina = parseFloat(document.getElementById('gasolina').value) || 0;
-            const pessoal = parseFloat(document.getElementById('pessoal').value) || 0;
-            const guardado = parseFloat(document.getElementById('guardado-valor').value) || 0;
+            const faturamento = parseValor(document.getElementById('faturamento').value) || 0;
+            const rendaExtra = parseValor(document.getElementById('renda-extra').value) || 0;
+            const gasolina = parseValor(document.getElementById('gasolina').value) || 0;
+            const pessoal = parseValor(document.getElementById('pessoal').value) || 0;
+            const guardado = parseValor(document.getElementById('guardado-valor').value) || 0;
 
             const saldoDia = (faturamento + rendaExtra) - gasolina - pessoal;
 
@@ -921,8 +1045,8 @@
                             const cat = g.categoria || 'OUTRO';
                             const descUpper = g.descricao.toUpperCase();
                             const chave = `[${cat}] ${descUpper}`;
-                            resumoPorDesc[chave] = (resumoPorDesc[chave] || 0) + parseFloat(g.valor);
-                            acumuloTotal += parseFloat(g.valor);
+                            resumoPorDesc[chave] = (resumoPorDesc[chave] || 0) + parseValor(g.valor);
+                            acumuloTotal += parseValor(g.valor);
                         });
                     }
                 });
@@ -936,7 +1060,7 @@
                 });
             } else {
                 dados.historico.forEach(item => {
-                    const v = parseFloat(item[propriedade]) || 0;
+                    const v = parseValor(item[propriedade]) || 0;
                     if (v !== 0) {
                         acumuloTotal += v;
                         const tr = document.createElement('tr');
@@ -968,7 +1092,7 @@
                         const chave = `[${cat}] ${descUpper}`;
                         
                         if (chave === chaveComposta || descUpper === chaveComposta.toUpperCase()) {
-                            totalItem += parseFloat(g.valor);
+                            totalItem += parseValor(g.valor);
                             const tr = document.createElement('tr');
                             tr.className = 'border-t border-gray-800 text-xs';
                             tr.innerHTML = `<td class="p-2.5 text-gray-300">${item.data}</td><td class="p-2.5 text-right font-bold text-red-400">${formatarMoeda(g.valor)}</td>`;
@@ -1016,18 +1140,18 @@
             let descritivoCompilado = {};
 
             dados.historico.forEach(item => {
-                fat += parseFloat(item.faturamento) || 0;
-                renda += parseFloat(item.rendaExtra) || 0;
-                gas += parseFloat(item.gasolina) || 0;
-                pes += parseFloat(item.pessoal) || 0;
-                gua += parseFloat(item.guardado) || 0;
+                fat += parseValor(item.faturamento) || 0;
+                renda += parseValor(item.rendaExtra) || 0;
+                gas += parseValor(item.gasolina) || 0;
+                pes += parseValor(item.pessoal) || 0;
+                gua += parseValor(item.guardado) || 0;
 
                 if (item.detalheGastos) {
                     item.detalheGastos.forEach(g => {
                         const cat = g.categoria || 'OUTRO';
                         const dUpper = g.descricao.toUpperCase();
                         const chave = `[${cat}] ${dUpper}`;
-                        descritivoCompilado[chave] = (descritivoCompilado[chave] || 0) + parseFloat(g.valor);
+                        descritivoCompilado[chave] = (descritivoCompilado[chave] || 0) + parseValor(g.valor);
                     });
                 }
             });
@@ -1066,8 +1190,8 @@
             let gas = 0, gua = 0;
             if (mes.historico) {
                 mes.historico.forEach(h => {
-                    gas += parseFloat(h.gasolina) || 0;
-                    gua += parseFloat(h.guardado) || 0;
+                    gas += parseValor(h.gasolina) || 0;
+                    gua += parseValor(h.guardado) || 0;
                 });
             }
 
@@ -1123,11 +1247,11 @@
         function salvarEdicao() {
             if (lancamentoEmEdicao === null) return;
             const item = dados.historico[lancamentoEmEdicao];
-            item.faturamento = parseFloat(document.getElementById('edit-faturamento').value) || 0;
-            item.rendaExtra = parseFloat(document.getElementById('edit-renda-extra').value) || 0;
-            item.gasolina = parseFloat(document.getElementById('edit-gasolina').value) || 0;
-            item.pessoal = parseFloat(document.getElementById('edit-pessoal').value) || 0;
-            item.guardado = parseFloat(document.getElementById('edit-guardado').value) || 0;
+            item.faturamento = parseValor(document.getElementById('edit-faturamento').value) || 0;
+            item.rendaExtra = parseValor(document.getElementById('edit-renda-extra').value) || 0;
+            item.gasolina = parseValor(document.getElementById('edit-gasolina').value) || 0;
+            item.pessoal = parseValor(document.getElementById('edit-pessoal').value) || 0;
+            item.guardado = parseValor(document.getElementById('edit-guardado').value) || 0;
             
             item.saldoDia = (item.faturamento + item.rendaExtra) - item.gasolina - item.pessoal;
             
@@ -1154,6 +1278,9 @@
         function limparDados() {
             if (confirm('Zerar o aplicativo inteiro?')) {
                 dados = { saldoAcumulado: 0, historico: [], mesesAnteriores: [], sugestoesGastos: [], categoriasCustomizadas: [...CATEGORIAS_PADRAO] };
+                itensGastosTemporarios = [];
+                localStorage.removeItem('rascunho_gastos_dia');
+                localStorage.removeItem('rascunho_campos_dia');
                 localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                 atualizarUI();
             }
@@ -1184,6 +1311,9 @@
                         if (!dados.categoriasCustomizadas) {
                             dados.categoriasCustomizadas = [...CATEGORIAS_PADRAO];
                         }
+                        itensGastosTemporarios = [];
+                        localStorage.removeItem('rascunho_gastos_dia');
+                        localStorage.removeItem('rascunho_campos_dia');
                         localStorage.setItem('financeiro_pro', JSON.stringify(dados));
                         atualizarUI();
                         alert('Backup restaurado com sucesso!');

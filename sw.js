@@ -1,4 +1,4 @@
-const CACHE_NAME = 'financeiro-pro-v1.1'; // Mude a versão sempre que atualizar o código
+const CACHE_NAME = 'financeiro-pro-v1.2'; // Incremente a versão a cada publicação
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -7,32 +7,27 @@ const ASSETS = [
   'https://cdn.tailwindcss.com'
 ];
 
-// Instalação: Salva arquivos no cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting(); // Força a ativação imediata
+  self.skipWaiting();
 });
 
-// Ativação: Limpa caches antigos e assume o controle
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('Removendo cache antigo:', cache);
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
+    caches.keys().then((cacheNames) => Promise.all(
+      cacheNames.map((cache) => {
+        if (cache !== CACHE_NAME) {
+          return caches.delete(cache);
+        }
+        return undefined;
+      })
+    ))
   );
-  self.clients.claim(); // Assume o controle das abas abertas imediatamente
+  self.clients.claim();
 });
 
-// Busca: Estratégia Stale-While-Revalidate (Cache primeiro, atualiza em background)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -44,9 +39,7 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Falha de rede silenciosa
-      });
+      }).catch(() => undefined);
 
       return cachedResponse || fetchPromise;
     })
