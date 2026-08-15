@@ -919,6 +919,9 @@
             inputNovaCat.value = '';
             inputNovaCat.classList.add('hidden');
 
+            // Limpa somente os campos do próximo lançamento; os itens já adicionados permanecem na lista.
+            descEl.value = '';
+            valEl.value = '';
             renderizarBaloesDinamicos();
             renderizarListaSubjanela();
             descEl.focus();
