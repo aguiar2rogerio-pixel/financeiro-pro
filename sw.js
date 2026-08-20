@@ -1,4 +1,4 @@
-const CACHE_NAME = 'financeiro-pro-v1.5'; // Incremente a versão a cada publicação
+const CACHE_NAME = 'financeiro-pro-v1.6'; // Incremente a versão a cada publicação
 const ASSETS = [
   './index.html',
   './style.css',
